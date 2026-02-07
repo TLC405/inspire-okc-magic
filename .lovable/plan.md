@@ -1,138 +1,121 @@
 
 
-# INSPIRE OKC — Complete Premium Rebuild
+# INSPIRE OKC — Brutalist Warmth Rebuild
 
-## What's Changing
+## The Problem Right Now
 
-The current site looks like a template — generic editorial patterns, fake podcast episodes, fake blog posts, fake events, gradient placeholders, and a hollow hero. This rebuild strips all of that out and replaces it with a genuine, high-craft product that works beautifully with zero data. i ondt want podcasts. i want Coach TLC, WORKOUT OKC, InPerson OKC, My apps a place for me to put all of my apps orgahnized intoa p lace i can alwyas upgrade them. Singles OKC to find real signels events with web and social media full csraping and advacned, in workout okc it is all things fitness in okc and metro. inperson is ilke meetup or evntbrite. Men-Talk OKC. I also want you to look at all the repos in my prfile just to stroe the names for putting aaps form there int o my app for the new updates.
+The site has controlling, preachy language ("stop scrolling", "start showing up", "ready to show up?", "apply now"). It feels like a brand lecturing people. The programs are mislabeled as things you "join" or "apply to" — they're actually directories and finders. Men-Talk OKC is missing entirely. There's no sense of what INSPIRE OKC actually is or why it exists. The design is still too safe and template-like.
+
+## Core Identity Shift
+
+INSPIRE OKC is rooted in **loneliness psychology** — the idea that disconnection is the real crisis, and the antidote is simply making it easier for people to find each other and do things together. It's not a club. It's not an organization you apply to. It's a set of tools and directories that help people in Oklahoma City find:
+
+- **Singles events** happening around OKC (Singles OKC)
+- **Fitness and exercise** opportunities — gyms, runs, classes, outdoor workouts (Workout OKC)
+- **Volunteering** opportunities and places to give back (Volunteering OKC)
+- **Personal coaching** and development (Coach TLC)
+- **Men's conversations** about real life (Men-Talk OKC)
+
+**Tagline direction**: Community. Connection. Health. — grounded in the psychology of belonging.
 
 ---
 
-## 1. Hero Section with Your Image
+## 1. Tone & Language Overhaul (Every Page)
 
-- Use the uploaded INSPIRE Oklahoma City photo as the hero background image (copied to `src/assets/`)
-- Full-viewport hero with a dark overlay for text legibility
-- No gradients — solid dark overlay with opacity
-- Clean, bold typography: "INSPIRE" + "Oklahoma City" in Inter (not Playfair — dropping the serif font entirely per your design law)
-- Single accent-colored CTA button with firm corners
-- Subtle downward scroll indicator (simple chevron, no bounce animation)
+Remove ALL commanding/controlling copy:
+- "Stop scrolling" -- gone
+- "Start showing up" -- gone
+- "Get out & do something" -- gone
+- "Ready to show up?" -- gone
+- "Apply Now" / "Join" buttons -- gone (there is no application)
+- "Pick what fits. Show up. That's it." -- gone
 
-## 2. Typography & Design System Overhaul
+Replace with warm, human, psychology-informed language:
+- Hero tagline: "Community. Connection. Health." with a subtitle about loneliness and belonging
+- Program descriptions explain what each tool helps you **find**, not what you should do
+- CTA buttons say "Explore" or "Browse" or "Find Events" — not "Apply" or "Join"
 
-- **Font**: Switch entirely to Inter (remove Playfair Display). One typeface, multiple weights
-- **No gradients, no glass, no neon** anywhere in the codebase
-- **Backgrounds**: Solid near-black (`#0a0a0a`) or solid off-white (`#fafafa`) only
-- **Depth**: Borders, subtle box-shadows, spacing rhythm — no decorative flourishes
-- **Accent**: Keep the single orange accent (`hsl(24, 80%, 50%)`)
-- **Buttons**: Firm corners (2px radius max), subtle shadow, no rounded-none (use small radius for tactile feel)
-- **Motion**: Reduce all animations to 150-250ms. Remove the staggered scroll reveal delays. Keep it crisp
+## 2. Add Men-Talk OKC (Missing Program)
 
-## 3. Remove All Fake Data
+Add as the 5th program everywhere:
+- **Men-Talk OKC** — tag: "Conversation" — icon: `MessageCircle` or `Users`
+- Description: A space for men to have real conversations about life, purpose, and growth
+- Added to: Community page grid, homepage CommunitySection, Footer, navbar if needed
 
-Every section currently has hardcoded mock content. All of it gets removed:
+## 3. About / Origin Section
 
-- **Events section**: Replace 3 fake events with a designed empty state: icon + "No upcoming events" + "Check back soon" message
-- **Podcast section**: Replace 8 fake episodes with empty state: headphones icon + "Episodes coming soon" + link to apply
-- **Blog section**: Replace 3 fake posts with empty state: "No stories yet" + clean placeholder
-- **Community section on homepage**: Keep the 4 program cards (these are real structural content, not fake data)
-- **Story page**: Remove the fabricated origin story paragraphs and fake quote. Replace with a minimal "Our story is being written" state or just the structural heading with space for real content to be added later
-- **Podcast page**: Remove all 8 fake episodes. Show empty episode list with designed empty state
+Add a section (on homepage or Story page) that explains what INSPIRE OKC is:
+- Born from the loneliness epidemic — backed by real psychology
+- Built in Oklahoma City, for Oklahoma City
+- Not a club, not a brand — a set of community tools
+- Structural copy only (no fabricated founding story)
 
-## 4. Rename Programs to Real Names
+## 4. Design Push: More Brutalist
 
-Update everywhere programs appear (Community page, homepage CommunitySection, Apply page dropdown, Footer):
+Current design is clean but safe. Push it harder:
+- **Larger, bolder typography** — headline sizes pushed to extremes (9xl+), tighter letter-spacing
+- **Raw borders** — thicker 2px borders on cards and sections, harsh grid lines
+- **Monochrome dominance** — less accent color, more black/white contrast
+- **Asymmetric layouts** — break the centered-everything pattern; left-aligned hero content, offset grids
+- **Dense information panels** — program cards feel like data panels, not marketing cards
+- **No rounded corners on major elements** — square edges for brutalist feel (keep 2px on small inputs only)
+- **Horizontal rules and dividers** as structural elements
+- **All-caps labels used more aggressively** throughout
 
-| Old Name | New Name | Tag |
-|---|---|---|
-| Adulting 101 | Volunteering OKC | Service |
-| Singles Connect | Singles OKC | Community |
-| Movement & Wellness | Workout OKC | Fitness |
-| Self-Mastery | Coach TLC | Development |
+## 5. Remove Apply Page & All "Apply" References
 
-Update icons accordingly:
-- Volunteering OKC: `HandHeart` or `Users`
-- Singles OKC: `Heart`
-- Workout OKC: `Dumbbell`
-- Coach TLC: `Target` or `Brain`
+- Remove `/apply` route from `App.tsx`
+- Remove Apply from navbar links
+- Remove Apply from footer links
+- Remove all "Apply Now" buttons across every page
+- Replace CTA sections with "Explore Programs" or links to individual program directories
 
-## 5. Page-by-Page Changes
+## 6. Restructure Programs as Directories/Finders
 
-### Homepage (`Index.tsx`)
-- Hero: full-bleed image background with dark overlay, Inter typography, single CTA
-- Events: empty state (no fake events)
-- Podcast: empty state (no fake episodes)
-- Community: 4 real program cards with updated names
-- Blog: empty state (no fake posts)
-- CTA: keep but simplify — solid black section, white text, one button
+Each program card should communicate that it's a **finder/directory**, not a group to join:
+- **Volunteering OKC**: "Find volunteer opportunities and places to give back across Oklahoma City"
+- **Singles OKC**: "Discover singles events, meetups, and social gatherings in OKC"
+- **Workout OKC**: "All things fitness — gyms, runs, classes, outdoor workouts in OKC and metro"
+- **Coach TLC**: "Connect with personal coaching, mindset work, and growth resources"
+- **Men-Talk OKC**: "Real conversations for men about life, growth, and purpose"
 
-### Story Page
-- Remove all fabricated paragraphs and fake quote
-- Keep the page header structure
-- Show a minimal, intentional state: just the heading + a single line like the tagline, with space for real content
+Buttons say "Browse" or "Explore" — not "Join" or "Apply"
 
-### Podcast Page
-- Remove all 8 fake episodes
-- Show designed empty state with headphones icon, title, and description
+## 7. Homepage Restructure
 
-### Community Page
-- Update all 4 programs to real names
-- Remove fake feature bullet points (those are fabricated content)
-- Keep program descriptions but make them structural/minimal (not fabricated stories)
+```
+Hero (full-viewport, your OKC photo, brutalist typography)
+  |
+About INSPIRE (what it is, psychology of connection)
+  |
+Programs Grid (5 programs as directory cards)
+  |
+CTA (warm, inviting — "Find your people" not "Apply now")
+  |
+Footer
+```
 
-### Apply Page
-- Update program dropdown to real names: Volunteering OKC, Singles OKC, Workout OKC, Coach TLC
-- Keep form structure, it's functional
+Remove: EventsSection, PodcastSection, BlogSection empty states — they add nothing right now. The homepage should be tight: hero, about, programs, footer.
 
-### Info Page
-- Keep FAQ structure but note these are structural content, not fabricated user data
-- Keep contact info section
-
-### NotFound Page
-- Keep as-is, it's clean
-
-## 6. Navigation & Footer
-
-### Navbar
-- Switch to Inter font
-- Remove `font-serif` references
-- Keep the scroll-linked background change but ensure it uses solid backgrounds only (no `backdrop-blur` — that's glassmorphism)
-
-### Footer
-- Update program names in footer links
-- Remove `backdrop-blur` if present
-- Solid black background, clean link columns
-
-## 7. CSS & Tailwind Cleanup
-
-- Remove Playfair Display from Google Fonts import
-- Remove `font-serif` from tailwind config (or keep but don't use)
-- Remove `.drop-cap` styles (editorial flourish)
-- Remove `.editorial-heading` serif dependency — switch to Inter bold
-- Remove `bg-gradient-to-br` from BlogSection placeholders
-- Remove `backdrop-blur-xl` from Navbar and mobile drawer — use solid backgrounds
-- Ensure all `rounded-none` buttons get `rounded-sm` (2px) for tactile feel
-- Reduce animation durations: ScrollReveal from 700ms to 200ms
-
-## 8. Files Modified
+## 8. Files Changed
 
 | File | Change |
 |---|---|
-| `src/index.css` | Remove Playfair font import, update base styles, remove drop-cap, remove serif heading rules |
-| `tailwind.config.ts` | Update font family to Inter-only, simplify animation durations |
-| `src/assets/hero-bg.jpg` | Copy uploaded image here |
-| `src/components/home/HeroSection.tsx` | Full rewrite — image background, Inter typography, no grain overlay |
-| `src/components/home/EventsSection.tsx` | Replace fake events with designed empty state |
-| `src/components/home/PodcastSection.tsx` | Replace fake episodes with designed empty state |
-| `src/components/home/BlogSection.tsx` | Replace fake posts with designed empty state |
-| `src/components/home/CommunitySection.tsx` | Update program names, remove fake descriptions |
-| `src/components/Navbar.tsx` | Remove backdrop-blur, use solid bg, Inter font |
-| `src/components/Footer.tsx` | Update program names |
-| `src/components/SectionHeading.tsx` | Remove serif dependency |
-| `src/components/ScrollReveal.tsx` | Reduce animation duration to 200ms |
-| `src/pages/Story.tsx` | Remove fabricated content, show minimal intentional state |
-| `src/pages/Podcast.tsx` | Remove fake episodes, show empty state |
-| `src/pages/Community.tsx` | Update all 4 programs to real names, clean up fake features |
-| `src/pages/Apply.tsx` | Update dropdown to real program names |
-| `src/pages/Info.tsx` | Minor font updates |
-| `src/pages/NotFound.tsx` | Minor font updates |
+| `src/App.tsx` | Remove `/apply` route, keep all other routes |
+| `src/pages/Index.tsx` | Remove Events, Podcast, Blog sections; add About section |
+| `src/components/home/HeroSection.tsx` | New tagline, remove "Apply Now" button, push brutalist typography harder |
+| `src/components/home/CommunitySection.tsx` | Add Men-Talk OKC, rewrite descriptions as directories, remove "Join" language |
+| `src/components/home/CTASection.tsx` | Warm CTA about connection, no "Apply" |
+| `src/pages/Community.tsx` | Add Men-Talk OKC, rewrite all copy, remove "Apply" buttons, push brutalist grid |
+| `src/components/Navbar.tsx` | Remove "Apply" link, update nav |
+| `src/components/Footer.tsx` | Remove "Apply" link, add Men-Talk OKC |
+| `src/pages/Story.tsx` | Add real structural content about loneliness psychology and INSPIRE's purpose |
+| `src/index.css` | Push brutalist styling — thicker borders, bolder type utilities |
+| `src/components/home/AboutSection.tsx` | New component — what INSPIRE OKC is and why it exists |
+
+Delete:
+| `src/pages/Apply.tsx` | Remove entirely |
+| `src/components/home/EventsSection.tsx` | Remove (empty state adds nothing) |
+| `src/components/home/PodcastSection.tsx` | Remove from homepage (Men-Talk is a program, not a podcast section) |
+| `src/components/home/BlogSection.tsx` | Remove (empty state adds nothing) |
 
