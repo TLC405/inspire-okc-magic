@@ -16,6 +16,8 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
 
+  const isHeroPage = location.pathname === "/" || location.pathname === "/community";
+
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -38,7 +40,10 @@ export function Navbar() {
       >
         <nav className="container flex items-center justify-between h-16 md:h-20">
           <Link to="/" className="relative z-10">
-            <span className="text-xl md:text-2xl font-bold tracking-tight text-foreground">
+            <span className={cn(
+              "text-xl md:text-2xl font-bold tracking-tight",
+              !scrolled && isHeroPage ? "text-white" : "text-foreground"
+            )}>
               INSPIRE
             </span>
             <span className="label-caps text-accent ml-2">OKC</span>
@@ -52,8 +57,8 @@ export function Navbar() {
                 className={cn(
                   "text-[11px] uppercase tracking-[0.12em] font-semibold py-1 transition-colors duration-200",
                   location.pathname === link.href
-                    ? "text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? (!scrolled && isHeroPage ? "text-white" : "text-foreground")
+                    : (!scrolled && isHeroPage ? "text-white/60 hover:text-white" : "text-muted-foreground hover:text-foreground")
                 )}
               >
                 {link.label}
@@ -63,7 +68,10 @@ export function Navbar() {
 
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden relative z-10 p-2 text-foreground"
+            className={cn(
+              "md:hidden relative z-10 p-2",
+              !scrolled && isHeroPage && !isOpen ? "text-white" : "text-foreground"
+            )}
             aria-label="Toggle menu"
           >
             {isOpen ? <X size={24} /> : <Menu size={24} />}
