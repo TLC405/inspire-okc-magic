@@ -16,16 +16,16 @@ const NotFound = () => {
       <Navbar />
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <p className="editorial-caption text-primary-foreground/40 mb-4 tracking-[0.3em]">
+          <p className="label-caps text-primary-foreground/40 mb-4 tracking-[0.3em]">
             Page Not Found
           </p>
-          <h1 className="editorial-heading text-8xl md:text-9xl mb-4">404</h1>
-          <p className="text-lg text-primary-foreground/60 font-sans font-light mb-8">
+          <h1 className="text-8xl md:text-9xl font-black tracking-tighter mb-4">404</h1>
+          <p className="text-base text-primary-foreground/50 mb-8">
             This page doesn't exist yet.
           </p>
           <Button
             asChild
-            className="bg-accent text-accent-foreground hover:bg-accent/90 font-sans text-sm tracking-wide px-8 h-12 rounded-none"
+            className="bg-accent text-accent-foreground hover:bg-accent/90 text-sm tracking-wide px-8 h-12 rounded-sm shadow-md"
           >
             <Link to="/">Return Home</Link>
           </Button>
