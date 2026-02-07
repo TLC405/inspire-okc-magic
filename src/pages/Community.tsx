@@ -1,9 +1,7 @@
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { ArrowRight, HandHeart, Heart, Dumbbell, Target } from "lucide-react";
+import { ArrowRight, HandHeart, Heart, Dumbbell, Target, MessageCircle } from "lucide-react";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const programs = [
@@ -11,25 +9,31 @@ const programs = [
     icon: HandHeart,
     title: "Volunteering OKC",
     tag: "Service",
-    description: "Find real volunteer opportunities. Show up, give back, meet people who care.",
+    description: "Find volunteer opportunities and places to give back across Oklahoma City.",
   },
   {
     icon: Heart,
     title: "Singles OKC",
     tag: "Community",
-    description: "Not a dating app. Real events, real people, real connections for singles in OKC.",
+    description: "Discover singles events, meetups, and social gatherings in OKC.",
   },
   {
     icon: Dumbbell,
     title: "Workout OKC",
     tag: "Fitness",
-    description: "Group runs, gym meetups, outdoor workouts. All things fitness in OKC and metro.",
+    description: "All things fitness — gyms, runs, classes, outdoor workouts in OKC and metro.",
   },
   {
     icon: Target,
     title: "Coach TLC",
     tag: "Development",
-    description: "Level up with personal coaching, mindset work, and accountability that sticks.",
+    description: "Connect with personal coaching, mindset work, and growth resources.",
+  },
+  {
+    icon: MessageCircle,
+    title: "Men-Talk OKC",
+    tag: "Conversation",
+    description: "Real conversations for men about life, growth, and purpose.",
   },
 ];
 
@@ -48,15 +52,15 @@ const Community = () => {
           <div className="absolute inset-0 bg-black/70" />
           <div className="container relative z-10 max-w-4xl">
             <ScrollReveal>
-              <p className="label-caps text-white/40 mb-4 tracking-[0.3em]">
-                Programs
+              <p className="label-caps text-white/30 mb-4 tracking-[0.3em]">
+                Directories
               </p>
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight text-white mb-4">
-                Get Out &{" "}
-                <span className="text-accent">Do Something</span>
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-[-0.04em] text-white leading-[0.9] mb-4">
+                Find Your{" "}
+                <span className="text-accent">People</span>
               </h1>
-              <p className="text-lg text-white/55 max-w-lg">
-                Stop scrolling. Start showing up. Find your people in Oklahoma City.
+              <p className="text-base text-white/45 max-w-lg">
+                Browse community directories built to help you connect with real people and real opportunities in Oklahoma City.
               </p>
             </ScrollReveal>
           </div>
@@ -64,34 +68,26 @@ const Community = () => {
 
         {/* Programs grid */}
         <section className="py-20 md:py-28">
-          <div className="container max-w-5xl">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-0 border border-border">
-              {programs.map((program, i) => (
+          <div className="container max-w-4xl">
+            <div className="border-2 border-border">
+              {programs.map((program) => (
                 <ScrollReveal key={program.title}>
-                  <div className={`p-8 md:p-12 ${i < 2 ? 'border-b border-border' : ''} ${i % 2 === 0 ? 'md:border-r md:border-border' : ''} hover:bg-secondary/50 transition-colors duration-200`}>
-                    <div className="flex items-start gap-5">
-                      <div className="flex-shrink-0 w-11 h-11 bg-accent/10 flex items-center justify-center rounded-sm">
-                        <program.icon size={20} className="text-accent" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="label-caps text-accent mb-2">{program.tag}</p>
-                        <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2">
+                  <div className="flex items-center gap-6 p-6 md:p-8 border-b-2 border-border last:border-b-0 hover:bg-secondary/50 transition-colors duration-150">
+                    <div className="flex-shrink-0 w-12 h-12 border-2 border-border flex items-center justify-center">
+                      <program.icon size={20} className="text-accent" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-baseline gap-3 mb-1">
+                        <h2 className="text-lg md:text-xl font-bold text-foreground tracking-tight">
                           {program.title}
                         </h2>
-                        <p className="text-sm text-muted-foreground leading-relaxed mb-6">
-                          {program.description}
-                        </p>
-                        <Button
-                          asChild
-                          size="sm"
-                          className="bg-primary text-primary-foreground hover:bg-primary/90 text-xs tracking-wide rounded-sm h-9 px-5"
-                        >
-                          <Link to="/apply">
-                            Join <ArrowRight size={12} className="ml-1" />
-                          </Link>
-                        </Button>
+                        <span className="label-caps text-muted-foreground">{program.tag}</span>
                       </div>
+                      <p className="text-sm text-muted-foreground">
+                        {program.description}
+                      </p>
                     </div>
+                    <ArrowRight size={16} className="text-muted-foreground flex-shrink-0" />
                   </div>
                 </ScrollReveal>
               ))}
@@ -100,22 +96,15 @@ const Community = () => {
         </section>
 
         {/* CTA */}
-        <section className="py-20 md:py-28 bg-primary text-primary-foreground">
-          <div className="container text-center max-w-lg">
+        <section className="py-20 md:py-28 bg-primary text-primary-foreground border-t-2 border-border">
+          <div className="container max-w-2xl">
             <ScrollReveal>
-              <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
-                Ready to show up?
+              <h2 className="text-3xl md:text-5xl font-black tracking-[-0.03em] mb-4">
+                Connection starts with showing up
               </h2>
-              <p className="text-primary-foreground/50 mb-8">
-                Apply and we'll match you with the right program.
+              <p className="text-sm text-primary-foreground/40 max-w-md">
+                Every directory is free to browse. Find what resonates, and take the first step.
               </p>
-              <Button
-                asChild
-                size="lg"
-                className="bg-accent text-accent-foreground hover:bg-accent/90 text-sm tracking-wide px-10 h-12 rounded-sm shadow-lg"
-              >
-                <Link to="/apply">Apply Now</Link>
-              </Button>
             </ScrollReveal>
           </div>
         </section>

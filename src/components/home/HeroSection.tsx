@@ -1,64 +1,47 @@
 import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
 import heroBg from "@/assets/hero-bg.jpg";
 
 export function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-end overflow-hidden">
-      {/* Background image */}
       <img
         src={heroBg}
         alt="INSPIRE Oklahoma City"
         className="absolute inset-0 w-full h-full object-cover"
         loading="eager"
       />
-      {/* Dark overlay — solid, no gradient */}
-      <div className="absolute inset-0 bg-black/65" />
+      <div className="absolute inset-0 bg-black/60" />
 
-      <div className="container relative z-10 pb-20 md:pb-28">
+      <div className="container relative z-10 pb-16 md:pb-24">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
-          className="max-w-2xl"
+          className="max-w-3xl"
         >
-          <p className="label-caps text-white/40 mb-4 tracking-[0.25em]">
+          <p className="label-caps text-white/35 mb-6 tracking-[0.3em]">
             Oklahoma City
           </p>
 
-          <h1 className="text-7xl sm:text-8xl md:text-9xl font-black tracking-[-0.04em] text-white leading-[0.9] mb-6">
+          <h1 className="text-[clamp(4rem,12vw,10rem)] font-black tracking-[-0.05em] text-white leading-[0.85] mb-4">
             INSPIRE
           </h1>
 
-          <p className="text-lg md:text-xl text-white/60 max-w-md mb-10 leading-relaxed">
-            Get out. Do something. Build real connections in OKC.
-          </p>
+          <div className="w-24 h-[2px] bg-accent mb-8" />
 
-          <div className="flex flex-wrap gap-3">
-            <Button
-              asChild
-              size="lg"
-              className="bg-accent text-accent-foreground hover:bg-accent/90 text-sm tracking-wide px-8 h-12 rounded-sm shadow-lg"
-            >
-              <Link to="/community">Explore Programs</Link>
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              size="lg"
-              className="border-white/20 text-white hover:bg-white/10 text-sm tracking-wide px-8 h-12 rounded-sm"
-            >
-              <Link to="/apply">Apply Now</Link>
-            </Button>
-          </div>
+          <p className="text-xl md:text-2xl font-semibold text-white/80 tracking-tight mb-3">
+            Community. Connection. Health.
+          </p>
+          <p className="text-sm md:text-base text-white/45 max-w-lg leading-relaxed">
+            A set of community tools built around the psychology of belonging — 
+            because disconnection is the crisis, and showing up for each other is the answer.
+          </p>
         </motion.div>
       </div>
 
-      {/* Scroll indicator */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10">
-        <ChevronDown size={20} className="text-white/25" />
+        <ChevronDown size={18} className="text-white/20" />
       </div>
     </section>
   );
