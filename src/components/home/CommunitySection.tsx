@@ -1,28 +1,28 @@
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { SectionHeading } from "@/components/SectionHeading";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Heart, Dumbbell, Target, HandHeart } from "lucide-react";
 
 const programs = [
   {
-    title: "Adulting 101",
-    description: "Life skills, financial literacy, and personal development for young adults navigating the real world.",
-    tag: "Life Skills",
+    icon: HandHeart,
+    title: "Volunteering OKC",
+    tag: "Service",
   },
   {
-    title: "Singles Connect",
-    description: "Meaningful connections and community for singles who want to grow together, not just date.",
-    tag: "Relationships",
+    icon: Heart,
+    title: "Singles OKC",
+    tag: "Community",
   },
   {
-    title: "Movement & Wellness",
-    description: "Group workouts, wellness workshops, and accountability for a healthier lifestyle.",
-    tag: "Wellness",
+    icon: Dumbbell,
+    title: "Workout OKC",
+    tag: "Fitness",
   },
   {
-    title: "Self-Mastery",
-    description: "Deep personal development — mindset, discipline, purpose, and becoming your best self.",
-    tag: "Growth",
+    icon: Target,
+    title: "Coach TLC",
+    tag: "Development",
   },
 ];
 
@@ -33,27 +33,24 @@ export function CommunitySection() {
         <SectionHeading
           label="Programs"
           title="Community"
-          subtitle="Curated programs designed to help you grow, connect, and thrive."
+          subtitle="Curated programs to help you grow, connect, and thrive in OKC."
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-          {programs.map((program, i) => (
-            <ScrollReveal key={program.title} delay={i * 0.1}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {programs.map((program) => (
+            <ScrollReveal key={program.title}>
               <Link
                 to="/community"
-                className="group block hover-lift border border-border p-8 md:p-10 bg-card transition-colors duration-500 hover:border-accent/30"
+                className="group flex items-center gap-5 hover-lift border border-border p-6 md:p-8 bg-card transition-colors duration-200 hover:border-accent/30"
               >
-                <p className="editorial-label text-accent mb-4">{program.tag}</p>
-                <h3 className="font-serif text-2xl md:text-3xl font-semibold text-card-foreground mb-3">
-                  {program.title}
-                </h3>
-                <p className="text-sm text-muted-foreground font-sans leading-relaxed mb-6">
-                  {program.description}
-                </p>
-                <div className="flex items-center gap-2 text-sm text-foreground font-sans group-hover:text-accent transition-colors">
-                  <span>Learn more</span>
-                  <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                <div className="flex-shrink-0 w-12 h-12 border border-border flex items-center justify-center group-hover:border-accent/40 transition-colors">
+                  <program.icon size={20} className="text-muted-foreground group-hover:text-accent transition-colors" />
                 </div>
+                <div className="flex-1 min-w-0">
+                  <p className="label-caps text-accent mb-1">{program.tag}</p>
+                  <h3 className="text-lg font-semibold text-card-foreground">{program.title}</h3>
+                </div>
+                <ArrowRight size={16} className="text-muted-foreground group-hover:text-accent group-hover:translate-x-1 transition-all" />
               </Link>
             </ScrollReveal>
           ))}

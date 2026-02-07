@@ -30,15 +30,15 @@ const Apply = () => {
         <section className="pt-32 pb-16 md:pt-40 md:pb-24 bg-primary text-primary-foreground">
           <div className="container max-w-4xl">
             <ScrollReveal>
-              <p className="editorial-caption text-primary-foreground/40 mb-4 tracking-[0.3em]">
+              <p className="label-caps text-primary-foreground/40 mb-4 tracking-[0.3em]">
                 Join Us
               </p>
-              <h1 className="editorial-heading text-4xl md:text-6xl lg:text-7xl mb-6">
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
                 Apply to{" "}
-                <span className="italic text-accent">INSPIRE</span>
+                <span className="text-accent">INSPIRE</span>
               </h1>
-              <p className="text-lg text-primary-foreground/60 font-sans font-light max-w-2xl leading-relaxed">
-                Tell us about yourself and which programs interest you. We review every application personally.
+              <p className="text-base text-primary-foreground/50 max-w-xl">
+                Tell us about yourself and which programs interest you.
               </p>
             </ScrollReveal>
           </div>
@@ -50,70 +50,54 @@ const Apply = () => {
               <form onSubmit={handleSubmit} className="space-y-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label className="editorial-caption">First Name</Label>
-                    <Input
-                      required
-                      placeholder="Your first name"
-                      className="rounded-none border-border bg-background h-12 font-sans"
-                    />
+                    <Label className="label-caps">First Name</Label>
+                    <Input required placeholder="Your first name" className="rounded-sm border-border bg-background h-12" />
                   </div>
                   <div className="space-y-2">
-                    <Label className="editorial-caption">Last Name</Label>
-                    <Input
-                      required
-                      placeholder="Your last name"
-                      className="rounded-none border-border bg-background h-12 font-sans"
-                    />
+                    <Label className="label-caps">Last Name</Label>
+                    <Input required placeholder="Your last name" className="rounded-sm border-border bg-background h-12" />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="editorial-caption">Email</Label>
-                  <Input
-                    required
-                    type="email"
-                    placeholder="your@email.com"
-                    className="rounded-none border-border bg-background h-12 font-sans"
-                  />
+                  <Label className="label-caps">Email</Label>
+                  <Input required type="email" placeholder="your@email.com" className="rounded-sm border-border bg-background h-12" />
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="editorial-caption">Phone</Label>
-                  <Input
-                    placeholder="(405) 555-0123"
-                    className="rounded-none border-border bg-background h-12 font-sans"
-                  />
+                  <Label className="label-caps">Phone</Label>
+                  <Input placeholder="(405) 555-0123" className="rounded-sm border-border bg-background h-12" />
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="editorial-caption">Program Interest</Label>
+                  <Label className="label-caps">Program Interest</Label>
                   <Select>
-                    <SelectTrigger className="rounded-none border-border bg-background h-12 font-sans">
+                    <SelectTrigger className="rounded-sm border-border bg-background h-12">
                       <SelectValue placeholder="Select a program" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="adulting">Adulting 101</SelectItem>
-                      <SelectItem value="singles">Singles Connect</SelectItem>
-                      <SelectItem value="wellness">Movement & Wellness</SelectItem>
-                      <SelectItem value="mastery">Self-Mastery</SelectItem>
+                    <SelectContent className="bg-popover border-border">
+                      <SelectItem value="volunteering">Volunteering OKC</SelectItem>
+                      <SelectItem value="singles">Singles OKC</SelectItem>
+                      <SelectItem value="workout">Workout OKC</SelectItem>
+                      <SelectItem value="coach">Coach TLC</SelectItem>
                       <SelectItem value="multiple">Multiple Programs</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="editorial-caption">Tell Us About Yourself</Label>
+                  <Label className="label-caps">Tell Us About Yourself</Label>
                   <Textarea
-                    placeholder="What are you looking to gain from INSPIRE OKC? What excites you about community?"
+                    placeholder="What are you looking to gain from INSPIRE OKC?"
                     rows={5}
-                    className="rounded-none border-border bg-background font-sans resize-none"
+                    className="rounded-sm border-border bg-background resize-none"
                   />
                 </div>
 
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-sans text-sm tracking-wide h-12 rounded-none"
+                  className="w-full bg-accent text-accent-foreground hover:bg-accent/90 text-sm tracking-wide h-12 rounded-sm shadow-md"
                 >
                   {isSubmitting ? "Submitting..." : "Submit Application"}
                 </Button>

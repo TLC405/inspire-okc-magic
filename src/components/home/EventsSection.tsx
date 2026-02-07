@@ -1,27 +1,6 @@
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { SectionHeading } from "@/components/SectionHeading";
-import { Calendar, MapPin } from "lucide-react";
-
-const events = [
-  {
-    date: "Mar 15",
-    title: "Community Mixer",
-    location: "The Jones Assembly",
-    description: "An evening of connection, conversation, and culture.",
-  },
-  {
-    date: "Mar 22",
-    title: "Adulting 101 Workshop",
-    location: "INSPIRE HQ",
-    description: "Financial literacy and life skills for young professionals.",
-  },
-  {
-    date: "Apr 05",
-    title: "Podcast Live Recording",
-    location: "Tower Theatre",
-    description: "Watch the magic happen live with special guests.",
-  },
-];
+import { Calendar } from "lucide-react";
 
 export function EventsSection() {
   return (
@@ -30,28 +9,15 @@ export function EventsSection() {
         <SectionHeading
           label="What's Next"
           title="Upcoming Events"
-          subtitle="Gather, grow, and connect with the community."
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-          {events.map((event, i) => (
-            <ScrollReveal key={event.title} delay={i * 0.1}>
-              <div className="group hover-lift border border-border p-8 md:p-10 bg-card transition-colors duration-500 hover:bg-secondary">
-                <p className="editorial-label text-accent mb-4">{event.date}</p>
-                <h3 className="font-serif text-xl md:text-2xl font-semibold text-card-foreground mb-3">
-                  {event.title}
-                </h3>
-                <p className="text-sm text-muted-foreground font-sans leading-relaxed mb-6">
-                  {event.description}
-                </p>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground font-sans">
-                  <MapPin size={14} />
-                  <span>{event.location}</span>
-                </div>
-              </div>
-            </ScrollReveal>
-          ))}
-        </div>
+        <ScrollReveal>
+          <div className="max-w-md mx-auto text-center py-16 border border-border">
+            <Calendar size={32} className="mx-auto text-muted-foreground/40 mb-4" />
+            <p className="text-foreground font-semibold mb-1">No upcoming events</p>
+            <p className="text-sm text-muted-foreground">Check back soon for new events in OKC.</p>
+          </div>
+        </ScrollReveal>
       </div>
     </section>
   );
