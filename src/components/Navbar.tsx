@@ -6,8 +6,7 @@ import { cn } from "@/lib/utils";
 
 const navLinks = [
   { label: "Story", href: "/story" },
-  { label: "Community", href: "/community" },
-  { label: "Apply", href: "/apply" },
+  { label: "Programs", href: "/community" },
   { label: "Info", href: "/info" },
 ];
 
@@ -34,14 +33,14 @@ export function Navbar() {
         className={cn(
           "fixed top-0 left-0 right-0 z-50 transition-all duration-200",
           scrolled
-            ? "bg-background border-b border-border shadow-sm"
+            ? "bg-background border-b-2 border-border"
             : "bg-transparent"
         )}
       >
         <nav className="container flex items-center justify-between h-16 md:h-20">
           <Link to="/" className="relative z-10">
             <span className={cn(
-              "text-xl md:text-2xl font-bold tracking-tight",
+              "text-xl md:text-2xl font-black tracking-[-0.02em]",
               !scrolled && isHeroPage ? "text-white" : "text-foreground"
             )}>
               INSPIRE
@@ -55,10 +54,10 @@ export function Navbar() {
                 key={link.href}
                 to={link.href}
                 className={cn(
-                  "text-[11px] uppercase tracking-[0.12em] font-semibold py-1 transition-colors duration-200",
+                  "label-caps py-1 transition-colors duration-150",
                   location.pathname === link.href
                     ? (!scrolled && isHeroPage ? "text-white" : "text-foreground")
-                    : (!scrolled && isHeroPage ? "text-white/60 hover:text-white" : "text-muted-foreground hover:text-foreground")
+                    : (!scrolled && isHeroPage ? "text-white/50 hover:text-white" : "text-muted-foreground hover:text-foreground")
                 )}
               >
                 {link.label}
@@ -94,7 +93,7 @@ export function Navbar() {
                   key={link.href}
                   to={link.href}
                   className={cn(
-                    "text-2xl font-semibold transition-colors",
+                    "text-2xl font-bold transition-colors",
                     location.pathname === link.href
                       ? "text-foreground"
                       : "text-muted-foreground"
