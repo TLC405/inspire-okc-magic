@@ -7,23 +7,23 @@ import { Mail, MapPin, Clock } from "lucide-react";
 const faqs = [
   {
     question: "What is INSPIRE OKC?",
-    answer: "INSPIRE OKC is a community platform for people in Oklahoma City. We offer programs, events, and resources designed to help you grow and build meaningful connections.",
+    answer: "A set of community directories built in Oklahoma City, for Oklahoma City. We make it easier to find singles events, fitness opportunities, volunteering, coaching, and real conversations. There's nothing to join or apply to.",
   },
   {
-    question: "How do I join a program?",
-    answer: "Fill out the application form on the Apply page. We review every application personally.",
+    question: "How do the directories work?",
+    answer: "Each directory focuses on one area — fitness, volunteering, singles events, coaching, or men's conversations. Browse what's available, find what resonates, and show up. That's it.",
   },
   {
-    question: "Are events free?",
-    answer: "Many community events are free. Some workshops may have a small fee. Pricing is always clear upfront.",
+    question: "Is it free?",
+    answer: "The directories are free to browse. Pricing for individual events, classes, or services depends on whoever is hosting them — it's always listed upfront.",
   },
   {
-    question: "Who can join?",
-    answer: "INSPIRE OKC is open to anyone in the Oklahoma City area looking to grow and connect.",
+    question: "Who is this for?",
+    answer: "Anyone in the Oklahoma City area looking to connect with people and opportunities. No age requirement, no membership, no gatekeeping.",
   },
   {
-    question: "Can I be part of multiple programs?",
-    answer: "Yes. Many members participate in more than one program.",
+    question: "Can I use multiple directories?",
+    answer: "Yes. They're all independent tools. Use one, use all five — whatever fits your life right now.",
   },
 ];
 
@@ -35,37 +35,37 @@ const Info = () => {
         <section className="pt-32 pb-16 md:pt-40 md:pb-24 bg-primary text-primary-foreground">
           <div className="container max-w-4xl">
             <ScrollReveal>
-              <p className="label-caps text-primary-foreground/40 mb-4 tracking-[0.3em]">
+              <p className="label-caps text-primary-foreground/30 mb-4 tracking-[0.3em]">
                 Information
               </p>
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
-                Everything You{" "}
-                <span className="text-accent">Need to Know</span>
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-[-0.04em] leading-[0.9] mb-4">
+                Need to{" "}
+                <span className="text-accent">Know</span>
               </h1>
             </ScrollReveal>
           </div>
         </section>
 
-        <section className="py-16 md:py-24 border-b border-border">
+        <section className="py-16 md:py-24 border-b-2 border-border">
           <div className="container max-w-4xl">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <ScrollReveal>
-                <div className="text-center md:text-left">
-                  <Mail size={24} className="text-accent mb-3 mx-auto md:mx-0" />
+                <div className="border-2 border-border p-6">
+                  <Mail size={20} className="text-accent mb-3" />
                   <h3 className="label-caps text-foreground mb-1">Email</h3>
                   <p className="text-sm text-muted-foreground">hello@inspireokc.com</p>
                 </div>
               </ScrollReveal>
               <ScrollReveal>
-                <div className="text-center md:text-left">
-                  <MapPin size={24} className="text-accent mb-3 mx-auto md:mx-0" />
+                <div className="border-2 border-border p-6">
+                  <MapPin size={20} className="text-accent mb-3" />
                   <h3 className="label-caps text-foreground mb-1">Location</h3>
                   <p className="text-sm text-muted-foreground">Oklahoma City, OK</p>
                 </div>
               </ScrollReveal>
               <ScrollReveal>
-                <div className="text-center md:text-left">
-                  <Clock size={24} className="text-accent mb-3 mx-auto md:mx-0" />
+                <div className="border-2 border-border p-6">
+                  <Clock size={20} className="text-accent mb-3" />
                   <h3 className="label-caps text-foreground mb-1">Response Time</h3>
                   <p className="text-sm text-muted-foreground">Within 48 hours</p>
                 </div>
@@ -77,24 +77,27 @@ const Info = () => {
         <section className="py-20 md:py-32">
           <div className="container max-w-3xl">
             <ScrollReveal>
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-12 text-center">
-                Frequently Asked Questions
+              <p className="label-caps text-accent mb-4 tracking-[0.3em]">FAQ</p>
+              <h2 className="text-3xl md:text-5xl font-black tracking-[-0.03em] text-foreground mb-12">
+                Common Questions
               </h2>
             </ScrollReveal>
 
             <ScrollReveal>
-              <Accordion type="single" collapsible>
-                {faqs.map((faq, i) => (
-                  <AccordionItem key={i} value={`item-${i}`} className="border-b border-border py-2">
-                    <AccordionTrigger className="text-base font-semibold text-foreground hover:text-accent hover:no-underline transition-colors py-4">
-                      {faq.question}
-                    </AccordionTrigger>
-                    <AccordionContent className="text-muted-foreground text-sm leading-relaxed pb-4">
-                      {faq.answer}
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
+              <div className="border-2 border-border">
+                <Accordion type="single" collapsible>
+                  {faqs.map((faq, i) => (
+                    <AccordionItem key={i} value={`item-${i}`} className="border-b-2 border-border last:border-b-0 px-6">
+                      <AccordionTrigger className="text-base font-bold text-foreground hover:text-accent hover:no-underline transition-colors py-5">
+                        {faq.question}
+                      </AccordionTrigger>
+                      <AccordionContent className="text-muted-foreground text-sm leading-relaxed pb-5">
+                        {faq.answer}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </div>
             </ScrollReveal>
           </div>
         </section>
