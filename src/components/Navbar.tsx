@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "./ThemeToggle";
 
 const navLinks = [
   { label: "Story", href: "/story" },
@@ -15,7 +16,8 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
 
-  const isHeroPage = location.pathname === "/" || location.pathname === "/community";
+  const isHomepage = location.pathname === "/";
+  const isHeroPage = location.pathname === "/community";
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -26,6 +28,9 @@ export function Navbar() {
   useEffect(() => {
     setIsOpen(false);
   }, [location.pathname]);
+
+  // Homepage has its own nav
+  if (isHomepage) return null;
 
   return (
     <>
@@ -63,18 +68,26 @@ export function Navbar() {
                 {link.label}
               </Link>
             ))}
+            <ThemeToggle className={cn(
+              !scrolled && isHeroPage ? "text-white/50 hover:text-white" : "text-muted-foreground hover:text-foreground"
+            )} />
           </div>
 
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className={cn(
-              "md:hidden relative z-10 p-2",
+          <div className="flex items-center gap-2 md:hidden">
+            <ThemeToggle className={cn(
               !scrolled && isHeroPage && !isOpen ? "text-white" : "text-foreground"
-            )}
-            aria-label="Toggle menu"
-          >
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+            )} />
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className={cn(
+                "relative z-10 p-2",
+                !scrolled && isHeroPage && !isOpen ? "text-white" : "text-foreground"
+              )}
+              aria-label="Toggle menu"
+            >
+              {isOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </nav>
       </header>
 

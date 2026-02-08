@@ -16,7 +16,7 @@ const footerLinks = [
       { label: "Singles OKC", href: "/community" },
       { label: "Workout OKC", href: "/community" },
       { label: "Coach TLC", href: "/community" },
-      { label: "Men-Talk OKC", href: "/community" },
+      { label: "Men-Talk OKC", href: "/men-talk" },
     ],
   },
 ];
@@ -31,6 +31,9 @@ export function Footer() {
             <span className="label-caps text-accent ml-2">OKC</span>
             <p className="mt-4 text-sm text-primary-foreground/40 max-w-xs leading-relaxed">
               Community. Connection. Health. Built around the psychology of belonging in Oklahoma City.
+            </p>
+            <p className="mt-3 text-xs font-mono text-primary-foreground/20">
+              405 · OKC · 73507
             </p>
           </div>
 
@@ -55,7 +58,10 @@ export function Footer() {
 
         <div className="mt-16 pt-8 border-t-2 border-primary-foreground/10 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-primary-foreground/25">
-            © {new Date().getFullYear()} INSPIRE OKC
+            © {new Date().getFullYear()} INSPIRE OKC · The Big Friendly
+          </p>
+          <p className="text-xs font-mono text-primary-foreground/15">
+            REF: OKC-73507
           </p>
         </div>
       </div>
