@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { Lock } from "lucide-react";
 
 const ACCESS_CODE = "73507";
 const STORAGE_KEY = "mentalk-access";
@@ -37,14 +38,22 @@ export function MenTalkGate({ children }: { children: React.ReactNode }) {
         transition={{ duration: 0.4 }}
         className="text-center max-w-md px-6"
       >
+        <div className="w-12 h-12 border-2 border-border flex items-center justify-center mx-auto mb-8">
+          <Lock size={18} className="text-accent" />
+        </div>
+
         <p className="label-caps text-accent mb-6 tracking-[0.3em]">
-          Restricted Access
+          Directory (05)
         </p>
-        <h1 className="text-4xl md:text-6xl font-black tracking-[-0.04em] text-foreground mb-4">
-          MEN-TALK<br />OKC
+        <h1 className="text-5xl md:text-7xl font-black tracking-[-0.04em] text-foreground leading-[0.85] mb-3">
+          MEN-TALK
         </h1>
-        <p className="text-sm text-muted-foreground mb-10">
-          This space requires an access code.
+        <h2 className="text-3xl md:text-5xl font-black tracking-[-0.04em] text-accent leading-[0.85] mb-6">
+          OKC
+        </h2>
+        <p className="text-sm text-muted-foreground mb-10 leading-relaxed">
+          This space requires an access code.<br />
+          Ask someone in the community — or you already know.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -52,23 +61,24 @@ export function MenTalkGate({ children }: { children: React.ReactNode }) {
             type="text"
             value={code}
             onChange={(e) => { setCode(e.target.value); setError(false); }}
-            placeholder="Enter code"
-            className="w-full bg-transparent border-2 border-border text-foreground text-center text-2xl font-mono tracking-[0.2em] py-4 px-6 focus:outline-none focus:border-accent transition-colors"
+            placeholder="• • • • •"
+            maxLength={5}
+            className="w-full bg-transparent border-2 border-border text-foreground text-center text-3xl font-mono tracking-[0.3em] py-5 px-6 focus:outline-none focus:border-accent transition-colors"
             autoFocus
           />
           {error && (
-            <p className="text-sm text-destructive font-medium">Invalid code</p>
+            <p className="text-sm text-destructive font-medium">Invalid code — try again</p>
           )}
           <button
             type="submit"
-            className="w-full border-2 border-accent text-accent label-caps py-3 hover:bg-accent hover:text-accent-foreground transition-colors duration-150"
+            className="w-full border-2 border-accent text-accent label-caps py-4 hover:bg-accent hover:text-accent-foreground transition-colors duration-150"
           >
             Enter
           </button>
         </form>
 
-        <p className="text-xs text-muted-foreground/40 mt-8 font-mono">
-          REF: OKC-73507
+        <p className="text-xs text-muted-foreground/30 mt-10 font-mono">
+          REF: OKC-73507 · RESTRICTED
         </p>
       </motion.div>
     </div>
