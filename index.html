@@ -3,20 +3,26 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- TODO: Set the document title to the name of your application -->
-    <title>Lovable App</title>
-    <meta name="description" content="Lovable Generated Project" />
-    <meta name="author" content="Lovable" />
+    <title>INSPIRE OKC — Community. Connection. Health.</title>
+    <meta name="description" content="Community directories built around the psychology of belonging in Oklahoma City. Find singles events, fitness, volunteering, coaching, and real conversations." />
+    <meta name="author" content="INSPIRE OKC" />
 
-    <!-- TODO: Update og:title to match your application name -->
-    <meta property="og:title" content="Lovable App" />
-    <meta property="og:description" content="Lovable Generated Project" />
+    <meta property="og:title" content="INSPIRE OKC" />
+    <meta property="og:description" content="Community. Connection. Health. Oklahoma City's directory for belonging." />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@Lovable" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+
+    <script>
+      // Prevent FOUC — apply saved theme before render
+      (function() {
+        try {
+          var theme = localStorage.getItem('theme') || 'dark';
+          if (theme === 'thunder') document.documentElement.classList.add('thunder');
+          else if (theme === 'dark') document.documentElement.classList.add('dark');
+        } catch(e) {}
+      })();
+    </script>
   </head>
 
   <body>

@@ -1,40 +1,15 @@
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import { ArrowRight, HandHeart, Heart, Dumbbell, Target, MessageCircle } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const programs = [
-  {
-    icon: HandHeart,
-    title: "Volunteering OKC",
-    tag: "Service",
-    description: "Find volunteer opportunities and places to give back across Oklahoma City.",
-  },
-  {
-    icon: Heart,
-    title: "Singles OKC",
-    tag: "Community",
-    description: "Discover singles events, meetups, and social gatherings in OKC.",
-  },
-  {
-    icon: Dumbbell,
-    title: "Workout OKC",
-    tag: "Fitness",
-    description: "All things fitness — gyms, runs, classes, outdoor workouts in OKC and metro.",
-  },
-  {
-    icon: Target,
-    title: "Coach TLC",
-    tag: "Development",
-    description: "Connect with personal coaching, mindset work, and growth resources.",
-  },
-  {
-    icon: MessageCircle,
-    title: "Men-Talk OKC",
-    tag: "Conversation",
-    description: "Real conversations for men about life, growth, and purpose.",
-  },
+  { num: "01", title: "Social Singles OKC", tag: "Community", description: "Discover singles events, meetups, and social gatherings in OKC." },
+  { num: "02", title: "OKC Workouts", tag: "Fitness", description: "All things fitness — gyms, runs, classes, outdoor workouts in OKC and metro." },
+  { num: "03", title: "Volunteering OKC", tag: "Service", description: "Find volunteer opportunities and places to give back across Oklahoma City." },
+  { num: "04", title: "Coach TLC", tag: "Development", description: "Connect with personal coaching, mindset work, and growth resources." },
+  { num: "05", title: "Men-Talk OKC", tag: "Conversation", description: "Real conversations for men about life, growth, and purpose." },
 ];
 
 const Community = () => {
@@ -66,19 +41,31 @@ const Community = () => {
           </div>
         </section>
 
+        {/* Quote */}
+        <section className="py-16 md:py-20 border-b-2 border-border">
+          <div className="container max-w-3xl">
+            <ScrollReveal>
+              <div className="quote-block">
+                <p className="italic text-xl md:text-3xl font-light text-foreground/60 leading-snug">
+                  "The problem isn't a lack of people.<br />
+                  It's the friction of finding them."
+                </p>
+              </div>
+            </ScrollReveal>
+          </div>
+        </section>
+
         {/* Programs grid */}
         <section className="py-20 md:py-28">
           <div className="container max-w-4xl">
             <div className="border-2 border-border">
               {programs.map((program) => (
-                <ScrollReveal key={program.title}>
+                <ScrollReveal key={program.num}>
                   <div className="flex items-center gap-6 p-6 md:p-8 border-b-2 border-border last:border-b-0 hover:bg-secondary/50 transition-colors duration-150">
-                    <div className="flex-shrink-0 w-12 h-12 border-2 border-border flex items-center justify-center">
-                      <program.icon size={20} className="text-accent" />
-                    </div>
+                    <span className="font-mono text-accent text-sm flex-shrink-0">({program.num})</span>
                     <div className="flex-1">
                       <div className="flex items-baseline gap-3 mb-1">
-                        <h2 className="text-lg md:text-xl font-bold text-foreground tracking-tight">
+                        <h2 className="text-lg md:text-xl font-black text-foreground tracking-tight">
                           {program.title}
                         </h2>
                         <span className="label-caps text-muted-foreground">{program.tag}</span>
