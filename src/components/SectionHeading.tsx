@@ -15,7 +15,7 @@ export function SectionHeading({ label, title, subtitle, className, align = "cen
       {label && (
         <p className="label-caps text-accent mb-3">{label}</p>
       )}
-      <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-foreground text-balance">
+      <h2 className="text-3xl md:text-5xl font-black tracking-[-0.03em] text-foreground text-balance">
         {title}
       </h2>
       {subtitle && (
