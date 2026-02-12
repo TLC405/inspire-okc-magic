@@ -1,163 +1,163 @@
 
+# INSPIRE OKC -- Live Data Ticker + World-Class UI Polish
 
-# INSPIRE OKC — World-Class Brutalist Overhaul Built with TLC.
-
-This is a major upgrade touching every page: a 3D logo reveal on the homepage, three professional theme modes (Light, Dark, Thunder), a community-data-driven feel with real OKC info, and a gated Men-Talk OKC section requiring access code `73507`. The reference screenshot shows massive stacked "INSPIRE / OKC" typography with a cinematic quote block and accent sidebar — that energy drives the whole redesign.
-
----
-
-## 1. Homepage: Static Photo + Blueprint Layout
-
-The homepage becomes a single full-viewport composition. No scrolling. Your OKC photo is fixed behind everything.
-
-### 3D Logo Title Reveal
-
-On page load, "INSPIRE" and "OKC" animate in using Framer Motion with a cinematic sequence:
-- Letters scale from 1.5x down to 1x with blur-to-sharp (filter blur transition)
-- "INSPIRE" slides in from left, "OKC" from right, both with staggered letter reveals
-- A vertical accent bar (terracotta) wipes in from top to bottom
-- The quote fades up after the logo settles: *"The city is a chassis. We are the architects."*
-- Total animation: ~2.5 seconds, then the rest of the UI fades in
-
-### Layout Structure (single viewport, no scroll)
-
-```text
-+----------------------------------------------------------+
-|  INSPIRE OKC [logo]     STORY  PROGRAMS  INFO  [theme]   |
-|                                                          |
-|         I N S P I R E                                    |
-|              O K C        (3D reveal animation)          |
-|                                                          |
-|  |  "The city is a chassis.                              |
-|  |   We are the architects."                             |
-|                                                          |
-|  ---- marquee ticker: NO DUES / NO CLUB / OKC METRO --- |
-|                                                          |
-|  (01) SOCIAL SINGLES OKC    (02) OKC WORKOUTS  (03) VOLUNTEERING OKC |
-|  (04) COACH TLC  (05) MEN-TALK OKC                        |
-|                                                          |
-|  [ BROWSE DIRECTORIES ]                                  |
-|                                                          |
-|  Community. Connection. Health.          (c) INSPIRE OKC |
-+----------------------------------------------------------+
-```
-
-Background: `hero-bg.jpg` set as `fixed`, `object-cover`, filling viewport. Dark overlay ~70%.
-
-### OKC Community Data Baked In
-
-Real Oklahoma City data embedded throughout to make it feel rooted:
-- Population: 700,000+ (metro 1.4M)
-- OKC zip codes in the marquee ticker or reference labels
-- "REF: OKC-73507" as a monospaced document reference
-- "EST. 2024" or similar structural label
-- Neighborhoods/areas mentioned: Midtown, Bricktown, Paseo, Plaza District, NW OKC
+The marquee ticker currently shows static text like "NO DUES" and "405 AREA CODE." This upgrade transforms it into a **live data feed** pulling real OKC information, and overhauls every visual detail across the entire site to eliminate anything that feels cheap or template-like.
 
 ---
 
-## 2. Three Theme Modes: Light, Dark, Thunder
+## 1. Live Data Ticker on Homepage
 
-A theme toggle in the navbar (sun/moon/zap icons) cycles through three modes. Using `next-themes` (already installed) with a custom provider.
+Replace the static ticker items with a **real-time feed** that rotates through live OKC data. Since we don't have a backend yet, we'll build a smart client-side system that pulls from free public APIs and displays rotating categories.
 
-### Light Theme (current warm off-white)
-- Background: warm off-white `hsl(40 20% 98%)`
-- Foreground: near-black
-- Accent: terracotta/rust
+### Data Sources (Free, No API Key Required)
 
-### Dark Theme (current)
-- Background: `hsl(20 8% 5%)` deep warm black
-- Foreground: warm off-white
-- Accent: brighter terracotta
+| Category | Source | Example Output |
+|---|---|---|
+| Weather | Open-Meteo API (free, no key) | "72 F PARTLY CLOUDY" |
+| Thunder NBA | NBA free data endpoint / static schedule | "THUNDER VS LAKERS -- FEB 14" |
+| Time | Browser local time | "2:34 PM CST" |
+| OKC Facts | Rotating static pool of 20+ real facts | "FOUNDED 1889 -- LAND RUN" |
 
-### Thunder Theme (new, premium)
-- Background: `hsl(230 15% 8%)` — deep navy-charcoal
-- Foreground: `hsl(45 20% 90%)` — warm ivory
-- Cards: `hsl(230 12% 11%)` — slightly lighter navy
-- Accent: `hsl(45 90% 55%)` — electric gold/amber
-- Borders: `hsl(230 10% 18%)` — subtle steel blue-gray
-- Muted text: `hsl(230 8% 45%)` — cool gray
-- Selection: gold tint
-- Overall feel: like a luxury sports app or premium editorial — dark but warm with gold accents, sophisticated and bold
+The ticker will show a **mix** of live and curated items, cycling through: current weather, current time, Thunder game info, city facts, neighborhood callouts, and community stats. Items tagged with category labels like `[WEATHER]` or `[THUNDER]` in accent color before the data.
 
-All three themes use the same CSS variable system. The Thunder theme is a new `.thunder` class alongside `.dark`.
+### New Component: `LiveTicker.tsx`
 
----
+A dedicated component that:
+- Fetches weather from Open-Meteo API on mount (latitude/longitude for OKC: 35.4676, -97.5164)
+- Maintains a pool of 15-20 ticker items mixing live + curated data
+- Refreshes weather every 10 minutes
+- Uses the existing CSS `marquee-track` animation
+- Displays category tags in accent color: `[LIVE]`, `[THUNDER]`, `[WEATHER]`, `[OKC]`
 
-## 3. Men-Talk OKC: Login Code Gate
+### Curated Data Pool (Real OKC Information)
 
-The ULTIMATE MENS RESOURCE/ page gets a code-entry gate before showing content:
-- Full-screen overlay with the heading "MEN-TALK OKC" and a subtitle: "This space requires an access code."
-- A single input field for the code (styled brutalist: 2px border, monospaced, large)
-- Code: `73507` (hardcoded for now, can move to env/backend later)
-- On correct entry: stores in `localStorage` so you don't re-enter each visit
-- On wrong code: subtle shake animation, "Invalid code" message
-- Once authenticated: shows the Men-Talk content
-
----
-
-## 4. Creative Quote Block (Reference Screenshot Style)
-
-Inspired by the uploaded reference: a vertical terracotta accent bar on the left with a large italic quote beside it. This pattern appears on:
-- Homepage: *"The city is a chassis. We are the architects."*
-- Story page: similar structural quote
-- Community page: could use *"The problem isn't a lack of people. It's the friction of finding them."*
-
-CSS: a `border-l-4 border-accent pl-8` with `italic text-3xl md:text-5xl font-light` text.
+Static items that rotate alongside live data:
+- "FOUNDED APRIL 22, 1889 -- THE LAND RUN"
+- "DEVON ENERGY CENTER -- 844 FT -- TALLEST IN OK"
+- "SCISSORTAIL PARK -- 70 ACRES DOWNTOWN"
+- "PAYCOM CENTER -- HOME OF THE THUNDER"
+- "PASEO ARTS DISTRICT -- EST. 1929"
+- "BRICKTOWN CANAL -- 1 MILE LOOP"
+- "OKC NATIONAL MEMORIAL -- APRIL 19, 1995"
+- "BOATHOUSE DISTRICT -- OLYMPIC TRAINING SITE"
+- "FACTORY OBSCURA -- IMMERSIVE ART"
+- "WHEELER DISTRICT -- NEW URBANISM"
+- Mayor/city reference: "MAYOR DAVID HOLT -- SINCE 2018"
+- Thunder reference: "OKC THUNDER -- EST. 2008 -- NBA WESTERN CONFERENCE"
+- Population and metro stats mixed in
 
 ---
 
-## 5. All Pages: Brutalist Polish Pass
+## 2. Full UI/UX Overhaul -- Every Page
 
-Every page gets upgraded typography, spacing, and the theme system applied:
+The current design has the right bones but the execution feels flat. Here's every upgrade:
 
-- **Navbar**: Theme toggle button added (cycles light/dark/thunder). On homepage, navbar is transparent over the photo. Theme toggle uses `Sun`, `Moon`, `Zap` icons.
-- **Footer**: Tighter, more data-panel styled. Add OKC area code "405" and zip reference.
-- **Story page**: Add the cinematic quote block. Keep minimal — hero + quote + footer.
-- **Community page**: Push typography harder. Add numbered indices `(01)` through `(05)` on program rows.
-- **Info page**: Already solid, just ensure theme variables work on Thunder. i WANT ELOGANT SMALL FONT BUT NOT TOO CURSIVE. 
+### Homepage (`HeroSection.tsx`)
+
+**Problems**: Directory grid text is small and gets lost. Quote block floats without enough visual weight. CTA button is thin. Footer line is barely visible. Overall layout feels like a template.
+
+**Fixes**:
+- Replace the static ticker with the new `LiveTicker` component
+- Add a subtle **gradient overlay** on the background (not just flat black/70 -- use a gradient from black/80 at bottom to black/50 at top) for depth
+- Directory grid: add hover states with accent underlines, make each item a clickable link
+- CTA button: increase padding, add a subtle arrow icon, stronger hover state with scale
+- Footer line: slightly larger text, add a subtle top border
+- Header nav links: add active underline indicator, slightly larger hit targets
+- Add a subtle **vignette** effect on the background image edges
+
+### Community Page (`Community.tsx`)
+
+**Problems**: Hero section uses same background image as homepage (feels repetitive). Stats bar is visually flat. Program list items lack visual hierarchy. Neighborhoods section feels tacked on.
+
+**Fixes**:
+- Hero: use a **solid color block** (bg-primary) instead of the photo -- reserve the photo for homepage only
+- Stats bar: add accent-colored top border, bolder number styling with `tabular-nums`
+- Program list: add subtle left border accent on hover, icon containers get accent background on hover (not just border change)
+- Quote section: increase font size, add more vertical padding
+- Neighborhoods: style as a proper grid with hover accent borders, not just inline tags
+- CTA section: add a decorative monospaced data line
+
+### Story Page (`Story.tsx`)
+
+**Problems**: Three narrative blocks look identical with no visual variation. Values grid is basic.
+
+**Fixes**:
+- Alternate narrative block layouts -- odd blocks get accent left border, even blocks get accent right alignment
+- Values grid: add hover lift effect, accent number styling
+- Add a closing decorative element before the CTA
+
+### Info Page (`Info.tsx`)
+
+**Problems**: Contact cards are visually identical. FAQ accordion triggers are plain.
+
+**Fixes**:
+- Contact cards: alternate accent positions (icon color, border accents)
+- FAQ: add subtle left accent bar on the active/open item
+- About block: add more typographic weight
+
+### Podcast/Men-Talk Page (`Podcast.tsx`)
+
+**Problems**: Content placeholder section is a dead end visually.
+
+**Fixes**:
+- Replace "Content is Coming" placeholder with a more intentional "Sessions launching soon" message with a date reference
+- Pillars grid: add hover states with accent fills
+
+### MenTalkGate (`MenTalkGate.tsx`)
+
+**Fixes**:
+- Add a subtle background pattern or very faint grid texture
+- Increase input field visual weight
+- Add a keyboard hint ("Enter your 5-digit code")
+
+### Footer (`Footer.tsx`)
+
+**Fixes**:
+- Increase spacing between sections
+- Add subtle hover underlines on links
+- Neighborhood tags: add hover accent color
+
+### Navbar (`Navbar.tsx`)
+
+**Fixes**:
+- Add active route underline indicator (2px accent bar under current page)
+- Slightly increase nav height for breathing room
+- Mobile menu: add accent border on active link
 
 ---
 
-## 6. Technical Implementation
+## 3. CSS Upgrades (`index.css`)
+
+- Add a `.vignette` overlay utility for the homepage background
+- Add `.ticker-tag` utility for the `[WEATHER]` / `[THUNDER]` category labels
+- Refine `.marquee-track` speed -- slow it down slightly for readability with longer live content
+- Add subtle `::before` / `::after` decorative elements for section dividers
+- Add a `.glass` utility for subtle backdrop-blur effects where appropriate
+
+---
+
+## 4. Technical Implementation
 
 ### Files Created
 | File | Purpose |
 |---|---|
-| `src/components/ThemeProvider.tsx` | Custom theme provider wrapping `next-themes` to support 3 themes (light, dark, thunder) |
-| `src/components/ThemeToggle.tsx` | Cycle button: Sun -> Moon -> Zap icons |
-| `src/components/home/LogoReveal.tsx` | Framer Motion 3D logo animation component |
-| `src/components/MenTalkGate.tsx` | Access code input overlay for Men-Talk OKC |
+| `src/components/home/LiveTicker.tsx` | Live data ticker: weather API + curated OKC facts + Thunder info |
 
 ### Files Modified
 | File | Change |
 |---|---|
-| `src/index.css` | Add `.thunder` theme variables (navy/gold palette). Add `@keyframes marquee` for ticker. Add quote-block utility classes. |
-| `src/App.tsx` | Wrap with `ThemeProvider` |
-| `src/pages/Index.tsx` | Replace with single-viewport blueprint layout using `LogoReveal`, marquee, directory grid, quote block. Remove Navbar/Footer (homepage has its own inline nav). |
-| `src/components/home/HeroSection.tsx` | Complete rewrite: full-viewport fixed background, inline header with theme toggle, LogoReveal, quote block, numbered directory grid, marquee ticker, bottom footer line. `h-screen overflow-hidden`. |
-| `src/components/Navbar.tsx` | Add `ThemeToggle` component. Hide entirely on homepage (blueprint has its own nav). |
-| `src/pages/Podcast.tsx` | Wrap content with `MenTalkGate` — code `73507` required to view |
-| `src/pages/Community.tsx` | Add numbered indices `(01)-(05)` to program rows. Add quote block. Ensure Thunder theme works. |
-| `src/pages/Story.tsx` | Add cinematic quote block with vertical accent bar. |
-| `src/pages/Info.tsx` | Verify all three themes render correctly. |
-| `src/components/Footer.tsx` | Add "405" area code reference. Ensure Thunder theme styling. |
-| `tailwind.config.ts` | No changes needed — CSS variables handle theming. |
-| `index.html` | Add script to prevent flash of unstyled content (FOUC) for theme. |
+| `src/components/home/HeroSection.tsx` | Replace static ticker with LiveTicker, gradient overlay, vignette, directory hover states, stronger CTA |
+| `src/pages/Community.tsx` | Solid color hero (no photo), enhanced stats bar, program hover states, neighborhoods grid |
+| `src/pages/Story.tsx` | Alternating narrative layouts, values hover effects |
+| `src/pages/Info.tsx` | Contact card accents, FAQ active states, about block polish |
+| `src/pages/Podcast.tsx` | Replace placeholder copy, pillar hover states |
+| `src/components/MenTalkGate.tsx` | Background texture, input refinements |
+| `src/components/Footer.tsx` | Spacing, hover states, link underlines |
+| `src/components/Navbar.tsx` | Active route indicator, height increase, mobile polish |
+| `src/index.css` | Vignette utility, ticker-tag styling, glass utility, marquee speed tuning |
 
-### OKC Data Points Used
-- Population: 700,000+ city / 1.4M metro
-- Area code: 405
-- Zip reference: 73507 (also the Men-Talk access code — intentional)
-- Key neighborhoods: Midtown, Bricktown, Paseo, Plaza District
-- State: Oklahoma (OK)
-- Nickname: "The Big Friendly"
-
-### Animation Details (LogoReveal)
-Using Framer Motion (already installed):
-- "INSPIRE" text: `initial={{ x: -100, opacity: 0, filter: "blur(20px)" }}` -> `animate={{ x: 0, opacity: 1, filter: "blur(0px)" }}` with spring physics
-- "OKC" text: same but from right, in accent color, delayed 0.3s
-- Vertical accent bar: `scaleY` from 0 to 1, origin top
-- Quote text: fade up after 1.5s delay
-- Directory grid + UI: fade in after 2s delay
-- All using `motion.div` with `variants` for orchestration
-
+### Weather API Call (Open-Meteo, completely free)
+```text
+GET https://api.open-meteo.com/v1/forecast?latitude=35.4676&longitude=-97.5164&current=temperature_2m,weather_code&temperature_unit=fahrenheit&timezone=America/Chicago
+```
+No API key needed. Returns current temp and weather code which maps to conditions (clear, cloudy, rain, etc.).
