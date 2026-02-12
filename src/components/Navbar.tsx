@@ -17,7 +17,7 @@ export function Navbar() {
   const location = useLocation();
 
   const isHomepage = location.pathname === "/";
-  const isHeroPage = location.pathname === "/community";
+  const isHeroPage = ["/community", "/singles", "/workouts", "/volunteering", "/coaching"].includes(location.pathname);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);

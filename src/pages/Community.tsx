@@ -5,10 +5,10 @@ import { ArrowRight, Heart, Dumbbell, Target, HandHeart, MessageCircle, Users, M
 import { Link } from "react-router-dom";
 
 const programs = [
-  { num: "01", id: "singles", title: "Social Singles OKC", tag: "Community", icon: Heart, description: "Discover singles events, meetups, and social gatherings across Oklahoma City. From casual mixers to curated experiences.", href: "/community#singles" },
-  { num: "02", id: "workouts", title: "OKC Workouts", tag: "Fitness", icon: Dumbbell, description: "All things fitness — gyms, group runs, outdoor classes, and movement culture in OKC and the greater metro.", href: "/community#workouts" },
-  { num: "03", id: "volunteering", title: "Volunteering OKC", tag: "Service", icon: HandHeart, description: "Find volunteer opportunities and meaningful ways to give back across Oklahoma City neighborhoods.", href: "/community#volunteering" },
-  { num: "04", id: "coaching", title: "Coach TLC", tag: "Development", icon: Target, description: "Connect with personal coaching, mindset work, accountability partners, and growth resources.", href: "/community#coaching" },
+  { num: "01", id: "singles", title: "Social Singles OKC", tag: "Community", icon: Heart, description: "Discover singles events, meetups, and social gatherings across Oklahoma City. From casual mixers to curated experiences.", href: "/singles" },
+  { num: "02", id: "workouts", title: "Fitness OKC", tag: "Fitness", icon: Dumbbell, description: "All things fitness — gyms, group runs, outdoor classes, and movement culture in OKC and the greater metro.", href: "/workouts" },
+  { num: "03", id: "volunteering", title: "Volunteering OKC", tag: "Service", icon: HandHeart, description: "Find volunteer opportunities and meaningful ways to give back across Oklahoma City neighborhoods.", href: "/volunteering" },
+  { num: "04", id: "coaching", title: "Coach TLC", tag: "Development", icon: Target, description: "Connect with personal coaching, mindset work, accountability partners, and growth resources.", href: "/coaching" },
   { num: "05", id: "mentalk", title: "Men-Talk OKC", tag: "Conversation", icon: MessageCircle, description: "Real conversations for men about life, growth, and purpose. No filters, no fluff.", href: "/men-talk" },
 ];
 
