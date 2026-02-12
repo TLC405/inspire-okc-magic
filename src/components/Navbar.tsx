@@ -29,7 +29,6 @@ export function Navbar() {
     setIsOpen(false);
   }, [location.pathname]);
 
-  // Homepage has its own nav
   if (isHomepage) return null;
 
   return (
@@ -42,7 +41,7 @@ export function Navbar() {
             : "bg-transparent"
         )}
       >
-        <nav className="container flex items-center justify-between h-16 md:h-20">
+        <nav className="container flex items-center justify-between h-18 md:h-22">
           <Link to="/" className="relative z-10">
             <span className={cn(
               "text-xl md:text-2xl font-black tracking-[-0.02em]",
@@ -59,13 +58,16 @@ export function Navbar() {
                 key={link.href}
                 to={link.href}
                 className={cn(
-                  "label-caps py-1 transition-colors duration-150",
+                  "label-caps py-2 transition-colors duration-150 relative",
                   location.pathname === link.href
                     ? (!scrolled && isHeroPage ? "text-white" : "text-foreground")
                     : (!scrolled && isHeroPage ? "text-white/50 hover:text-white" : "text-muted-foreground hover:text-foreground")
                 )}
               >
                 {link.label}
+                {location.pathname === link.href && (
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent" />
+                )}
               </Link>
             ))}
             <ThemeToggle className={cn(
@@ -106,13 +108,16 @@ export function Navbar() {
                   key={link.href}
                   to={link.href}
                   className={cn(
-                    "text-2xl font-bold transition-colors",
+                    "text-2xl font-bold transition-colors relative",
                     location.pathname === link.href
                       ? "text-foreground"
                       : "text-muted-foreground"
                   )}
                 >
                   {link.label}
+                  {location.pathname === link.href && (
+                    <span className="absolute -left-4 top-0 bottom-0 w-1 bg-accent" />
+                  )}
                 </Link>
               ))}
             </nav>

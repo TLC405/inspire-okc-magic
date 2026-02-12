@@ -11,6 +11,24 @@ const values = [
   { num: "04", title: "Community First", text: "Every decision we make asks one question: does this make Oklahoma City more connected?" },
 ];
 
+const narrativeBlocks = [
+  {
+    label: "The Problem",
+    heading: "700,000 people. One city. Zero excuses.",
+    body: "Oklahoma City has everything — culture, energy, neighborhoods with soul. Midtown, Bricktown, the Paseo Arts District, Plaza District. But connection doesn't happen by accident. People move here, people live here, and still feel like strangers. The infrastructure for belonging barely exists. INSPIRE OKC was built to change that equation.",
+  },
+  {
+    label: "The Insight",
+    heading: "People don't need another social network",
+    body: "They need a map. A finder. Something that says: here's where the people are, here's what they're doing, here's how to show up. That's what a directory does. It removes the guesswork and leaves only the action. No algorithms, no feeds, no engagement metrics — just real connection points in your city.",
+  },
+  {
+    label: "The Solution",
+    heading: "Five directories. One mission.",
+    body: "Social Singles OKC for finding your people. OKC Workouts for moving your body. Volunteering OKC for giving back. Coach TLC for personal growth. Men-Talk OKC for real conversations. Each one independent. Each one free to browse. Each one designed to reduce the friction between wanting to belong and actually belonging.",
+  },
+];
+
 const Story = () => {
   return (
     <div className="min-h-screen bg-background">
@@ -50,44 +68,26 @@ const Story = () => {
           </div>
         </section>
 
-        {/* Narrative blocks */}
+        {/* Narrative blocks with alternating layout */}
         <section className="py-20 md:py-28">
           <div className="container max-w-3xl space-y-16 md:space-y-24">
-            <ScrollReveal>
-              <div>
-                <p className="label-caps text-accent mb-4 tracking-[0.3em]">The Problem</p>
-                <h2 className="text-3xl md:text-5xl font-black tracking-[-0.03em] text-foreground leading-[0.95] mb-6">
-                  700,000 people. One city. Zero excuses.
-                </h2>
-                <p className="text-base text-muted-foreground leading-relaxed max-w-2xl">
-                  Oklahoma City has everything — culture, energy, neighborhoods with soul. Midtown, Bricktown, the Paseo Arts District, Plaza District. But connection doesn't happen by accident. People move here, people live here, and still feel like strangers. The infrastructure for belonging barely exists. INSPIRE OKC was built to change that equation.
-                </p>
-              </div>
-            </ScrollReveal>
-
-            <ScrollReveal>
-              <div>
-                <p className="label-caps text-accent mb-4 tracking-[0.3em]">The Insight</p>
-                <h2 className="text-3xl md:text-5xl font-black tracking-[-0.03em] text-foreground leading-[0.95] mb-6">
-                  People don't need another social network
-                </h2>
-                <p className="text-base text-muted-foreground leading-relaxed max-w-2xl">
-                  They need a map. A finder. Something that says: here's where the people are, here's what they're doing, here's how to show up. That's what a directory does. It removes the guesswork and leaves only the action. No algorithms, no feeds, no engagement metrics — just real connection points in your city.
-                </p>
-              </div>
-            </ScrollReveal>
-
-            <ScrollReveal>
-              <div>
-                <p className="label-caps text-accent mb-4 tracking-[0.3em]">The Solution</p>
-                <h2 className="text-3xl md:text-5xl font-black tracking-[-0.03em] text-foreground leading-[0.95] mb-6">
-                  Five directories. One mission.
-                </h2>
-                <p className="text-base text-muted-foreground leading-relaxed max-w-2xl">
-                  Social Singles OKC for finding your people. OKC Workouts for moving your body. Volunteering OKC for giving back. Coach TLC for personal growth. Men-Talk OKC for real conversations. Each one independent. Each one free to browse. Each one designed to reduce the friction between wanting to belong and actually belonging.
-                </p>
-              </div>
-            </ScrollReveal>
+            {narrativeBlocks.map((block, i) => (
+              <ScrollReveal key={block.label}>
+                <div className={
+                  i % 2 === 0
+                    ? "border-l-4 border-l-accent pl-6 md:pl-10"
+                    : "border-r-4 border-r-accent pr-6 md:pr-10 text-right"
+                }>
+                  <p className="label-caps text-accent mb-4 tracking-[0.3em]">{block.label}</p>
+                  <h2 className="text-3xl md:text-5xl font-black tracking-[-0.03em] text-foreground leading-[0.95] mb-6">
+                    {block.heading}
+                  </h2>
+                  <p className={`text-base text-muted-foreground leading-relaxed max-w-2xl ${i % 2 !== 0 ? "ml-auto" : ""}`}>
+                    {block.body}
+                  </p>
+                </div>
+              </ScrollReveal>
+            ))}
           </div>
         </section>
 
@@ -104,8 +104,8 @@ const Story = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-0 border-2 border-border">
               {values.map((v) => (
                 <ScrollReveal key={v.num}>
-                  <div className="p-8 md:p-10 border-b-2 md:odd:border-r-2 border-border last:border-b-0 md:[&:nth-last-child(-n+2)]:border-b-0">
-                    <span className="font-mono text-accent text-xs">({v.num})</span>
+                  <div className="p-8 md:p-10 border-b-2 md:odd:border-r-2 border-border last:border-b-0 md:[&:nth-last-child(-n+2)]:border-b-0 hover-lift cursor-default">
+                    <span className="font-mono text-accent text-sm font-bold">({v.num})</span>
                     <h3 className="text-xl font-black text-foreground tracking-tight mt-2 mb-3">{v.title}</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">{v.text}</p>
                   </div>
@@ -114,6 +114,15 @@ const Story = () => {
             </div>
           </div>
         </section>
+
+        {/* Decorative data line before CTA */}
+        <div className="border-t-2 border-border">
+          <div className="container max-w-4xl py-4 flex items-center justify-between">
+            <span className="font-mono text-muted-foreground/20 text-[10px]">INSPIRE OKC · EST. 2024</span>
+            <div className="h-px flex-1 mx-6 bg-border" />
+            <span className="font-mono text-muted-foreground/20 text-[10px]">405 · OKC · OK</span>
+          </div>
+        </div>
 
         {/* CTA */}
         <section className="py-24 md:py-32 bg-primary text-primary-foreground border-t-2 border-border">
@@ -128,7 +137,7 @@ const Story = () => {
               </p>
               <Link
                 to="/community"
-                className="inline-flex items-center gap-3 border-2 border-accent text-accent label-caps py-3 px-8 hover:bg-accent hover:text-accent-foreground transition-colors duration-150"
+                className="inline-flex items-center gap-3 border-2 border-accent text-accent label-caps py-4 px-10 hover:bg-accent hover:text-accent-foreground hover:scale-[1.02] transition-all duration-150"
               >
                 Browse Directories <ArrowRight size={14} />
               </Link>

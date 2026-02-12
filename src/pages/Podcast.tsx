@@ -2,7 +2,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { MenTalkGate } from "@/components/MenTalkGate";
-import { MessageCircle, Shield, Users, ArrowRight } from "lucide-react";
+import { MessageCircle, Shield, Users, ArrowRight, Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const pillars = [
@@ -65,10 +65,12 @@ const Podcast = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border-2 border-border">
                 {pillars.map((p) => (
                   <ScrollReveal key={p.num}>
-                    <div className="p-8 md:p-10 border-b-2 md:border-b-0 md:border-r-2 border-border last:border-r-0 last:border-b-0">
+                    <div className="p-8 md:p-10 border-b-2 md:border-b-0 md:border-r-2 border-border last:border-r-0 last:border-b-0 group hover:bg-accent/5 transition-colors">
                       <div className="flex items-center gap-3 mb-4">
                         <span className="font-mono text-accent text-xs">({p.num})</span>
-                        <p.icon size={18} className="text-accent" />
+                        <div className="w-8 h-8 border-2 border-border flex items-center justify-center group-hover:border-accent group-hover:bg-accent/10 transition-all">
+                          <p.icon size={14} className="text-accent" />
+                        </div>
                       </div>
                       <h3 className="text-xl font-black text-foreground tracking-tight mb-3">{p.title}</h3>
                       <p className="text-sm text-muted-foreground leading-relaxed">{p.text}</p>
@@ -79,15 +81,18 @@ const Podcast = () => {
             </div>
           </section>
 
-          {/* Content placeholder */}
+          {/* Sessions launching */}
           <section className="py-20 md:py-28 border-t-2 border-border bg-secondary/20">
             <div className="container max-w-lg text-center">
               <ScrollReveal>
                 <div className="border-2 border-border p-12 md:p-16">
-                  <MessageCircle size={28} className="mx-auto text-muted-foreground/30 mb-6" />
-                  <p className="text-xl font-black text-foreground mb-2">Content is Coming</p>
+                  <div className="w-12 h-12 border-2 border-accent flex items-center justify-center mx-auto mb-6">
+                    <Calendar size={20} className="text-accent" />
+                  </div>
+                  <p className="text-xl font-black text-foreground mb-2">Sessions Launching Soon</p>
+                  <p className="label-caps text-accent mb-4 tracking-[0.2em]">Spring 2026</p>
                   <p className="text-sm text-muted-foreground mb-8 leading-relaxed">
-                    Conversations, resources, and community updates will live here. Stay tuned.
+                    Conversations, resources, and community updates will live here. The room is being prepared.
                   </p>
                   <Link
                     to="/community"

@@ -2,13 +2,13 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Mail, MapPin, Clock, Phone, ExternalLink } from "lucide-react";
+import { Mail, MapPin, Clock, Phone } from "lucide-react";
 
 const contactCards = [
-  { icon: Mail, label: "Email", value: "hello@inspireokc.com", sub: "Primary contact" },
-  { icon: MapPin, label: "Location", value: "Oklahoma City, OK", sub: "The Big Friendly" },
-  { icon: Phone, label: "Area Code", value: "405", sub: "OKC Metro" },
-  { icon: Clock, label: "Response", value: "Within 48hrs", sub: "Usually faster" },
+  { icon: Mail, label: "Email", value: "hello@inspireokc.com", sub: "Primary contact", accent: true },
+  { icon: MapPin, label: "Location", value: "Oklahoma City, OK", sub: "The Big Friendly", accent: false },
+  { icon: Phone, label: "Area Code", value: "405", sub: "OKC Metro", accent: true },
+  { icon: Clock, label: "Response", value: "Within 48hrs", sub: "Usually faster", accent: false },
 ];
 
 const faqs = [
@@ -72,8 +72,8 @@ const Info = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 border-2 border-border">
               {contactCards.map((card, i) => (
                 <ScrollReveal key={card.label} delay={i * 0.05}>
-                  <div className="p-6 md:p-8 border-b-2 md:border-b-0 md:border-r-2 border-border last:border-r-0 last:border-b-0 [&:nth-child(2)]:border-r-0 md:[&:nth-child(2)]:border-r-2">
-                    <card.icon size={18} className="text-accent mb-4" />
+                  <div className={`p-6 md:p-8 border-b-2 md:border-b-0 md:border-r-2 border-border last:border-r-0 last:border-b-0 [&:nth-child(2)]:border-r-0 md:[&:nth-child(2)]:border-r-2 ${card.accent ? "border-t-4 border-t-accent" : ""}`}>
+                    <card.icon size={18} className={card.accent ? "text-accent mb-4" : "text-muted-foreground mb-4"} />
                     <p className="label-caps text-muted-foreground/50 mb-1">{card.label}</p>
                     <p className="text-lg md:text-xl font-black text-foreground tracking-tight">{card.value}</p>
                     <p className="text-xs text-muted-foreground mt-1">{card.sub}</p>
@@ -90,6 +90,9 @@ const Info = () => {
             <ScrollReveal>
               <div className="quote-block">
                 <p className="label-caps text-accent mb-4 tracking-[0.3em]">About</p>
+                <h2 className="text-2xl md:text-3xl font-black text-foreground tracking-tight mb-6 leading-tight">
+                  Community infrastructure for Oklahoma City
+                </h2>
                 <p className="text-lg md:text-xl text-foreground/80 leading-relaxed">
                   INSPIRE OKC is a collection of five community directories designed to make belonging in Oklahoma City effortless. We serve the entire metro — from Deep Deuce to Automobile Alley, Film Row to Uptown 23rd. No memberships, no dues, no applications. Just tools that help you find your people.
                 </p>
@@ -113,7 +116,11 @@ const Info = () => {
               <div className="border-2 border-border">
                 <Accordion type="single" collapsible>
                   {faqs.map((faq, i) => (
-                    <AccordionItem key={i} value={`item-${i}`} className="border-b-2 border-border last:border-b-0 px-6 md:px-8">
+                    <AccordionItem
+                      key={i}
+                      value={`item-${i}`}
+                      className="border-b-2 border-border last:border-b-0 px-6 md:px-8 data-[state=open]:border-l-4 data-[state=open]:border-l-accent data-[state=open]:bg-secondary/30"
+                    >
                       <AccordionTrigger className="text-base md:text-lg font-bold text-foreground hover:text-accent hover:no-underline transition-colors py-6">
                         <span className="flex items-center gap-4 text-left">
                           <span className="font-mono text-accent text-xs flex-shrink-0">({String(i + 1).padStart(2, "0")})</span>

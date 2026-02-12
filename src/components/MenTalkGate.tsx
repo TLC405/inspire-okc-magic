@@ -32,14 +32,23 @@ export function MenTalkGate({ children }: { children: React.ReactNode }) {
   if (authenticated) return <>{children}</>;
 
   return (
-    <div className="fixed inset-0 z-50 bg-background flex items-center justify-center">
+    <div
+      className="fixed inset-0 z-50 bg-background flex items-center justify-center"
+      style={{
+        backgroundImage: `
+          linear-gradient(hsl(var(--border) / 0.15) 1px, transparent 1px),
+          linear-gradient(90deg, hsl(var(--border) / 0.15) 1px, transparent 1px)
+        `,
+        backgroundSize: "40px 40px",
+      }}
+    >
       <motion.div
         animate={shake ? { x: [-12, 12, -8, 8, -4, 4, 0] } : {}}
         transition={{ duration: 0.4 }}
         className="text-center max-w-md px-6"
       >
-        <div className="w-12 h-12 border-2 border-border flex items-center justify-center mx-auto mb-8">
-          <Lock size={18} className="text-accent" />
+        <div className="w-14 h-14 border-2 border-border flex items-center justify-center mx-auto mb-8">
+          <Lock size={20} className="text-accent" />
         </div>
 
         <p className="label-caps text-accent mb-6 tracking-[0.3em]">
@@ -57,15 +66,18 @@ export function MenTalkGate({ children }: { children: React.ReactNode }) {
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="text"
-            value={code}
-            onChange={(e) => { setCode(e.target.value); setError(false); }}
-            placeholder="• • • • •"
-            maxLength={5}
-            className="w-full bg-transparent border-2 border-border text-foreground text-center text-3xl font-mono tracking-[0.3em] py-5 px-6 focus:outline-none focus:border-accent transition-colors"
-            autoFocus
-          />
+          <div>
+            <input
+              type="text"
+              value={code}
+              onChange={(e) => { setCode(e.target.value); setError(false); }}
+              placeholder="• • • • •"
+              maxLength={5}
+              className="w-full bg-transparent border-2 border-border text-foreground text-center text-3xl font-mono tracking-[0.3em] py-5 px-6 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all"
+              autoFocus
+            />
+            <p className="text-[10px] text-muted-foreground/40 font-mono mt-2 tracking-wider">ENTER YOUR 5-DIGIT CODE</p>
+          </div>
           {error && (
             <p className="text-sm text-destructive font-medium">Invalid code — try again</p>
           )}
