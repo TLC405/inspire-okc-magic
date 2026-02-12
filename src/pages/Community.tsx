@@ -5,11 +5,11 @@ import { ArrowRight, Heart, Dumbbell, Target, HandHeart, MessageCircle, Users, M
 import { Link } from "react-router-dom";
 
 const programs = [
-  { num: "01", title: "Social Singles OKC", tag: "Community", icon: Heart, description: "Discover singles events, meetups, and social gatherings across Oklahoma City. From casual mixers to curated experiences.", href: "/community" },
-  { num: "02", title: "OKC Workouts", tag: "Fitness", icon: Dumbbell, description: "All things fitness — gyms, group runs, outdoor classes, and movement culture in OKC and the greater metro.", href: "/community" },
-  { num: "03", title: "Volunteering OKC", tag: "Service", icon: HandHeart, description: "Find volunteer opportunities and meaningful ways to give back across Oklahoma City neighborhoods.", href: "/community" },
-  { num: "04", title: "Coach TLC", tag: "Development", icon: Target, description: "Connect with personal coaching, mindset work, accountability partners, and growth resources.", href: "/community" },
-  { num: "05", title: "Men-Talk OKC", tag: "Conversation", icon: MessageCircle, description: "Real conversations for men about life, growth, and purpose. No filters, no fluff.", href: "/men-talk" },
+  { num: "01", id: "singles", title: "Social Singles OKC", tag: "Community", icon: Heart, description: "Discover singles events, meetups, and social gatherings across Oklahoma City. From casual mixers to curated experiences.", href: "/community#singles" },
+  { num: "02", id: "workouts", title: "OKC Workouts", tag: "Fitness", icon: Dumbbell, description: "All things fitness — gyms, group runs, outdoor classes, and movement culture in OKC and the greater metro.", href: "/community#workouts" },
+  { num: "03", id: "volunteering", title: "Volunteering OKC", tag: "Service", icon: HandHeart, description: "Find volunteer opportunities and meaningful ways to give back across Oklahoma City neighborhoods.", href: "/community#volunteering" },
+  { num: "04", id: "coaching", title: "Coach TLC", tag: "Development", icon: Target, description: "Connect with personal coaching, mindset work, accountability partners, and growth resources.", href: "/community#coaching" },
+  { num: "05", id: "mentalk", title: "Men-Talk OKC", tag: "Conversation", icon: MessageCircle, description: "Real conversations for men about life, growth, and purpose. No filters, no fluff.", href: "/men-talk" },
 ];
 
 const stats = [
@@ -50,8 +50,8 @@ const Community = () => {
               {stats.map((stat, i) => (
                 <ScrollReveal key={stat.label} delay={i * 0.05}>
                   <div className="py-8 md:py-10 px-6 border-r-2 border-border last:border-r-0 text-center">
-                    <p className="text-3xl md:text-4xl font-black text-accent tracking-tight tabular-nums">{stat.value}</p>
-                    <p className="label-caps text-muted-foreground mt-1">{stat.label}</p>
+                    <p className="text-3xl md:text-5xl font-black text-accent tracking-tight tabular-nums">{stat.value}</p>
+                    <p className="label-caps text-muted-foreground mt-2">{stat.label}</p>
                   </div>
                 </ScrollReveal>
               ))}
@@ -91,7 +91,7 @@ const Community = () => {
           </div>
         </section>
 
-        {/* Programs grid */}
+        {/* Programs grid with scroll anchor IDs */}
         <section className="py-20 md:py-28">
           <div className="container max-w-5xl">
             <ScrollReveal>
@@ -105,27 +105,29 @@ const Community = () => {
             <div className="border-2 border-border">
               {programs.map((program) => (
                 <ScrollReveal key={program.num}>
-                  <Link
-                    to={program.href}
-                    className="group flex items-center gap-5 md:gap-8 p-6 md:p-8 border-b-2 border-border last:border-b-0 hover:bg-secondary/50 transition-all duration-150 border-l-4 border-l-transparent hover:border-l-accent"
-                  >
-                    <span className="font-mono text-accent text-sm flex-shrink-0 w-8">({program.num})</span>
-                    <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 border-2 border-border flex items-center justify-center group-hover:border-accent group-hover:bg-accent/10 transition-all">
-                      <program.icon size={18} className="text-muted-foreground group-hover:text-accent transition-colors" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-baseline gap-3 mb-1">
-                        <h2 className="text-lg md:text-xl font-black text-foreground tracking-tight group-hover:text-accent transition-colors">
-                          {program.title}
-                        </h2>
-                        <span className="label-caps text-muted-foreground/50">{program.tag}</span>
+                  <div id={program.id} className="scroll-mt-24">
+                    <Link
+                      to={program.href}
+                      className="group flex items-center gap-5 md:gap-8 p-6 md:p-8 border-b-2 border-border last:border-b-0 hover:bg-secondary/50 transition-all duration-150 border-l-4 border-l-transparent hover:border-l-accent"
+                    >
+                      <span className="font-mono text-accent text-sm flex-shrink-0 w-8">({program.num})</span>
+                      <div className="flex-shrink-0 w-12 h-12 md:w-14 md:h-14 border-2 border-border flex items-center justify-center group-hover:border-accent group-hover:bg-accent/10 transition-all">
+                        <program.icon size={22} className="text-muted-foreground group-hover:text-accent transition-colors" />
                       </div>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        {program.description}
-                      </p>
-                    </div>
-                    <ArrowRight size={16} className="text-muted-foreground/30 group-hover:text-accent group-hover:translate-x-1 transition-all flex-shrink-0" />
-                  </Link>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-baseline gap-3 mb-1">
+                          <h2 className="text-lg md:text-xl font-black text-foreground tracking-tight group-hover:text-accent transition-colors">
+                            {program.title}
+                          </h2>
+                          <span className="label-caps text-muted-foreground/50">{program.tag}</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          {program.description}
+                        </p>
+                      </div>
+                      <ArrowRight size={16} className="text-muted-foreground/30 group-hover:text-accent group-hover:translate-x-1 transition-all flex-shrink-0" />
+                    </Link>
+                  </div>
                 </ScrollReveal>
               ))}
             </div>

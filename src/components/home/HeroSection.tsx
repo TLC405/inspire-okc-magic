@@ -1,20 +1,29 @@
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Menu, X } from "lucide-react";
 import { LogoReveal } from "./LogoReveal";
 import { LiveTicker } from "./LiveTicker";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const directories = [
-  { num: "01", name: "Social Singles OKC", desc: "Events & meetups", href: "/community" },
-  { num: "02", name: "OKC Workouts", desc: "Fitness & movement", href: "/community" },
-  { num: "03", name: "Volunteering OKC", desc: "Give back locally", href: "/community" },
-  { num: "04", name: "Coach TLC", desc: "Personal growth", href: "/community" },
+  { num: "01", name: "Social Singles OKC", desc: "Events & meetups", href: "/community#singles" },
+  { num: "02", name: "OKC Workouts", desc: "Fitness & movement", href: "/community#workouts" },
+  { num: "03", name: "Volunteering OKC", desc: "Give back locally", href: "/community#volunteering" },
+  { num: "04", name: "Coach TLC", desc: "Personal growth", href: "/community#coaching" },
   { num: "05", name: "Men-Talk OKC", desc: "Real conversations", href: "/men-talk" },
 ];
 
+const navLinks = [
+  { label: "Story", href: "/story" },
+  { label: "Programs", href: "/community" },
+  { label: "Info", href: "/info" },
+];
+
 export function HeroSection() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   return (
     <section className="relative h-screen overflow-hidden flex flex-col">
       {/* Background with vignette */}
@@ -25,38 +34,67 @@ export function HeroSection() {
         style={{ position: "fixed" }}
         loading="eager"
       />
-      {/* Gradient overlay for depth */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/65 to-black/50" />
-      {/* Vignette */}
       <div className="vignette" />
 
-      {/* Header */}
+      {/* Header — no small logo, just nav + toggle */}
       <motion.header
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 2, duration: 0.5 }}
         className="relative z-10 flex items-center justify-between px-6 md:px-10 py-5"
       >
-        <div className="flex items-center gap-2">
-          <span className="text-xl font-black tracking-[-0.02em] text-white">INSPIRE</span>
-          <span className="label-caps text-accent">OKC</span>
+        <div className="hidden md:flex items-center gap-8">
+          {navLinks.map((link) => (
+            <Link key={link.href} to={link.href} className="label-caps text-white/40 hover:text-white transition-colors py-1">
+              {link.label}
+            </Link>
+          ))}
         </div>
-        <div className="flex items-center gap-8">
-          <Link to="/story" className="label-caps text-white/40 hover:text-white transition-colors hidden md:block py-1">Story</Link>
-          <Link to="/community" className="label-caps text-white/40 hover:text-white transition-colors hidden md:block py-1">Programs</Link>
-          <Link to="/info" className="label-caps text-white/40 hover:text-white transition-colors hidden md:block py-1">Info</Link>
+        {/* Spacer on mobile to push toggle + hamburger right */}
+        <div className="md:hidden flex-1" />
+        <div className="flex items-center gap-3">
           <ThemeToggle className="text-white/40 hover:text-white" />
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="md:hidden p-2 text-white/60 hover:text-white transition-colors"
+            aria-label="Toggle menu"
+          >
+            {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
         </div>
       </motion.header>
 
+      {/* Mobile nav overlay */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="fixed inset-0 z-40 bg-black/95 flex flex-col items-center justify-center gap-8 md:hidden"
+          >
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                to={link.href}
+                onClick={() => setMobileOpen(false)}
+                className="text-2xl font-bold text-white/60 hover:text-white transition-colors"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Main content */}
       <div className="relative z-10 flex-1 flex flex-col justify-center px-6 md:px-10 max-w-6xl">
-        {/* Logo reveal */}
         <div className="mb-6">
           <LogoReveal />
         </div>
 
-        {/* Quote block */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -68,35 +106,34 @@ export function HeroSection() {
           </p>
         </motion.div>
 
-        {/* Live ticker */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.8, duration: 0.5 }}
-          className="mb-6"
+          className="mb-8"
         >
           <LiveTicker />
         </motion.div>
 
-        {/* Directory grid */}
+        {/* Directory grid — clickable with proper destinations */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 2, duration: 0.5 }}
-          className="grid grid-cols-2 md:grid-cols-5 gap-x-6 gap-y-3 mb-6"
+          className="grid grid-cols-2 md:grid-cols-5 gap-x-8 gap-y-4 mb-8"
         >
           {directories.map((d) => (
             <Link
               key={d.num}
               to={d.href}
-              className="group block"
+              className="group block py-2"
             >
               <span className="font-mono text-accent text-xs">({d.num})</span>
-              <p className="text-white text-sm font-bold tracking-tight leading-tight group-hover:text-accent transition-colors">
+              <p className="text-white text-base font-bold tracking-tight leading-tight group-hover:text-accent transition-colors duration-150">
                 {d.name}
               </p>
-              <p className="text-white/25 text-xs group-hover:text-white/40 transition-colors">{d.desc}</p>
-              <div className="h-0.5 w-0 bg-accent group-hover:w-full transition-all duration-200 mt-1" />
+              <p className="text-white/25 text-xs group-hover:text-white/50 transition-colors">{d.desc}</p>
+              <div className="h-0.5 w-0 bg-accent group-hover:w-full transition-all duration-300 mt-1.5" />
             </Link>
           ))}
         </motion.div>
