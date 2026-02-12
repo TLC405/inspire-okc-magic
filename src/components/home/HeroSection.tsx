@@ -8,10 +8,10 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const directories = [
-  { num: "01", name: "Social Singles OKC", desc: "Events & meetups", href: "/community#singles" },
-  { num: "02", name: "OKC Workouts", desc: "Fitness & movement", href: "/community#workouts" },
-  { num: "03", name: "Volunteering OKC", desc: "Give back locally", href: "/community#volunteering" },
-  { num: "04", name: "Coach TLC", desc: "Personal growth", href: "/community#coaching" },
+  { num: "01", name: "Social Singles OKC", desc: "Events & meetups", href: "/singles" },
+  { num: "02", name: "Fitness OKC", desc: "Fitness & movement", href: "/workouts" },
+  { num: "03", name: "Volunteering OKC", desc: "Give back locally", href: "/volunteering" },
+  { num: "04", name: "Coach TLC", desc: "Personal growth", href: "/coaching" },
   { num: "05", name: "Men-Talk OKC", desc: "Real conversations", href: "/men-talk" },
 ];
 

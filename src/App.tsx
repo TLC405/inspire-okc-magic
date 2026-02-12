@@ -7,6 +7,10 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import Index from "./pages/Index";
 import Story from "./pages/Story";
 import Community from "./pages/Community";
+import Singles from "./pages/Singles";
+import Workouts from "./pages/Workouts";
+import Volunteering from "./pages/Volunteering";
+import Coaching from "./pages/Coaching";
 import Info from "./pages/Info";
 import Podcast from "./pages/Podcast";
 import NotFound from "./pages/NotFound";
@@ -24,6 +28,10 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/story" element={<Story />} />
             <Route path="/community" element={<Community />} />
+            <Route path="/singles" element={<Singles />} />
+            <Route path="/workouts" element={<Workouts />} />
+            <Route path="/volunteering" element={<Volunteering />} />
+            <Route path="/coaching" element={<Coaching />} />
             <Route path="/info" element={<Info />} />
             <Route path="/men-talk" element={<Podcast />} />
             <Route path="*" element={<NotFound />} />
