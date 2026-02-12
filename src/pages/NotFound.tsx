@@ -2,7 +2,7 @@ import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
-import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
 
 const NotFound = () => {
   const location = useLocation();
@@ -20,15 +20,18 @@ const NotFound = () => {
             Page Not Found
           </p>
           <h1 className="text-8xl md:text-9xl font-black tracking-tighter mb-4">404</h1>
-          <p className="text-base text-primary-foreground/50 mb-8">
+          <p className="text-base text-primary-foreground/50 mb-2">
             This page doesn't exist yet.
           </p>
-          <Button
-            asChild
-            className="bg-accent text-accent-foreground hover:bg-accent/90 text-sm tracking-wide px-8 h-12 rounded-sm shadow-md"
+          <p className="text-xs font-mono text-primary-foreground/15 mb-10">
+            REF: {location.pathname} · OKC-73507
+          </p>
+          <Link
+            to="/"
+            className="inline-flex items-center gap-3 border-2 border-accent text-accent label-caps py-4 px-10 hover:bg-accent hover:text-accent-foreground hover:scale-[1.02] transition-all duration-150"
           >
-            <Link to="/">Return Home</Link>
-          </Button>
+            Return Home <ArrowRight size={14} />
+          </Link>
         </div>
       </div>
     </div>

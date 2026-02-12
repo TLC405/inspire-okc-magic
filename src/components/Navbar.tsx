@@ -29,6 +29,7 @@ export function Navbar() {
     setIsOpen(false);
   }, [location.pathname]);
 
+  // Homepage has its own header built into HeroSection
   if (isHomepage) return null;
 
   return (

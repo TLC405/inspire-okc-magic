@@ -12,10 +12,10 @@ const footerLinks = [
   {
     title: "Directories",
     links: [
-      { label: "Social Singles OKC", href: "/community" },
-      { label: "OKC Workouts", href: "/community" },
-      { label: "Volunteering OKC", href: "/community" },
-      { label: "Coach TLC", href: "/community" },
+      { label: "Social Singles OKC", href: "/community#singles" },
+      { label: "OKC Workouts", href: "/community#workouts" },
+      { label: "Volunteering OKC", href: "/community#volunteering" },
+      { label: "Coach TLC", href: "/community#coaching" },
       { label: "Men-Talk OKC", href: "/men-talk" },
     ],
   },
