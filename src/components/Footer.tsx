@@ -25,19 +25,19 @@ export function Footer() {
   return (
     <footer className="bg-primary text-primary-foreground border-t-2 border-border">
       {/* Main footer */}
-      <div className="container py-16 md:py-24">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
+      <div className="container py-20 md:py-28">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-12">
           <div>
-            <div className="mb-4">
+            <div className="mb-6">
               <span className="text-2xl font-black tracking-[-0.02em]">INSPIRE</span>
               <span className="label-caps text-accent ml-2">OKC</span>
             </div>
-            <p className="text-sm text-primary-foreground/40 max-w-xs leading-relaxed mb-4">
+            <p className="text-sm text-primary-foreground/40 max-w-xs leading-relaxed mb-6">
               Community. Connection. Health. Five directories built around the psychology of belonging in Oklahoma City.
             </p>
-            <div className="flex flex-wrap gap-2 mb-4">
+            <div className="flex flex-wrap gap-2 mb-6">
               {["Midtown", "Bricktown", "Paseo", "Plaza", "NW OKC"].map((area) => (
-                <span key={area} className="text-[10px] font-mono text-primary-foreground/15 border border-primary-foreground/10 px-2 py-0.5">
+                <span key={area} className="text-[10px] font-mono text-primary-foreground/20 border border-primary-foreground/10 px-2 py-1 hover:text-accent hover:border-accent/30 transition-colors cursor-default">
                   {area}
                 </span>
               ))}
@@ -49,13 +49,13 @@ export function Footer() {
 
           {footerLinks.map((group) => (
             <div key={group.title}>
-              <h4 className="label-caps text-primary-foreground/25 mb-5 tracking-[0.2em]">{group.title}</h4>
-              <ul className="space-y-3">
+              <h4 className="label-caps text-primary-foreground/25 mb-6 tracking-[0.2em]">{group.title}</h4>
+              <ul className="space-y-4">
                 {group.links.map((link) => (
                   <li key={link.label}>
                     <Link
                       to={link.href}
-                      className="text-sm text-primary-foreground/40 hover:text-primary-foreground transition-colors duration-150"
+                      className="text-sm text-primary-foreground/40 hover:text-primary-foreground transition-colors duration-150 relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-px after:bottom-0 after:left-0 after:bg-accent after:origin-bottom-right after:transition-transform after:duration-200 hover:after:scale-x-100 hover:after:origin-bottom-left"
                     >
                       {link.label}
                     </Link>
