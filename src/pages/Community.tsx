@@ -1,35 +1,45 @@
+import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import { ArrowRight, Heart, Dumbbell, Target, HandHeart, MessageCircle, Users, MapPin } from "lucide-react";
+import { ArrowRight, Heart, Dumbbell, Target, HandHeart, MessageCircle, Users, MapPin, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const programs = [
-  { num: "01", id: "singles", title: "Social Singles OKC", tag: "Community", icon: Heart, description: "Discover singles events, meetups, and social gatherings across Oklahoma City. From casual mixers to curated experiences.", href: "/singles" },
-  { num: "02", id: "workouts", title: "Fitness OKC", tag: "Fitness", icon: Dumbbell, description: "All things fitness — gyms, group runs, outdoor classes, and movement culture in OKC and the greater metro.", href: "/workouts" },
-  { num: "03", id: "volunteering", title: "Volunteering OKC", tag: "Service", icon: HandHeart, description: "Find volunteer opportunities and meaningful ways to give back across Oklahoma City neighborhoods.", href: "/volunteering" },
+  { num: "01", id: "singles", title: "Social Singles", tag: "Community", icon: Heart, description: "Discover singles events, meetups, and social gatherings across Oklahoma City. From casual mixers to curated experiences.", href: "/singles" },
+  { num: "02", id: "workouts", title: "Fitness", tag: "Fitness", icon: Dumbbell, description: "All things fitness — gyms, group runs, outdoor classes, and movement culture in Oklahoma City and the greater metro.", href: "/workouts" },
+  { num: "03", id: "volunteering", title: "Volunteering", tag: "Service", icon: HandHeart, description: "Find volunteer opportunities and meaningful ways to give back across Oklahoma City neighborhoods.", href: "/volunteering" },
   { num: "04", id: "coaching", title: "Coach TLC", tag: "Development", icon: Target, description: "Connect with personal coaching, mindset work, accountability partners, and growth resources.", href: "/coaching" },
-  { num: "05", id: "mentalk", title: "Men-Talk OKC", tag: "Conversation", icon: MessageCircle, description: "Real conversations for men about life, growth, and purpose. No filters, no fluff.", href: "/men-talk" },
+  { num: "05", id: "mentalk", title: "Men-Talk", tag: "Conversation", icon: MessageCircle, description: "Real conversations for men about life, growth, and purpose. No filters, no fluff.", href: "/men-talk" },
 ];
 
 const stats = [
-  { value: "700K+", label: "OKC Population" },
+  { value: "700K+", label: "Population" },
   { value: "5", label: "Directories" },
   { value: "405", label: "Area Code" },
   { value: "∞", label: "Potential" },
 ];
 
 const Community = () => {
+  const [search, setSearch] = useState("");
+
+  const filtered = programs.filter(
+    (p) =>
+      p.title.toLowerCase().includes(search.toLowerCase()) ||
+      p.tag.toLowerCase().includes(search.toLowerCase()) ||
+      p.description.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <main>
-        {/* Hero - solid color, no photo */}
+        {/* Hero */}
         <section className="pt-32 pb-24 md:pt-44 md:pb-36 bg-primary text-primary-foreground">
           <div className="container max-w-5xl">
             <ScrollReveal>
               <div className="flex items-center gap-3 mb-6">
-                <span className="font-mono text-primary-foreground/20 text-xs">REF: OKC-DIRECTORIES</span>
+                <span className="font-mono text-primary-foreground/20 text-xs">REF: OKLAHOMA-CITY-DIRECTORIES</span>
                 <div className="h-px flex-1 bg-primary-foreground/10" />
               </div>
               <h1 className="text-6xl md:text-8xl lg:text-9xl font-black tracking-[-0.04em] leading-[0.85] mb-6">
@@ -91,45 +101,63 @@ const Community = () => {
           </div>
         </section>
 
-        {/* Programs grid with scroll anchor IDs */}
+        {/* Search + Programs grid */}
         <section className="py-20 md:py-28">
           <div className="container max-w-5xl">
             <ScrollReveal>
-              <div className="flex items-center gap-3 mb-12">
+              <div className="flex items-center gap-3 mb-8">
                 <p className="label-caps text-accent tracking-[0.3em]">Directory Index</p>
                 <div className="h-px flex-1 bg-border" />
-                <span className="font-mono text-muted-foreground/40 text-xs">{programs.length} ACTIVE</span>
+                <span className="font-mono text-muted-foreground/40 text-xs">{filtered.length} ACTIVE</span>
+              </div>
+            </ScrollReveal>
+
+            {/* Search bar */}
+            <ScrollReveal>
+              <div className="relative mb-6">
+                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/40" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search directories..."
+                  className="w-full bg-transparent border-2 border-border text-foreground pl-11 pr-4 py-4 text-sm font-medium focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all placeholder:text-muted-foreground/40"
+                />
               </div>
             </ScrollReveal>
 
             <div className="border-2 border-border">
-              {programs.map((program) => (
-                <ScrollReveal key={program.num}>
-                  <div id={program.id} className="scroll-mt-24">
-                    <Link
-                      to={program.href}
-                      className="group flex items-center gap-5 md:gap-8 p-6 md:p-8 border-b-2 border-border last:border-b-0 hover:bg-secondary/50 transition-all duration-150 border-l-4 border-l-transparent hover:border-l-accent"
-                    >
-                      <span className="font-mono text-accent text-sm flex-shrink-0 w-8">({program.num})</span>
-                      <div className="flex-shrink-0 w-12 h-12 md:w-14 md:h-14 border-2 border-border flex items-center justify-center group-hover:border-accent group-hover:bg-accent/10 transition-all">
-                        <program.icon size={22} className="text-muted-foreground group-hover:text-accent transition-colors" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-baseline gap-3 mb-1">
-                          <h2 className="text-lg md:text-xl font-black text-foreground tracking-tight group-hover:text-accent transition-colors">
-                            {program.title}
-                          </h2>
-                          <span className="label-caps text-muted-foreground/50">{program.tag}</span>
+              {filtered.length === 0 ? (
+                <div className="p-12 text-center">
+                  <p className="text-muted-foreground text-sm">No directories match your search.</p>
+                </div>
+              ) : (
+                filtered.map((program) => (
+                  <ScrollReveal key={program.num}>
+                    <div id={program.id} className="scroll-mt-24">
+                      <Link
+                        to={program.href}
+                        className="group flex items-center gap-5 md:gap-8 p-6 md:p-8 border-b-2 border-border last:border-b-0 hover:bg-secondary/50 transition-all duration-150 border-l-4 border-l-transparent hover:border-l-accent"
+                      >
+                        <span className="font-mono text-accent text-sm flex-shrink-0 w-8">({program.num})</span>
+                        <div className="flex-shrink-0 w-12 h-12 md:w-14 md:h-14 border-2 border-border flex items-center justify-center group-hover:border-accent group-hover:bg-accent/10 transition-all">
+                          <program.icon size={22} className="text-muted-foreground group-hover:text-accent transition-colors" />
                         </div>
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                          {program.description}
-                        </p>
-                      </div>
-                      <ArrowRight size={16} className="text-muted-foreground/30 group-hover:text-accent group-hover:translate-x-1 transition-all flex-shrink-0" />
-                    </Link>
-                  </div>
-                </ScrollReveal>
-              ))}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-baseline gap-3 mb-1">
+                            <h2 className="text-lg md:text-xl font-black text-foreground tracking-tight group-hover:text-accent transition-colors">
+                              {program.title}
+                            </h2>
+                            <span className="label-caps text-muted-foreground/50">{program.tag}</span>
+                          </div>
+                          <p className="text-sm text-muted-foreground leading-relaxed">{program.description}</p>
+                        </div>
+                        <ArrowRight size={16} className="text-muted-foreground/30 group-hover:text-accent group-hover:translate-x-1 transition-all flex-shrink-0" />
+                      </Link>
+                    </div>
+                  </ScrollReveal>
+                ))
+              )}
             </div>
           </div>
         </section>
@@ -140,10 +168,10 @@ const Community = () => {
             <ScrollReveal>
               <div className="flex items-center gap-3 mb-8">
                 <MapPin size={14} className="text-accent" />
-                <p className="label-caps text-muted-foreground tracking-[0.3em]">Serving All of OKC</p>
+                <p className="label-caps text-muted-foreground tracking-[0.3em]">Serving All of Oklahoma City</p>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-                {["Midtown", "Bricktown", "Paseo Arts", "Plaza District", "NW OKC", "Deep Deuce", "Automobile Alley", "Film Row", "Uptown 23rd", "Capitol Hill"].map((area) => (
+                {["Midtown", "Bricktown", "Paseo Arts", "Plaza District", "NW Oklahoma City", "Deep Deuce", "Automobile Alley", "Film Row", "Uptown 23rd", "Capitol Hill"].map((area) => (
                   <span key={area} className="border-2 border-border px-4 py-3 text-sm text-muted-foreground font-medium hover:border-accent hover:text-foreground transition-colors cursor-default text-center">
                     {area}
                   </span>

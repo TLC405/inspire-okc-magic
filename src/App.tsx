@@ -13,6 +13,7 @@ import Volunteering from "./pages/Volunteering";
 import Coaching from "./pages/Coaching";
 import Info from "./pages/Info";
 import Podcast from "./pages/Podcast";
+import MyApps from "./pages/MyApps";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/coaching" element={<Coaching />} />
             <Route path="/info" element={<Info />} />
             <Route path="/men-talk" element={<Podcast />} />
+            <Route path="/my-apps" element={<MyApps />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

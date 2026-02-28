@@ -17,7 +17,6 @@ const Podcast = () => {
       <div className="min-h-screen bg-background">
         <Navbar />
         <main>
-          {/* Hero */}
           <section className="pt-32 pb-20 md:pt-44 md:pb-28 bg-primary text-primary-foreground">
             <div className="container max-w-4xl">
               <ScrollReveal>
@@ -28,7 +27,7 @@ const Podcast = () => {
                 <p className="label-caps text-accent mb-4 tracking-[0.3em]">Directory (05)</p>
                 <h1 className="text-6xl md:text-8xl lg:text-9xl font-black tracking-[-0.04em] leading-[0.85] mb-6">
                   Men-Talk{" "}
-                  <span className="text-accent">OKC</span>
+                  <span className="text-accent">Oklahoma City</span>
                 </h1>
                 <p className="text-base md:text-lg text-primary-foreground/40 max-w-lg leading-relaxed">
                   Real conversations for men in Oklahoma City. No filters, no fluff, no posturing. Just honest dialogue about life, growth, and purpose.
@@ -37,14 +36,12 @@ const Podcast = () => {
             </div>
           </section>
 
-          {/* Quote */}
           <section className="py-20 md:py-28 border-b-2 border-border">
             <div className="container max-w-3xl">
               <ScrollReveal>
                 <div className="quote-block">
                   <p className="italic text-2xl md:text-4xl font-light text-foreground/60 leading-snug">
-                    "Men don't need more advice.<br />
-                    They need a room where they can finally be honest."
+                    "Men don't need more advice.<br />They need a room where they can finally be honest."
                   </p>
                   <p className="label-caps text-muted-foreground/40 mt-6">— Men-Talk Principle</p>
                 </div>
@@ -52,7 +49,6 @@ const Podcast = () => {
             </div>
           </section>
 
-          {/* Pillars */}
           <section className="py-20 md:py-28">
             <div className="container max-w-4xl">
               <ScrollReveal>
@@ -61,7 +57,6 @@ const Podcast = () => {
                   <div className="h-px flex-1 bg-border" />
                 </div>
               </ScrollReveal>
-
               <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border-2 border-border">
                 {pillars.map((p) => (
                   <ScrollReveal key={p.num}>
@@ -81,7 +76,6 @@ const Podcast = () => {
             </div>
           </section>
 
-          {/* Sessions launching */}
           <section className="py-20 md:py-28 border-t-2 border-border bg-secondary/20">
             <div className="container max-w-lg text-center">
               <ScrollReveal>
@@ -94,10 +88,7 @@ const Podcast = () => {
                   <p className="text-sm text-muted-foreground mb-8 leading-relaxed">
                     Conversations, resources, and community updates will live here. The room is being prepared.
                   </p>
-                  <Link
-                    to="/community"
-                    className="inline-flex items-center gap-2 border-2 border-accent text-accent label-caps py-3 px-6 hover:bg-accent hover:text-accent-foreground transition-colors duration-150"
-                  >
+                  <Link to="/community" className="inline-flex items-center gap-2 border-2 border-accent text-accent label-caps py-3 px-6 hover:bg-accent hover:text-accent-foreground transition-colors duration-150">
                     Explore Other Directories <ArrowRight size={14} />
                   </Link>
                 </div>
@@ -105,7 +96,6 @@ const Podcast = () => {
             </div>
           </section>
 
-          {/* CTA */}
           <section className="py-24 md:py-32 bg-primary text-primary-foreground border-t-2 border-border">
             <div className="container max-w-3xl">
               <ScrollReveal>

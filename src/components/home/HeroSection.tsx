@@ -8,16 +8,17 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const directories = [
-  { num: "01", name: "Social Singles OKC", desc: "Events & meetups", href: "/singles" },
-  { num: "02", name: "Fitness OKC", desc: "Fitness & movement", href: "/workouts" },
-  { num: "03", name: "Volunteering OKC", desc: "Give back locally", href: "/volunteering" },
+  { num: "01", name: "Social Singles", desc: "Events & meetups", href: "/singles" },
+  { num: "02", name: "Fitness", desc: "Fitness & movement", href: "/workouts" },
+  { num: "03", name: "Volunteering", desc: "Give back locally", href: "/volunteering" },
   { num: "04", name: "Coach TLC", desc: "Personal growth", href: "/coaching" },
-  { num: "05", name: "Men-Talk OKC", desc: "Real conversations", href: "/men-talk" },
+  { num: "05", name: "Men-Talk", desc: "Real conversations", href: "/men-talk" },
 ];
 
 const navLinks = [
   { label: "Story", href: "/story" },
   { label: "Programs", href: "/community" },
+  { label: "My Apps", href: "/my-apps" },
   { label: "Info", href: "/info" },
 ];
 
@@ -29,7 +30,7 @@ export function HeroSection() {
       {/* Background with vignette */}
       <img
         src={heroBg}
-        alt="Oklahoma City"
+        alt="Oklahoma City skyline"
         className="absolute inset-0 w-full h-full object-cover"
         style={{ position: "fixed" }}
         loading="eager"
@@ -37,7 +38,7 @@ export function HeroSection() {
       <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/65 to-black/50" />
       <div className="vignette" />
 
-      {/* Header — no small logo, just nav + toggle */}
+      {/* Header */}
       <motion.header
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -51,7 +52,6 @@ export function HeroSection() {
             </Link>
           ))}
         </div>
-        {/* Spacer on mobile to push toggle + hamburger right */}
         <div className="md:hidden flex-1" />
         <div className="flex items-center gap-3">
           <ThemeToggle className="text-white/40 hover:text-white" />
@@ -115,7 +115,7 @@ export function HeroSection() {
           <LiveTicker />
         </motion.div>
 
-        {/* Directory grid — clickable with proper destinations */}
+        {/* Directory grid */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -161,7 +161,7 @@ export function HeroSection() {
         className="relative z-10 flex items-center justify-between px-6 md:px-10 py-5 border-t border-white/8"
       >
         <p className="text-xs text-white/25 tracking-wide">Community. Connection. Health.</p>
-        <p className="text-xs text-white/20 font-mono">© {new Date().getFullYear()} INSPIRE OKC</p>
+        <p className="text-xs text-white/20 font-mono">© {new Date().getFullYear()} INSPIRE Oklahoma City</p>
       </motion.div>
     </section>
   );

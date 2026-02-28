@@ -10,19 +10,18 @@ const features = [
   { num: "03", title: "Accountability", desc: "Weekly check-ins, progress tracking, and peer accountability groups to keep you moving forward.", icon: Flame },
 ];
 
-const neighborhoods = ["Midtown", "Nichols Hills", "Edmond", "Norman", "NW OKC", "Downtown", "The Village", "Yukon"];
+const neighborhoods = ["Midtown", "Nichols Hills", "Edmond", "Norman", "NW Oklahoma City", "Downtown", "The Village", "Yukon"];
 
 const Coaching = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <main>
-        {/* Hero */}
         <section className="pt-32 pb-24 md:pt-44 md:pb-36 bg-primary text-primary-foreground">
           <div className="container max-w-5xl">
             <ScrollReveal>
               <div className="flex items-center gap-3 mb-6">
-                <span className="font-mono text-primary-foreground/20 text-xs">REF: OKC-COACH-004</span>
+                <span className="font-mono text-primary-foreground/20 text-xs">REF: OKLAHOMA-CITY-COACH-004</span>
                 <div className="h-px flex-1 bg-primary-foreground/10" />
               </div>
               <p className="label-caps text-accent mb-4 tracking-[0.3em]">Directory (04)</p>
@@ -31,20 +30,18 @@ const Coaching = () => {
                 <span className="text-accent">TLC</span>
               </h1>
               <p className="text-base md:text-lg text-primary-foreground/40 max-w-xl leading-relaxed">
-                Connect with personal coaching, mindset work, accountability partners, and growth resources in OKC.
+                Connect with personal coaching, mindset work, accountability partners, and growth resources in Oklahoma City.
               </p>
             </ScrollReveal>
           </div>
         </section>
 
-        {/* Quote */}
         <section className="py-24 md:py-32 border-b-2 border-border">
           <div className="container max-w-3xl">
             <ScrollReveal>
               <div className="quote-block">
                 <p className="italic text-3xl md:text-5xl font-light text-foreground/60 leading-snug">
-                  "Growth is not automatic.<br />
-                  It requires intentional pursuit."
+                  "Growth is not automatic.<br />It requires intentional pursuit."
                 </p>
                 <p className="label-caps text-muted-foreground/40 mt-8">— Coach TLC</p>
               </div>
@@ -52,7 +49,6 @@ const Coaching = () => {
           </div>
         </section>
 
-        {/* What You'll Find */}
         <section className="py-20 md:py-28">
           <div className="container max-w-5xl">
             <ScrollReveal>
@@ -80,7 +76,6 @@ const Coaching = () => {
           </div>
         </section>
 
-        {/* Neighborhoods */}
         <section className="py-16 md:py-20 border-t-2 border-border bg-secondary/20">
           <div className="container max-w-5xl">
             <ScrollReveal>
@@ -90,16 +85,13 @@ const Coaching = () => {
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {neighborhoods.map((area) => (
-                  <span key={area} className="border-2 border-border px-4 py-3 text-sm text-muted-foreground font-medium hover:border-accent hover:text-foreground transition-colors cursor-default text-center">
-                    {area}
-                  </span>
+                  <span key={area} className="border-2 border-border px-4 py-3 text-sm text-muted-foreground font-medium hover:border-accent hover:text-foreground transition-colors cursor-default text-center">{area}</span>
                 ))}
               </div>
             </ScrollReveal>
           </div>
         </section>
 
-        {/* Launching */}
         <section className="py-16 md:py-20 border-t-2 border-border">
           <div className="container max-w-5xl">
             <ScrollReveal>
@@ -114,18 +106,12 @@ const Coaching = () => {
           </div>
         </section>
 
-        {/* CTA */}
         <section className="py-24 md:py-32 bg-primary text-primary-foreground border-t-2 border-border">
           <div className="container max-w-3xl text-center">
             <ScrollReveal>
               <span className="font-mono text-accent text-xs mb-4 block">EXPLORE MORE</span>
-              <h2 className="text-4xl md:text-6xl font-black tracking-[-0.03em] leading-[0.9] mb-8">
-                Browse All Directories
-              </h2>
-              <Link
-                to="/community"
-                className="inline-flex items-center gap-3 border-2 border-accent text-accent label-caps py-4 px-10 hover:bg-accent hover:text-accent-foreground transition-all duration-150"
-              >
+              <h2 className="text-4xl md:text-6xl font-black tracking-[-0.03em] leading-[0.9] mb-8">Browse All Directories</h2>
+              <Link to="/community" className="inline-flex items-center gap-3 border-2 border-accent text-accent label-caps py-4 px-10 hover:bg-accent hover:text-accent-foreground transition-all duration-150">
                 View Programs <ArrowRight size={14} />
               </Link>
             </ScrollReveal>
