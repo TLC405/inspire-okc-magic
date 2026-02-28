@@ -8,19 +8,19 @@ export function LogoReveal() {
         initial={{ x: -80, opacity: 0, filter: "blur(20px)" }}
         animate={{ x: 0, opacity: 1, filter: "blur(0px)" }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="text-[clamp(3.5rem,14vw,12rem)] font-black tracking-[-0.06em] text-white leading-[0.85] select-none"
+        className="text-[clamp(3rem,12vw,10rem)] font-black tracking-[-0.06em] text-white leading-[0.85] select-none"
       >
         INSPIRE
       </motion.h1>
 
-      {/* OKC */}
+      {/* OKLAHOMA CITY */}
       <motion.h2
         initial={{ x: 80, opacity: 0, filter: "blur(20px)" }}
         animate={{ x: 0, opacity: 1, filter: "blur(0px)" }}
         transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-        className="text-[clamp(3.5rem,14vw,12rem)] font-black tracking-[-0.06em] text-accent leading-[0.85] select-none"
+        className="text-[clamp(2rem,8vw,6.5rem)] font-black tracking-[-0.04em] text-accent leading-[0.85] select-none"
       >
-        OKC
+        OKLAHOMA CITY
       </motion.h2>
 
       {/* Vertical accent bar */}
