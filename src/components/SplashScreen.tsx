@@ -126,6 +126,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
                   muted
                   playsInline
                   onEnded={handleVideoEnd}
+                  onError={handleVideoEnd}
                   className="w-full h-full object-contain max-w-[90vw] max-h-[90vh]"
                 />
               </motion.div>
