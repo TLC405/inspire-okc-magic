@@ -22,9 +22,18 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
   }, [phase]);
 
   const handleVideoEnd = () => {
+    if (phase === "done") return;
     setPhase("done");
     setTimeout(onComplete, 600);
   };
+
+  // Fallback: if video fails to load/play or takes too long, skip after 6s
+  useEffect(() => {
+    if (phase === "video") {
+      const fallback = setTimeout(handleVideoEnd, 6000);
+      return () => clearTimeout(fallback);
+    }
+  }, [phase]);
 
   return (
     <AnimatePresence>
