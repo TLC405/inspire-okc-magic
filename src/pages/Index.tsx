@@ -2,7 +2,7 @@ import { HeroSection } from "@/components/home/HeroSection";
 
 const Index = () => {
   return (
-    <div className="h-screen overflow-hidden bg-background">
+    <div className="min-h-screen bg-[#06080D]">
       <HeroSection />
     </div>
   );

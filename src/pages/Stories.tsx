@@ -4,13 +4,6 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 
-const values = [
-  { num: "01", title: "No Gatekeeping", text: "There's no membership, no application, no exclusive list. If you're in Oklahoma City, you're in." },
-  { num: "02", title: "Reduce Friction", text: "The hardest part of belonging shouldn't be finding where to start. We eliminate that barrier." },
-  { num: "03", title: "Stay Practical", text: "We build tools, not platforms. Directories that connect you to real people, real events, real places." },
-  { num: "04", title: "Community First", text: "Every decision we make asks one question: does this make Oklahoma City more connected?" },
-];
-
 const narrativeBlocks = [
   {
     label: "The Problem",
@@ -29,19 +22,27 @@ const narrativeBlocks = [
   },
 ];
 
-const Story = () => {
+const values = [
+  { num: "01", title: "No Gatekeeping", text: "No membership, no application, no exclusive list. If you're in Oklahoma City, you're in." },
+  { num: "02", title: "Reduce Friction", text: "The hardest part of belonging shouldn't be finding where to start." },
+  { num: "03", title: "Stay Practical", text: "Directories that connect you to real people, real events, real places." },
+  { num: "04", title: "Community First", text: "Every decision asks one question: does this make Oklahoma City more connected?" },
+];
+
+const Stories = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <main>
+        {/* Hero — Editorial mode feel */}
         <section className="pt-32 pb-20 md:pt-44 md:pb-28 bg-primary text-primary-foreground">
           <div className="container max-w-4xl">
             <ScrollReveal>
               <div className="flex items-center gap-3 mb-6">
-                <span className="font-mono text-primary-foreground/20 text-xs">REF: MANIFESTO</span>
+                <span className="mono-data text-primary-foreground/20">Journal · Issue 001</span>
                 <div className="h-px flex-1 bg-primary-foreground/10" />
               </div>
-              <h1 className="text-6xl md:text-8xl lg:text-9xl font-black tracking-[-0.04em] leading-[0.85] mb-6">
+              <h1 className="display-hero mb-6">
                 The Loneliness{" "}
                 <span className="text-accent">Epidemic</span>
               </h1>
@@ -52,47 +53,50 @@ const Story = () => {
           </div>
         </section>
 
-        <section className="py-24 md:py-32 border-b-2 border-border">
+        {/* Quote */}
+        <section className="py-20 md:py-28 border-b border-border">
           <div className="container max-w-3xl">
             <ScrollReveal>
               <div className="quote-block">
-                <p className="italic text-2xl md:text-4xl lg:text-5xl font-light text-foreground/60 leading-snug">
+                <p className="italic text-2xl md:text-4xl font-light text-foreground/50 leading-snug">
                   "The problem isn't a lack of people.<br />It's the friction of finding them."
                 </p>
-                <p className="label-caps text-muted-foreground/40 mt-8">— The INSPIRE Thesis</p>
+                <p className="mono-data text-muted-foreground/40 mt-6">— The INSPIRE Thesis</p>
               </div>
             </ScrollReveal>
           </div>
         </section>
 
-        <section className="py-20 md:py-28">
+        {/* Narrative */}
+        <section className="py-16 md:py-24">
           <div className="container max-w-3xl space-y-16 md:space-y-24">
             {narrativeBlocks.map((block, i) => (
               <ScrollReveal key={block.label}>
-                <div className={i % 2 === 0 ? "border-l-4 border-l-accent pl-6 md:pl-10" : "border-r-4 border-r-accent pr-6 md:pr-10 text-right"}>
+                <div className={i % 2 === 0 ? "border-l-2 border-l-accent pl-6 md:pl-10" : "border-r-2 border-r-accent pr-6 md:pr-10 text-right"}>
                   <p className="label-caps text-accent mb-4 tracking-[0.3em]">{block.label}</p>
-                  <h2 className="text-3xl md:text-5xl font-black tracking-[-0.03em] text-foreground leading-[0.95] mb-6">{block.heading}</h2>
-                  <p className={`text-base text-muted-foreground leading-relaxed max-w-2xl ${i % 2 !== 0 ? "ml-auto" : ""}`}>{block.body}</p>
+                  <h2 className="display-section text-foreground mb-6">{block.heading}</h2>
+                  <p className={`text-sm md:text-base text-muted-foreground leading-relaxed max-w-2xl ${i % 2 !== 0 ? "ml-auto" : ""}`}>{block.body}</p>
                 </div>
               </ScrollReveal>
             ))}
           </div>
         </section>
 
-        <section className="py-20 md:py-28 border-t-2 border-border bg-secondary/20">
+        {/* Principles */}
+        <section className="py-16 md:py-20 border-t border-border bg-secondary/10">
           <div className="container max-w-4xl">
             <ScrollReveal>
-              <div className="flex items-center gap-3 mb-12">
+              <div className="flex items-center gap-3 mb-10">
                 <p className="label-caps text-accent tracking-[0.3em]">Principles</p>
                 <div className="h-px flex-1 bg-border" />
               </div>
             </ScrollReveal>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-0 border-2 border-border">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-border border border-border">
               {values.map((v) => (
                 <ScrollReveal key={v.num}>
-                  <div className="p-8 md:p-10 border-b-2 md:odd:border-r-2 border-border last:border-b-0 md:[&:nth-last-child(-n+2)]:border-b-0 hover-lift cursor-default">
-                    <span className="font-mono text-accent text-sm font-bold">({v.num})</span>
-                    <h3 className="text-xl font-black text-foreground tracking-tight mt-2 mb-3">{v.title}</h3>
+                  <div className="p-8 md:p-10 bg-background hover-lift cursor-default">
+                    <span className="mono-data text-signal-secondary">({v.num})</span>
+                    <h3 className="text-lg font-bold text-foreground tracking-tight mt-2 mb-3">{v.title}</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">{v.text}</p>
                   </div>
                 </ScrollReveal>
@@ -101,24 +105,17 @@ const Story = () => {
           </div>
         </section>
 
-        <div className="border-t-2 border-border">
-          <div className="container max-w-4xl py-4 flex items-center justify-between">
-            <span className="font-mono text-muted-foreground/20 text-[10px]">INSPIRE Oklahoma City · EST. 2024</span>
-            <div className="h-px flex-1 mx-6 bg-border" />
-            <span className="font-mono text-muted-foreground/20 text-[10px]">405 · Oklahoma City · OK</span>
-          </div>
-        </div>
-
-        <section className="py-24 md:py-32 bg-primary text-primary-foreground border-t-2 border-border">
+        {/* CTA */}
+        <section className="py-20 md:py-28 bg-primary text-primary-foreground border-t border-border">
           <div className="container max-w-3xl">
             <ScrollReveal>
-              <span className="font-mono text-accent text-xs mb-4 block">NEXT STEP</span>
-              <h2 className="text-4xl md:text-6xl font-black tracking-[-0.03em] leading-[0.9] mb-6">See what we've built</h2>
+              <span className="mono-data text-accent mb-4 block">Next</span>
+              <h2 className="display-section mb-6">See what we've built</h2>
               <p className="text-sm text-primary-foreground/40 max-w-md mb-8 leading-relaxed">
                 Browse the five directories powering connection in Oklahoma City.
               </p>
-              <Link to="/community" className="inline-flex items-center gap-3 border-2 border-accent text-accent label-caps py-4 px-10 hover:bg-accent hover:text-accent-foreground hover:scale-[1.02] transition-all duration-150">
-                Browse Directories <ArrowRight size={14} />
+              <Link to="/explore" className="inline-flex items-center gap-3 border border-accent text-accent label-caps py-3.5 px-8 hover:bg-accent hover:text-accent-foreground transition-all duration-150">
+                Explore Directories <ArrowRight size={14} />
               </Link>
             </ScrollReveal>
           </div>
@@ -129,4 +126,4 @@ const Story = () => {
   );
 };
 
-export default Story;
+export default Stories;

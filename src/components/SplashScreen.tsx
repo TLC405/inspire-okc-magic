@@ -96,7 +96,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
                   animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                   transition={{ duration: 0.6, delay: 1.1, ease: [0.16, 1, 0.3, 1] }}
                   className="text-lg md:text-2xl font-black tracking-[-0.02em] leading-none"
-                  style={{ color: "hsl(16, 70%, 50%)" }}
+                  style={{ color: "hsl(205, 100%, 38%)" }}
                 >
                   OKLAHOMA CITY
                 </motion.span>
