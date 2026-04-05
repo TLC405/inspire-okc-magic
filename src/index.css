@@ -283,6 +283,15 @@
   .signal-pulse {
     animation: signal-pulse 2s ease-in-out infinite;
   }
+
+  /* Scrollbar hide utility */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 @keyframes signal-pulse {
