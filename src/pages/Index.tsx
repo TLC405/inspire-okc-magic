@@ -6,7 +6,7 @@ import { singlesEvents } from "@/data/singlesEvents";
 import { fitnessSpots } from "@/data/fitnessSpots";
 import { volunteerOrgs } from "@/data/volunteerOrgs";
 import { cityShowcase } from "@/data/cityShowcase";
-import { ArrowRight, Building2, Scale, Leaf, Palette, TrendingUp } from "lucide-react";
+import { ArrowRight, Building2, Scale, Leaf, Palette, TrendingUp, Heart, Dumbbell, HandHelping } from "lucide-react";
 
 const today = new Date();
 const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -22,12 +22,12 @@ const Index = () => {
 
       <main className="flex-1">
         {/* Masthead */}
-        <div className="container pt-12 md:pt-20 pb-6">
-          <div className="rule-double mb-6" />
+        <div className="container pt-8 md:pt-20 pb-4 md:pb-6">
+          <div className="rule-double mb-4 md:mb-6" />
           <h1 className="masthead text-foreground text-center">INSPIRE</h1>
-          <p className="masthead-sub text-center text-muted-foreground mb-4">Oklahoma City</p>
-          <div className="rule-heavy mb-4" />
-          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mb-6">
+          <p className="masthead-sub text-center text-muted-foreground mb-3 md:mb-4">Oklahoma City</p>
+          <div className="rule-heavy mb-3 md:mb-4" />
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mb-4 md:mb-6">
             <span className="dateline text-muted-foreground">{dateStr}</span>
             <span className="dateline text-muted-foreground/30">·</span>
             <span className="dateline text-muted-foreground">{dayStr}</span>
@@ -36,14 +36,35 @@ const Index = () => {
           </div>
 
           {/* Search */}
-          <div className="max-w-2xl mx-auto mb-8">
+          <div className="max-w-2xl mx-auto mb-5 md:mb-8">
             <SearchSurface />
           </div>
           <div className="rule-thin" />
         </div>
 
-        {/* Three-column teasers */}
-        <div className="container py-8 md:py-12">
+        {/* Quick-Nav Cards (mobile-first, replaces verbose teasers on small screens) */}
+        <div className="container py-4 md:hidden">
+          <div className="grid grid-cols-3 gap-2">
+            <Link to="/singles" className="p-3 border border-border hover:bg-foreground/[0.03] transition-colors text-center">
+              <Heart size={18} className="mx-auto mb-1.5 text-accent" />
+              <p className="label-caps text-foreground text-[10px]">Singles</p>
+              <p className="dateline text-muted-foreground mt-0.5">{singlesEvents.length}</p>
+            </Link>
+            <Link to="/fitness" className="p-3 border border-border hover:bg-foreground/[0.03] transition-colors text-center">
+              <Dumbbell size={18} className="mx-auto mb-1.5 text-accent" />
+              <p className="label-caps text-foreground text-[10px]">Fitness</p>
+              <p className="dateline text-muted-foreground mt-0.5">{fitnessSpots.length}</p>
+            </Link>
+            <Link to="/volunteering" className="p-3 border border-border hover:bg-foreground/[0.03] transition-colors text-center">
+              <HandHelping size={18} className="mx-auto mb-1.5 text-accent" />
+              <p className="label-caps text-foreground text-[10px]">Volunteer</p>
+              <p className="dateline text-muted-foreground mt-0.5">{volunteerOrgs.length}</p>
+            </Link>
+          </div>
+        </div>
+
+        {/* Three-column teasers (desktop) */}
+        <div className="container py-4 md:py-12 hidden md:block">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
             {/* Singles Column */}
             <div className="md:pr-6 md:border-r border-foreground/10 pb-8 md:pb-0">
@@ -69,7 +90,7 @@ const Index = () => {
             </div>
 
             {/* Fitness Column */}
-            <div className="md:px-6 md:border-r border-foreground/10 pb-8 md:pb-0 border-t md:border-t-0 border-foreground/10 pt-8 md:pt-0">
+            <div className="md:px-6 md:border-r border-foreground/10 pb-8 md:pb-0">
               <div className="flex items-center gap-2 mb-5">
                 <h2 className="section-head text-foreground">Fitness</h2>
                 <span className="news-badge-live signal-pulse">Live</span>
@@ -91,7 +112,7 @@ const Index = () => {
             </div>
 
             {/* Volunteering Column */}
-            <div className="md:pl-6 border-t md:border-t-0 border-foreground/10 pt-8 md:pt-0">
+            <div className="md:pl-6">
               <div className="flex items-center gap-2 mb-5">
                 <h2 className="section-head text-foreground">Volunteering</h2>
                 <span className="news-badge-live signal-pulse">Live</span>
@@ -115,16 +136,18 @@ const Index = () => {
         </div>
 
         {/* City Showcase Teaser */}
-        <div className="container py-8 md:py-12">
-          <div className="rule-double mb-6" />
-          <div className="flex items-center justify-between mb-6">
+        <div className="container py-6 md:py-12">
+          <div className="rule-double mb-4 md:mb-6" />
+          <div className="flex items-center justify-between mb-4 md:mb-6">
             <h2 className="section-head text-foreground">Discover Oklahoma City</h2>
             <Link to="/discover" className="inline-flex items-center gap-2 label-caps text-accent hover:text-foreground transition-colors">
               View all 100 <ArrowRight size={12} />
             </Link>
           </div>
-          <p className="dateline text-muted-foreground mb-6">Architecture · Policy · Sustainability · Culture · Growth</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-0">
+          <p className="dateline text-muted-foreground mb-4 md:mb-6">Architecture · Policy · Sustainability · Culture · Growth</p>
+
+          {/* Horizontal scroll on mobile, 5-col on desktop */}
+          <div className="flex md:grid md:grid-cols-5 gap-0 overflow-x-auto md:overflow-visible scrollbar-hide">
             {([
               { cat: 'architecture' as const, icon: Building2, label: 'Architecture' },
               { cat: 'policy' as const, icon: Scale, label: 'Policy' },
@@ -138,9 +161,9 @@ const Index = () => {
                 <Link
                   key={cat}
                   to={`/discover?cat=${cat}`}
-                  className={`p-5 border-b md:border-b-0 border-foreground/10 hover:bg-foreground/[0.02] transition-colors ${
+                  className={`p-4 md:p-5 min-w-[160px] md:min-w-0 border-r md:border-r-0 border-foreground/10 hover:bg-foreground/[0.02] transition-colors flex-shrink-0 md:flex-shrink ${
                     i < 4 ? 'lg:border-r' : ''
-                  }`}
+                  } last:border-r-0`}
                 >
                   <Icon size={16} className="text-muted-foreground mb-3" />
                   <h3 className="label-caps text-foreground mb-1">{label}</h3>
@@ -158,8 +181,8 @@ const Index = () => {
           <div className="rule-thin mt-0" />
         </div>
 
-        {/* Bottom edition bar */}
-        <div className="container pb-8">
+        {/* Bottom edition bar — hidden on mobile */}
+        <div className="container pb-8 hidden md:block">
           <div className="rule-heavy mb-4" />
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="dateline text-muted-foreground/40">Community · Connection · Health</p>
