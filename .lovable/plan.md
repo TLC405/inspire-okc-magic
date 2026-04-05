@@ -1,73 +1,92 @@
-# Massive Fitness Data Expansion + Mobile-Optimized Homepage
 
-## Problems
 
-1. **Missing categories**: The user's research shows 29 fitness categories with 337+ organizations. Current data has only 19 categories and ~100 spots. Missing: Infrared/HOTWORX, BJJ (separate from MMA), Powerlifting/Strongman, Tai Chi/Mind-Body, Senior/Adaptive, Kids/Family/Ninja, Aerial Fitness, Stretch/Recovery (as distinct), Community Rec Centers, Outdoor Fitness Parks, Luxury/Resort-Style, Women-Only, Sports-Specific Training, Strength & Conditioning, Hybrid/Boutique.
-2. **No "Districts" concept**: Fitness spots aren't grouped by district/area in a browseable way.
-3. **Homepage is cluttered on mobile**: Three-column teasers + 5-column Discover grid + edition bar all stack vertically into a wall of text on small screens.
+# UI Depth + Skeuomorphic Polish + Simplified UX
+
+## Current Problems
+- Everything is flat text on flat backgrounds — no visual depth, shadows, or texture
+- Filter sections on directory pages are confusing walls of chips and collapsibles
+- Result cards are just plain text rows with no visual separation or dimensionality
+- Homepage three-column teasers feel like a spreadsheet, not a premium product
+- No tactile/skeuomorphic feel anywhere — no embossing, insets, raised surfaces, paper textures
+
+## Design Direction: Newspaper Skeuomorphism
+
+Think physical newspaper meets premium iOS: raised card surfaces with subtle paper texture, inset search fields that look carved into the surface, embossed section headers, soft drop shadows on cards, subtle gradients on filter chips to make them feel like physical buttons, and warm noise/grain on backgrounds.
+
+---
 
 ## Plan
 
-### 1. Expand Fitness Categories & Data (~200+ new entries)
+### 1. Skeuomorphic CSS Foundation (`src/index.css`)
 
-Add 10 new categories to the type and category list:
+Add new utility classes that give physical depth:
+- **`.skeuo-card`** — raised surface with layered box-shadows (soft outer + crisp inner), subtle paper-grain background via CSS noise gradient, 1px highlight on top edge
+- **`.skeuo-card-inset`** — pressed-in/recessed surface for search inputs and filter panels (inner shadow, darker background)
+- **`.skeuo-chip`** / **`.skeuo-chip-active`** — filter chips that look like physical toggle buttons with gradient, pressed state with inset shadow
+- **`.skeuo-search`** — search input that looks carved into the surface with inner shadow and subtle border gradient
+- **Paper texture** — add a faint CSS repeating-radial-gradient noise to the background body
+- **`.skeuo-badge`** — tags/badges with subtle emboss effect (1px text-shadow for engraved look)
+- **`.skeuo-divider`** — horizontal rules with a 3D groove/ridge effect instead of flat lines
 
-- `Infrared` (HOTWORX locations)
-- `BJJ` (Brazilian Jiu-Jitsu, split from Martial Arts)
-- `Powerlifting` 
-- `Mind-Body` (Tai Chi, meditation movement)
-- `Senior/Adaptive`
-- `Kids/Family`
-- `Aerial`
-- `Stretch`
-- `Rec Center` (9 public centers)
-- `Sports Training`
+Update existing editorial theme colors to have slightly warmer, more textured tones.
 
-Research and add ~200 more verified spots across these categories plus filling gaps in existing ones (more gyms like 10GYM, Crunch, Gold's, Planet Fitness locations; more yoga studios; more dance studios; aquatics/pools).
+### 2. Simplified Fitness Page (`src/pages/Workouts.tsx`)
 
-### 2. Add District Browsing to Fitness Page
+**Simplify the filter UX:**
+- Replace the separate District bar + Category collapsibles with a **single sidebar panel** on desktop (sticky, left side) and a **slide-out drawer** on mobile (triggered by a "Filters" button)
+- The filter panel itself uses `skeuo-card-inset` styling — looks recessed into the page
+- Inside: District dropdown (select, not 19 chips), Category grouped list with counts
+- Active filters show as removable pills above results
 
-Add a "Districts" filter section showing OKC fitness districts as tappable areas:
+**Upgrade result cards:**
+- Each fitness spot renders inside a `skeuo-card` with raised shadow, paper-grain texture
+- Category badge gets color-coded accent strip on the left edge (like a physical tab/divider)
+- Tags use `skeuo-badge` embossed style
+- External link button gets a subtle raised button treatment
+- Remove the faint "01" numbering — replace with category icon in a small circle
 
-- **Midtown** — yoga/barre/boutique corridor
-- **Automobile Alley** — boxing/CrossFit concentration  
-- **Bricktown** — big-box gyms, climbing
-- **NW Expressway** — chain gym strip (Planet Fitness, 10GYM, Crunch)
-- **Edmond/North** — family fitness, rec centers
-- **Moore/South** — martial arts, bootcamps
-- **Paseo/Plaza** — dance studios, aerial
-- **Downtown** — luxury/resort gyms
+### 3. Simplified Singles Page (`src/pages/Singles.tsx`)
 
-These map to neighborhoods already in the data, presented as a horizontal scrollable district bar.
+Same treatment as Fitness:
+- Filter panel consolidated into sidebar/drawer instead of 3 separate grid sections
+- Result cards upgraded to `skeuo-card` with depth
+- Category/frequency/neighborhood as a single compact filter panel
 
-### 3. Mobile-First Homepage Redesign
+### 4. Simplified Volunteering Page (`src/pages/Volunteering.tsx`)
 
-**Current problem**: On mobile (740px viewport), the 3-column teasers stack into 3 long sections, then the 5-column Discover grid stacks into 5 blocks. Way too much scrolling.
+Same card + filter treatment for consistency.
 
-**Fix**:
+### 5. Homepage Polish (`src/pages/Index.tsx`)
 
-- **Masthead**: Tighten padding, smaller on mobile
-- **Directory teasers**: Show only 1 preview item per section on mobile (not 3), with a compact card layout instead of article blocks
-- **Discover section**: Horizontal scrollable row on mobile instead of stacking 5 cards vertically
-- **Add a quick-nav row** below search: 3 tappable cards (Singles / Fitness / Volunteering) with counts, replacing the verbose teasers on mobile
-- **Bottom edition bar**: Hide on mobile, it's noise
+- **Masthead area**: Add subtle paper texture background, embossed rule lines
+- **Three-column teasers**: Each column gets a `skeuo-card` treatment — raised panels with shadow, hover lift effect
+- **Search bar**: `skeuo-search` inset styling — looks carved into the page
+- **Discover section**: Cards get raised treatment with category color accent strips
+- **Quick-nav cards (mobile)**: Raised with shadow + icon, feel tappable
 
-### 4. Fitness Page Category UX Improvement
+### 6. Discover Page (`src/pages/Discover.tsx`)
 
-With 29 categories, the filter chips become overwhelming. Replace with:
+- Filter buttons get `skeuo-chip` treatment
+- Result cards get `skeuo-card` with category color strip
+- Consistent with other pages
 
-- A **scrollable category bar** with icons (horizontal scroll on mobile)
-- **Grouped sections**: "Popular" (Gym, CrossFit, Yoga, HIIT), "Combat" (Boxing, MMA, BJJ), "Movement" (Dance, Aerial, Pilates, Barre), "Outdoor" (Running, Cycling, Outdoor, Pickleball, Tennis, Swimming), "Specialty" (Powerlifting, Sports Training, Mind-Body, Senior, Kids, Stretch, Infrared, Rec Center)
-- Collapsible group headers so users can drill into what they want
+### 7. Navbar + Footer Polish
 
-vasa isnt open 24-/7 so always fact check and have ai alwasy check sites information to keep app updated alwyas. add admin section for me to edit the app deirtslla and things and cool stuff in app like send notifiatns, 
+- **Navbar**: Add subtle bottom shadow (not just border) for floating-header feel
+- **Footer**: Subtle top inner-shadow to feel grounded
+
+---
 
 ## Files
 
+| Action | File | Details |
+|---|---|---|
+| Modify | `src/index.css` | Add skeuomorphic utility classes, paper texture, emboss effects |
+| Modify | `src/pages/Workouts.tsx` | Sidebar filters, skeuo cards, simplified UX |
+| Modify | `src/pages/Singles.tsx` | Sidebar filters, skeuo cards |
+| Modify | `src/pages/Volunteering.tsx` | Sidebar filters, skeuo cards |
+| Modify | `src/pages/Index.tsx` | Raised cards, textured masthead, inset search |
+| Modify | `src/pages/Discover.tsx` | Skeuo card grid, chip filters |
+| Modify | `src/components/Navbar.tsx` | Subtle shadow depth |
+| Modify | `src/components/Footer.tsx` | Inner shadow grounding |
 
-| Action        | File                       | Details                                                                           |
-| ------------- | -------------------------- | --------------------------------------------------------------------------------- |
-| Major rewrite | `src/data/fitnessSpots.ts` | Add ~200 new entries, 10 new categories, update type union                        |
-| Modify        | `src/pages/Workouts.tsx`   | District bar, grouped category filter, mobile-optimized cards                     |
-| Modify        | `src/pages/Index.tsx`      | Mobile-first layout: compact teasers, horizontal scroll Discover, quick-nav cards |
-| Modify        | `src/index.css`            | Add horizontal-scroll utility, district-chip styles, mobile breakpoint overrides  |
