@@ -5,7 +5,8 @@ import { SearchSurface } from "@/components/SearchSurface";
 import { singlesEvents } from "@/data/singlesEvents";
 import { fitnessSpots } from "@/data/fitnessSpots";
 import { volunteerOrgs } from "@/data/volunteerOrgs";
-import { ArrowRight } from "lucide-react";
+import { cityShowcase } from "@/data/cityShowcase";
+import { ArrowRight, Building2, Scale, Leaf, Palette, TrendingUp } from "lucide-react";
 
 const today = new Date();
 const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -111,6 +112,50 @@ const Index = () => {
               </Link>
             </div>
           </div>
+        </div>
+
+        {/* City Showcase Teaser */}
+        <div className="container py-8 md:py-12">
+          <div className="rule-double mb-6" />
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="section-head text-foreground">Discover Oklahoma City</h2>
+            <Link to="/discover" className="inline-flex items-center gap-2 label-caps text-accent hover:text-foreground transition-colors">
+              View all 100 <ArrowRight size={12} />
+            </Link>
+          </div>
+          <p className="dateline text-muted-foreground mb-6">Architecture · Policy · Sustainability · Culture · Growth</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-0">
+            {([
+              { cat: 'architecture' as const, icon: Building2, label: 'Architecture' },
+              { cat: 'policy' as const, icon: Scale, label: 'Policy' },
+              { cat: 'sustainability' as const, icon: Leaf, label: 'Sustainability' },
+              { cat: 'culture' as const, icon: Palette, label: 'Culture' },
+              { cat: 'growth' as const, icon: TrendingUp, label: 'Growth' },
+            ]).map(({ cat, icon: Icon, label }, i) => {
+              const items = cityShowcase.filter(x => x.category === cat);
+              const featured = items[0];
+              return (
+                <Link
+                  key={cat}
+                  to={`/discover?cat=${cat}`}
+                  className={`p-5 border-b md:border-b-0 border-foreground/10 hover:bg-foreground/[0.02] transition-colors ${
+                    i < 4 ? 'lg:border-r' : ''
+                  }`}
+                >
+                  <Icon size={16} className="text-muted-foreground mb-3" />
+                  <h3 className="label-caps text-foreground mb-1">{label}</h3>
+                  <p className="dateline text-muted-foreground mb-3">{items.length} items</p>
+                  {featured && (
+                    <>
+                      <p className="headline text-foreground text-sm leading-tight">{featured.title}</p>
+                      <p className="text-xs text-muted-foreground mt-1 italic">{featured.subtitle}</p>
+                    </>
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+          <div className="rule-thin mt-0" />
         </div>
 
         {/* Bottom edition bar */}

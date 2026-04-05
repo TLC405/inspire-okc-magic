@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Singles from "./pages/Singles";
 import Workouts from "./pages/Workouts";
 import Volunteering from "./pages/Volunteering";
+import Discover from "./pages/Discover";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => {
               <Route path="/singles" element={<Singles />} />
               <Route path="/fitness" element={<Workouts />} />
               <Route path="/volunteering" element={<Volunteering />} />
+              <Route path="/discover" element={<Discover />} />
               {/* Redirects from old routes */}
               <Route path="/workouts" element={<Navigate to="/fitness" replace />} />
               <Route path="/explore" element={<Navigate to="/" replace />} />
