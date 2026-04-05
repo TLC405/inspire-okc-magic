@@ -10,11 +10,11 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const directories = [
-  { num: "01", name: "Social Singles", desc: "Events & meetups", href: "/singles" },
-  { num: "02", name: "Fitness", desc: "Fitness & movement", href: "/workouts" },
-  { num: "03", name: "Volunteering", desc: "Give back locally", href: "/volunteering" },
-  { num: "04", name: "Coach TLC", desc: "Personal growth", href: "/coaching" },
-  { num: "05", name: "Men-Talk", desc: "Real conversations", href: "/men-talk" },
+  { num: "01", name: "Singles Events", desc: "17 events live", href: "/singles" },
+  { num: "02", name: "Fitness", desc: "12 spots mapped", href: "/workouts" },
+  { num: "03", name: "Volunteering", desc: "10 organizations", href: "/volunteering" },
+  { num: "04", name: "Coach TLC", desc: "3 tracks active", href: "/coaching" },
+  { num: "05", name: "Men-Talk", desc: "Code required", href: "/men-talk" },
 ];
 
 const navLinks = [
