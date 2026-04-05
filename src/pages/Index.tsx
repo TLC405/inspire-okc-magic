@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SearchSurface } from "@/components/SearchSurface";
-import { singlesEvents, getVerifiedEvents } from "@/data/singlesEvents";
+import { singlesEvents } from "@/data/singlesEvents";
 import { ListingImage } from "@/components/ListingImage";
 import { fitnessSpots } from "@/data/fitnessSpots";
 import { volunteerOrgs } from "@/data/volunteerOrgs";
