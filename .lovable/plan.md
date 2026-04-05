@@ -1,66 +1,58 @@
 
 
-# Events & Date Nights + Real Photo Showcase + AI Atmosphere
+# Fix Hero Visibility + Photo-Rich Homepage + Image Cache Check
 
-## What We're Building
+## Problems
 
-A new **Events & Date Nights** section integrated across the app, with real AI-fetched photos embedded everywhere, creating an immersive showcase experience.
+1. **Hero/masthead not visible** — The hero section with "INSPIRE Oklahoma City" may be cut off or hard to see depending on viewport. The gradient overlay and text sizing need to be more prominent and the hero needs to be taller on mobile.
+
+2. **No real photos on the homepage listings** — The three-column broadsheet teasers are text-only with numbered lists. Each listing item should show a small thumbnail from the image cache (181 cached images exist in DB across fitness, volunteer, discover, singles).
+
+3. **Image cache has quality issues** — Many cached images point to the same generic OKC.gov banner or Wikipedia file pages (not direct images). These need to be identified and flagged.
 
 ## Changes
 
-### 1. Add "Date Night" Category to Singles Events Data
-- Add `"Date Night"` to the `SinglesEvent` category type union
-- Add 8 verified OKC date night entries with real source URLs:
-  - Factory Obscura immersive art (factoryobscura.com — verified)
-  - Scissortail Park sunset kayaking (scissortailpark.org — verified)  
-  - Wheeler District waterfront dinner (wheelerdistrict.com — verified)
-  - Paseo First Friday gallery walk (thepaseo.org — verified)
-  - OKC Riversport adventure date (riversportokc.org — verified)
-  - Automobile Alley cocktail crawl (automobilealley.org — verified)
-  - First Americans Museum evening (famok.org — verified)
-  - Painting with a Twist (already exists, reclassify as Date Night)
-- Update `singlesCategories` to include "Date Night"
+### 1. Make Hero Dominant (Index.tsx)
+- Increase hero height: `h-[340px] md:h-[500px]` (was 280/420)
+- Make "INSPIRE" text larger: `text-5xl md:text-8xl` with stronger text-shadow
+- Add "Oklahoma City" as a larger sub-masthead
+- Ensure the gradient overlay is strong enough: `from-black/70 via-black/50 to-background`
+- Add the uploaded OKC images as a rotating hero or collage strip below the masthead
 
-### 2. New Events & Date Nights Page (`/events`)
-- Dedicated page at `/events` route showing all events + date nights
-- Visual-first layout: large hero cards with AI-fetched venue photos via `ListingImage`
-- Category tabs: "All", "Date Night", "Speed Dating", "Mixer", "Social", "Dance", "Activity", "Faith"
-- Each card shows: venue photo (full-width top), event name, venue, neighborhood, price, frequency, verification badge
-- Date Night cards get a warm rose-gold accent border and heart icon
-- "Tonight" / "This Weekend" / "This Month" quick-filter pills based on frequency
+### 2. Add Photo Thumbnails to Every Teaser Item (Index.tsx)
+- Each numbered item in the 3-column broadsheet gets a small `ListingImage` thumbnail (48x48 rounded) next to the text
+- This uses the existing `ListingImage` component which auto-fetches from `image_cache` or triggers the AI image agent
+- Layout changes from `flex items-baseline` to a row with image + text
 
-### 3. Embed Real Photos Everywhere with AI Image Agent
-- Every card across Fitness, Singles, Volunteering, Discover, and Events pages uses `ListingImage` component (already built) to auto-fetch real venue photos
-- Homepage column teasers: add small thumbnail next to each numbered item using `ListingImage`
-- Discover cards: add hero image area at top of each card
-- Make the `image-search` edge function prioritize venue-specific photos over generic stock
+### 3. Add Photo Grid Showcase Section (Index.tsx)
+- New section above the broadsheet: a masonry-style grid of 6-8 real venue photos from the image cache
+- Uses `ListingImage` for top-rated cached images across all categories
+- Creates the "newspaper photo spread" feel
 
-### 4. Homepage "Events & Date Nights" Section
-- Add a new section between the 3-column broadsheet and the Discover section
-- Horizontal scroll of 4-6 date night cards with large venue photos
-- Each card: full photo background, gradient overlay, event name + venue + price overlay text
-- "View All Events" CTA linking to `/events`
+### 4. Uploaded Images as Homepage Assets
+- Copy the user-uploaded OKC images (skyline, cartoon character, etc.) to `src/assets/`
+- Use them as accent images in the hero area and section dividers
+- The cartoon character images become part of the site personality
 
-### 5. Navigation Update
-- Add "Events" to the Navbar between "Singles" and "Fitness"
-- Update redirect: `/events` route now points to the new Events page instead of redirecting to `/`
+### 5. Image Cache Audit (Admin Panel)
+- Add an "Image Cache" tab to the Admin panel showing:
+  - Total cached images by category (fitness: 119, volunteer: 29, discover: 27, singles: 6)
+  - Flagged duplicates (same URL used for multiple listings)
+  - Broken/generic images (Wikipedia file pages, tiny banners)
+  - Button to re-fetch flagged images
 
-### 6. Visual Atmosphere Upgrades
-- All listing cards site-wide get a photo header area (using existing `ListingImage` hook)
-- Cards without images show a gradient placeholder with category icon instead of blank space
-- Subtle parallax effect on homepage hero
-- Date Night cards glow with warm accent shadow on hover
+### 6. Mobile Hero Fix
+- On the 690px viewport, ensure hero takes at least 50% of initial viewport
+- Make quick-nav cards show photos more prominently
+- Increase the hero image height on mobile from `h-16` to `h-24` in quick-nav cards
 
 ## Files
 
 | Action | File | Details |
 |---|---|---|
-| Modify | `src/data/singlesEvents.ts` | Add "Date Night" to category union, add 8 verified date night entries |
-| Create | `src/pages/Events.tsx` | Visual-first events + date nights page with photo cards |
-| Modify | `src/App.tsx` | Add `/events` route, remove old redirect |
-| Modify | `src/components/Navbar.tsx` | Add "Events" nav link |
-| Modify | `src/pages/Index.tsx` | Add Events & Date Nights horizontal showcase section |
-| Modify | `src/components/ListingImage.tsx` | Improve fallback with category-colored gradient + icon |
+| Modify | `src/pages/Index.tsx` | Taller hero, photo thumbnails in teasers, photo grid section, uploaded images |
+| Modify | `src/pages/Admin.tsx` | Add Image Cache audit tab |
+| Modify | `src/index.css` | Larger masthead sizing, photo grid styles |
 
-No new dependencies. Uses existing `ListingImage` + `useListingImage` hook + `image-search` edge function for real photos.
+No new dependencies. No database changes. Uses existing `ListingImage` component and `image_cache` table.
 
