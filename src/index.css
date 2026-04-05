@@ -51,48 +51,48 @@
     --sidebar-ring: 205 100% 38%;
   }
 
-  /* Editorial Mode — warm paper, publication feel */
+  /* Editorial Mode — warm paper, publication feel, HIGH CONTRAST */
   .editorial {
-    --background: 40 25% 96%;
-    --foreground: 220 15% 8%;
+    --background: 38 20% 92%;
+    --foreground: 220 20% 6%;
 
-    --card: 40 30% 98%;
-    --card-foreground: 220 15% 8%;
+    --card: 40 25% 97%;
+    --card-foreground: 220 20% 6%;
 
-    --popover: 40 30% 98%;
-    --popover-foreground: 220 15% 8%;
+    --popover: 40 25% 97%;
+    --popover-foreground: 220 20% 6%;
 
-    --primary: 220 15% 8%;
-    --primary-foreground: 40 25% 96%;
+    --primary: 220 20% 6%;
+    --primary-foreground: 38 20% 92%;
 
-    --secondary: 38 18% 91%;
-    --secondary-foreground: 220 12% 15%;
+    --secondary: 35 15% 85%;
+    --secondary-foreground: 220 15% 10%;
 
-    --muted: 38 15% 90%;
-    --muted-foreground: 220 8% 42%;
+    --muted: 35 12% 82%;
+    --muted-foreground: 220 10% 35%;
 
-    --accent: 205 100% 38%;
+    --accent: 205 100% 35%;
     --accent-foreground: 0 0% 100%;
 
     --signal-secondary: 8 87% 48%;
-    --signal-highlight: 42 98% 55%;
-    --signal-positive: 157 55% 40%;
+    --signal-highlight: 42 98% 50%;
+    --signal-positive: 157 55% 36%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 35 15% 82%;
-    --input: 35 15% 82%;
-    --ring: 220 15% 8%;
+    --border: 30 12% 72%;
+    --input: 30 12% 72%;
+    --ring: 220 20% 6%;
 
-    --sidebar-background: 40 25% 95%;
-    --sidebar-foreground: 220 15% 8%;
-    --sidebar-primary: 205 100% 38%;
+    --sidebar-background: 38 20% 90%;
+    --sidebar-foreground: 220 20% 6%;
+    --sidebar-primary: 205 100% 35%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 38 18% 91%;
-    --sidebar-accent-foreground: 220 15% 8%;
-    --sidebar-border: 35 15% 82%;
-    --sidebar-ring: 205 100% 38%;
+    --sidebar-accent: 35 15% 85%;
+    --sidebar-accent-foreground: 220 20% 6%;
+    --sidebar-border: 30 12% 72%;
+    --sidebar-ring: 205 100% 35%;
   }
 
   /* Raw Mode — monochrome utility, compressed */
@@ -159,17 +159,17 @@
 }
 
 @layer components {
-  /* Typography System */
+  /* Typography System — MASSIVE and authoritative */
   .display-hero {
-    @apply text-[clamp(2.5rem,10vw,7.5rem)] font-black tracking-[-0.04em] leading-[0.85];
+    @apply text-[clamp(3rem,12vw,9rem)] font-black tracking-[-0.05em] leading-[0.8];
   }
 
   .display-section {
-    @apply text-[clamp(1.75rem,5vw,4rem)] font-black tracking-[-0.03em] leading-[0.9];
+    @apply text-[clamp(2rem,6vw,5rem)] font-black tracking-[-0.04em] leading-[0.85];
   }
 
   .title-lg {
-    @apply text-2xl md:text-3xl font-bold tracking-tight;
+    @apply text-3xl md:text-4xl font-bold tracking-tight;
   }
 
   .title-md {
@@ -177,7 +177,7 @@
   }
 
   .mono-data {
-    @apply font-mono text-[10px] md:text-xs tracking-wider uppercase;
+    @apply font-mono text-[11px] md:text-xs tracking-wider uppercase;
   }
 
   .label-caps {
@@ -208,7 +208,7 @@
   }
 
   .ticker-tag {
-    @apply font-mono text-[10px] font-bold tracking-wider;
+    @apply font-mono text-[11px] font-bold tracking-wider;
     color: hsl(var(--signal-secondary));
   }
 

@@ -160,31 +160,32 @@ function EventCard({ event, index }: { event: SinglesEvent; index: number }) {
       href={event.source}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex items-start gap-4 md:gap-6 p-5 md:p-6 border border-border hover:border-accent/40 transition-all duration-150 bg-card"
+      className="group flex items-start gap-5 md:gap-8 p-6 md:p-8 border-2 border-border hover:border-accent/60 transition-all duration-200 bg-card"
     >
-      <span className="mono-data text-signal-secondary flex-shrink-0 pt-1">({num})</span>
+      <div className="flex flex-col items-center gap-2 flex-shrink-0 pt-1">
+        <span className="text-2xl md:text-3xl font-black text-signal-secondary">({num})</span>
+        <div className="w-px h-8 bg-border group-hover:bg-accent transition-colors" />
+      </div>
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-1 flex-wrap">
-          <h3 className="text-base md:text-lg font-bold text-foreground tracking-tight group-hover:text-accent transition-colors">
-            {event.name}
-          </h3>
+        <h3 className="text-lg md:text-xl font-black text-foreground tracking-tight group-hover:text-accent transition-colors mb-2">
+          {event.name}
+        </h3>
+        <div className="flex items-center gap-4 mb-3 flex-wrap">
+          <span className="mono-data text-accent font-bold">{event.venue}</span>
+          <span className="mono-data text-signal-secondary">{event.neighborhood}</span>
+          <span className="mono-data text-muted-foreground">{event.frequency}</span>
+          <span className="text-sm font-bold text-signal-highlight">{event.price}</span>
         </div>
-        <div className="flex items-center gap-3 mb-2 flex-wrap">
-          <span className="mono-data text-muted-foreground/60">{event.venue}</span>
-          <span className="mono-data text-accent">{event.neighborhood}</span>
-          <span className="mono-data text-muted-foreground/40">{event.frequency}</span>
-          <span className="mono-data text-signal-highlight">{event.price}</span>
-        </div>
-        <p className="text-sm text-muted-foreground leading-relaxed mb-2">{event.description}</p>
-        <div className="flex items-center gap-2 flex-wrap">
+        <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-4">{event.description}</p>
+        <div className="flex items-center gap-3 flex-wrap">
           <SignalChip label={event.category} variant={event.category === "Speed Dating" ? "energy" : event.category === "Nightlife" ? "live" : "default"} />
           {event.ageRange && <SignalChip label={event.ageRange} variant="near" />}
-          {event.tags.slice(0, 2).map(t => (
-            <span key={t} className="mono-data text-muted-foreground/30">{t}</span>
+          {event.tags.slice(0, 3).map(t => (
+            <span key={t} className="mono-data text-muted-foreground/50 border border-border px-2 py-0.5">{t}</span>
           ))}
         </div>
       </div>
-      <ExternalLink size={14} className="text-muted-foreground/20 group-hover:text-accent flex-shrink-0 mt-1 transition-colors" />
+      <ExternalLink size={16} className="text-muted-foreground/30 group-hover:text-accent flex-shrink-0 mt-2 transition-colors" />
     </a>
   );
 }
