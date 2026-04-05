@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import Index from "./pages/Index";
 import Singles from "./pages/Singles";
+import Events from "./pages/Events";
 import Workouts from "./pages/Workouts";
 import Volunteering from "./pages/Volunteering";
 import Discover from "./pages/Discover";
@@ -24,13 +25,14 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/singles" element={<Singles />} />
+              <Route path="/events" element={<Events />} />
               <Route path="/fitness" element={<Workouts />} />
               <Route path="/volunteering" element={<Volunteering />} />
               <Route path="/discover" element={<Discover />} />
               {/* Redirects from old routes */}
               <Route path="/workouts" element={<Navigate to="/fitness" replace />} />
               <Route path="/explore" element={<Navigate to="/" replace />} />
-              <Route path="/events" element={<Navigate to="/" replace />} />
+              {/* /events is now a real route */}
               <Route path="/community" element={<Navigate to="/" replace />} />
               <Route path="/stories" element={<Navigate to="/" replace />} />
               <Route path="/ask" element={<Navigate to="/" replace />} />
