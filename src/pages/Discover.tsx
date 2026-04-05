@@ -4,6 +4,7 @@ import { Footer } from "@/components/Footer";
 import { cityShowcase, showcaseCategories, type ShowcaseCategory } from "@/data/cityShowcase";
 import { ExternalLink, Search, Building2, Scale, Leaf, Palette, TrendingUp } from "lucide-react";
 import heroImg from "@/assets/hero-discover.jpg";
+import { ListingImage } from "@/components/ListingImage";
 
 const categoryIcons: Record<ShowcaseCategory, typeof Building2> = {
   architecture: Building2,
@@ -78,20 +79,30 @@ const Discover = () => {
             {filtered.map((item) => {
               const Icon = categoryIcons[item.category];
               return (
-                <article key={item.id} className="skeuo-card p-5 rounded">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Icon size={14} className="text-accent" />
-                    <span className="skeuo-badge-accent">{item.category}</span>
-                    {item.stat && <span className="skeuo-badge ml-auto">{item.stat}</span>}
-                  </div>
-                  <h3 className="headline text-foreground leading-tight">{item.title}</h3>
-                  <p className="subheadline mt-0.5">{item.subtitle}</p>
-                  <p className="body-text mt-2 line-clamp-3">{item.description}</p>
-                  <div className="flex flex-wrap items-center gap-1.5 mt-3">
-                    {item.tags.slice(0, 3).map((tag) => (<span key={tag} className="skeuo-badge">{tag}</span>))}
-                    <a href={item.sourceUrl} target="_blank" rel="noopener noreferrer" className="skeuo-btn !px-2 !py-1 ml-auto">
-                      Source <ExternalLink size={10} />
-                    </a>
+                <article key={item.id} className="skeuo-card rounded overflow-hidden">
+                  <ListingImage
+                    listingType="discover"
+                    listingId={item.id}
+                    name={item.title}
+                    category={item.category}
+                    websiteUrl={item.sourceUrl}
+                    className="w-full h-36"
+                  />
+                  <div className="p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Icon size={14} className="text-accent" />
+                      <span className="skeuo-badge-accent">{item.category}</span>
+                      {item.stat && <span className="skeuo-badge ml-auto">{item.stat}</span>}
+                    </div>
+                    <h3 className="headline text-foreground leading-tight">{item.title}</h3>
+                    <p className="subheadline mt-0.5">{item.subtitle}</p>
+                    <p className="body-text mt-2 line-clamp-3">{item.description}</p>
+                    <div className="flex flex-wrap items-center gap-1.5 mt-3">
+                      {item.tags.slice(0, 3).map((tag) => (<span key={tag} className="skeuo-badge">{tag}</span>))}
+                      <a href={item.sourceUrl} target="_blank" rel="noopener noreferrer" className="skeuo-btn !px-2 !py-1 ml-auto">
+                        Source <ExternalLink size={10} />
+                      </a>
+                    </div>
                   </div>
                 </article>
               );

@@ -11,6 +11,7 @@ import {
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import heroImg from "@/assets/hero-singles.jpg";
+import { ListingImage } from "@/components/ListingImage";
 
 const neighborhoods = ["All Areas", ...Array.from(new Set(singlesEvents.map((e) => e.neighborhood)))];
 
@@ -214,7 +215,16 @@ const Singles = () => {
                     ? "border-l-amber-500" : "border-l-red-400";
 
                   return (
-                    <article key={evt.id} className={`skeuo-card p-5 rounded border-l-4 ${borderColor}`}>
+                    <article key={evt.id} className={`skeuo-card rounded overflow-hidden border-l-4 ${borderColor}`}>
+                      <ListingImage
+                        listingType="singles"
+                        listingId={evt.id}
+                        name={`${evt.name} ${evt.organizer}`}
+                        category={evt.category}
+                        websiteUrl={evt.sources[0]?.status === "verified" ? evt.sources[0].url : undefined}
+                        className="w-full h-32 lg:h-36"
+                      />
+                      <div className="p-4">
                       <div className="flex items-start justify-between gap-2 mb-1">
                         <h2 className="headline text-foreground">{evt.name}</h2>
                         <div className="flex items-center gap-1.5 flex-shrink-0">
@@ -248,6 +258,7 @@ const Singles = () => {
                         {evt.tags.slice(0, 3).map((t) => (<span key={t} className="skeuo-badge">{t}</span>))}
                       </div>
                       <EvidenceDrawer event={evt} />
+                      </div>
                     </article>
                   );
                 })}

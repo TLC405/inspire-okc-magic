@@ -7,6 +7,7 @@ import { ExternalLink, Search, SlidersHorizontal, X, MapPin, HandHelping } from 
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import heroImg from "@/assets/hero-volunteer.jpg";
+import { ListingImage } from "@/components/ListingImage";
 
 const neighborhoods = ["All Areas", ...Array.from(new Set(volunteerOrgs.map((o) => o.neighborhood)))];
 
@@ -131,26 +132,31 @@ const Volunteering = () => {
             <div className="flex-1 min-w-0">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {filtered.map((org) => (
-                  <article key={org.id} className="skeuo-card p-5 rounded">
-                    <div className="flex items-start gap-3">
-                      <div className="w-1 self-stretch rounded-full bg-accent/30 flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <h2 className="headline text-foreground">{org.name}</h2>
-                          <a href={org.source} target="_blank" rel="noopener noreferrer" className="skeuo-btn flex-shrink-0 !px-2 !py-1.5">
-                            <ExternalLink size={12} />
-                          </a>
-                        </div>
-                        <p className="flex items-center gap-1 dateline text-muted-foreground/60 mt-1">
-                          <MapPin size={10} /> {org.neighborhood} · {org.category}
-                        </p>
-                        <p className="body-text mt-2 line-clamp-2">{org.description}</p>
-                        <div className="flex flex-wrap items-center gap-1.5 mt-3">
-                          <span className="skeuo-badge-accent">{org.category}</span>
-                          {org.commitment && <span className="skeuo-badge">{org.commitment}</span>}
-                          {org.type && <span className="skeuo-badge">{org.type}</span>}
-                          {org.tags.slice(0, 2).map((t) => (<span key={t} className="skeuo-badge">{t}</span>))}
-                        </div>
+                  <article key={org.id} className="skeuo-card rounded overflow-hidden">
+                    <ListingImage
+                      listingType="volunteer"
+                      listingId={org.id}
+                      name={org.name}
+                      category={org.category}
+                      websiteUrl={org.source}
+                      className="w-full h-32 lg:h-36"
+                    />
+                    <div className="p-4">
+                      <div className="flex items-start justify-between gap-2">
+                        <h2 className="headline text-foreground">{org.name}</h2>
+                        <a href={org.source} target="_blank" rel="noopener noreferrer" className="skeuo-btn flex-shrink-0 !px-2 !py-1.5">
+                          <ExternalLink size={12} />
+                        </a>
+                      </div>
+                      <p className="flex items-center gap-1 dateline text-muted-foreground/60 mt-1">
+                        <MapPin size={10} /> {org.neighborhood} · {org.category}
+                      </p>
+                      <p className="body-text mt-2 line-clamp-2">{org.description}</p>
+                      <div className="flex flex-wrap items-center gap-1.5 mt-3">
+                        <span className="skeuo-badge-accent">{org.category}</span>
+                        {org.commitment && <span className="skeuo-badge">{org.commitment}</span>}
+                        {org.type && <span className="skeuo-badge">{org.type}</span>}
+                        {org.tags.slice(0, 2).map((t) => (<span key={t} className="skeuo-badge">{t}</span>))}
                       </div>
                     </div>
                   </article>
