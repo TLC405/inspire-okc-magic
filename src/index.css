@@ -403,6 +403,18 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  /* Masthead shadow for hero overlay */
+  .masthead-shadow {
+    text-shadow: 0 2px 16px rgba(0,0,0,0.6), 0 1px 4px rgba(0,0,0,0.4);
+  }
+
+  /* Column lead image */
+  .column-lead-img {
+    @apply w-full h-[140px] object-cover rounded;
+    box-shadow: var(--skeuo-shadow);
+    border: 1px solid hsl(var(--border) / 0.3);
+  }
 }
 
 @keyframes signal-pulse {
