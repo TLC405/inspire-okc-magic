@@ -1,35 +1,36 @@
+import { useState, useMemo } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { SignalChip } from "@/components/SignalChip";
 import { MetricRail } from "@/components/MetricRail";
-import { ArrowRight, MapPin, TreePine, Home, Package } from "lucide-react";
-import { Link } from "react-router-dom";
-
-const features = [
-  { num: "01", title: "Local Nonprofits", desc: "Connect with established nonprofits and community organizations across Oklahoma City.", icon: Home },
-  { num: "02", title: "Outdoor Cleanups", desc: "Park cleanups, river trail restoration, and neighborhood beautification projects.", icon: TreePine },
-  { num: "03", title: "Food & Supply Drives", desc: "Organize and participate in food drives, clothing donations, and supply initiatives.", icon: Package },
-];
-
-const communities = ["Capitol Hill", "Del City", "Midwest City", "Spencer", "NE Oklahoma City", "SW Oklahoma City", "Moore", "Norman"];
+import { ExternalLink, Filter, HandHeart, MapPin } from "lucide-react";
+import { volunteerOrgs, volunteerCategories, type VolunteerOrg } from "@/data/volunteerOrgs";
 
 const Volunteering = () => {
+  const [activeCategory, setActiveCategory] = useState<string>("All");
+
+  const filtered = useMemo(() => {
+    return volunteerOrgs.filter((o) => activeCategory === "All" || o.category === activeCategory);
+  }, [activeCategory]);
+
+  const neighborhoods = [...new Set(volunteerOrgs.map(o => o.neighborhood))];
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <main>
-        <section className="pt-32 pb-20 md:pt-44 md:pb-28 bg-primary text-primary-foreground">
+        <section className="pt-32 pb-12 md:pt-44 md:pb-16 bg-primary text-primary-foreground">
           <div className="container max-w-5xl">
             <ScrollReveal>
               <div className="flex items-center gap-3 mb-4">
                 <SignalChip label="Directory 03" variant="free" />
-                <SignalChip label="Service" variant="default" />
+                <SignalChip label={`${volunteerOrgs.length} Organizations`} variant="live" pulse />
               </div>
-              <h1 className="display-hero mb-4">Volunteering</h1>
-              <h2 className="text-[clamp(1.5rem,4vw,3rem)] font-black tracking-[-0.03em] text-accent leading-[0.9] mb-6">Oklahoma City</h2>
+              <h1 className="display-hero mb-2">Volunteering</h1>
+              <h2 className="text-[clamp(1.2rem,3vw,2.5rem)] font-black tracking-[-0.03em] text-signal-positive leading-[0.9] mb-4">Oklahoma City</h2>
               <p className="text-base md:text-lg text-primary-foreground/40 max-w-xl leading-relaxed">
-                Find volunteer opportunities and meaningful ways to give back across Oklahoma City neighborhoods.
+                Real organizations doing real work. Find where to give your time across Oklahoma City.
               </p>
             </ScrollReveal>
           </div>
@@ -38,46 +39,70 @@ const Volunteering = () => {
         <section className="border-b border-border bg-card">
           <div className="container max-w-5xl">
             <MetricRail items={[
-              { label: "Communities", value: String(communities.length), accent: true },
-              { label: "Categories", value: "3" },
-              { label: "Status", value: "Building", accent: true },
-              { label: "Launch", value: "Spring 2026" },
+              { label: "Organizations", value: String(volunteerOrgs.length), accent: true },
+              { label: "Categories", value: String(volunteerCategories.length - 1) },
+              { label: "Areas", value: String(neighborhoods.length) },
+              { label: "Status", value: "Live", accent: true },
             ]} />
           </div>
         </section>
 
-        <section className="py-20 md:py-28 border-b border-border">
-          <div className="container max-w-3xl">
-            <ScrollReveal>
-              <div className="quote-block">
-                <p className="italic text-2xl md:text-4xl font-light text-foreground/50 leading-snug">
-                  "Service is the rent we pay<br />for living."
-                </p>
-                <p className="mono-data text-muted-foreground/40 mt-6">— Volunteering Oklahoma City</p>
-              </div>
-            </ScrollReveal>
+        <section className="py-4 border-b border-border sticky top-16 md:top-20 z-30 bg-background/95 backdrop-blur-sm">
+          <div className="container max-w-5xl">
+            <div className="flex items-center gap-2 overflow-x-auto pb-1">
+              <Filter size={14} className="text-muted-foreground/40 flex-shrink-0" />
+              {volunteerCategories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`label-caps px-3 py-2 border transition-all duration-150 flex-shrink-0 ${
+                    activeCategory === cat
+                      ? "border-signal-positive text-signal-positive bg-signal-positive/10"
+                      : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
           </div>
         </section>
 
-        <section className="py-16 md:py-20">
+        {/* Org listings — unique layout with category accent bar */}
+        <section className="py-8 md:py-12">
           <div className="container max-w-5xl">
-            <ScrollReveal>
-              <div className="flex items-center gap-3 mb-10">
-                <p className="label-caps text-accent tracking-[0.3em]">What You'll Find</p>
-                <div className="h-px flex-1 bg-border" />
-              </div>
-            </ScrollReveal>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-border">
-              {features.map((f, i) => (
-                <ScrollReveal key={f.num} delay={i * 0.06}>
-                  <div className="bg-background p-8 group hover:bg-accent/5 transition-colors h-full">
-                    <div className="flex items-center gap-3 mb-5">
-                      <span className="mono-data text-signal-positive">({f.num})</span>
-                      <f.icon size={16} className="text-muted-foreground group-hover:text-signal-positive transition-colors" />
+            <div className="flex items-center gap-3 mb-6">
+              <span className="mono-data text-muted-foreground/40">{filtered.length} Organizations</span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+
+            <div className="space-y-3">
+              {filtered.map((org, i) => (
+                <ScrollReveal key={org.id} delay={i * 0.03}>
+                  <a
+                    href={org.source}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-start gap-4 md:gap-6 p-5 md:p-6 border border-border hover:border-signal-positive/40 transition-all bg-card"
+                  >
+                    <div className="w-1 self-stretch bg-signal-positive/20 group-hover:bg-signal-positive transition-colors flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <h3 className="text-base md:text-lg font-bold text-foreground tracking-tight group-hover:text-signal-positive transition-colors">
+                          {org.name}
+                        </h3>
+                        <SignalChip label={org.category} variant="free" />
+                      </div>
+                      <p className="mono-data text-signal-positive mb-2">{org.neighborhood}</p>
+                      <p className="text-sm text-muted-foreground leading-relaxed mb-2">{org.description}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {org.tags.map(t => (
+                          <span key={t} className="mono-data text-muted-foreground/30">{t}</span>
+                        ))}
+                      </div>
                     </div>
-                    <h3 className="text-lg font-bold tracking-tight mb-3">{f.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
-                  </div>
+                    <ExternalLink size={14} className="text-muted-foreground/20 group-hover:text-signal-positive flex-shrink-0 mt-1 transition-colors" />
+                  </a>
                 </ScrollReveal>
               ))}
             </div>
@@ -88,38 +113,14 @@ const Volunteering = () => {
           <div className="container max-w-5xl">
             <ScrollReveal>
               <div className="flex items-center gap-3 mb-6">
-                <MapPin size={14} className="text-accent" />
-                <span className="label-caps text-muted-foreground">Communities We Serve</span>
+                <MapPin size={14} className="text-signal-positive" />
+                <span className="label-caps text-muted-foreground">Communities Served</span>
               </div>
               <div className="flex flex-wrap gap-2">
-                {communities.map((area) => (
+                {neighborhoods.map((area) => (
                   <span key={area} className="border border-border px-3 py-2 text-sm text-muted-foreground hover:border-signal-positive hover:text-foreground transition-colors cursor-default">{area}</span>
                 ))}
               </div>
-            </ScrollReveal>
-          </div>
-        </section>
-
-        <section className="py-12 md:py-16 border-t border-border">
-          <div className="container max-w-3xl text-center">
-            <ScrollReveal>
-              <div className="border border-accent p-8 md:p-12">
-                <span className="mono-data text-accent mb-3 block">Status</span>
-                <h2 className="display-section mb-4">Launching Spring 2026</h2>
-                <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                  Your central hub for every way to give back in Oklahoma City.
-                </p>
-              </div>
-            </ScrollReveal>
-          </div>
-        </section>
-
-        <section className="py-16 md:py-20 bg-primary text-primary-foreground border-t border-border">
-          <div className="container max-w-3xl text-center">
-            <ScrollReveal>
-              <Link to="/explore" className="inline-flex items-center gap-3 border border-accent text-accent label-caps py-3.5 px-8 hover:bg-accent hover:text-accent-foreground transition-all duration-150">
-                Explore All Directories <ArrowRight size={14} />
-              </Link>
             </ScrollReveal>
           </div>
         </section>

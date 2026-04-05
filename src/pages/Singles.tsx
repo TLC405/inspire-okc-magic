@@ -1,37 +1,45 @@
+import { useState, useMemo } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { SignalChip } from "@/components/SignalChip";
 import { MetricRail } from "@/components/MetricRail";
-import { ArrowRight, Heart, Calendar, MapPin, Users, Sparkles } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ExternalLink, Filter, Heart, MapPin } from "lucide-react";
+import { singlesEvents, singlesCategories, type SinglesEvent } from "@/data/singlesEvents";
 
-const features = [
-  { num: "01", title: "Curated Events", desc: "Mixers, speed-dates, and social gatherings designed for real connection — not swiping.", icon: Calendar },
-  { num: "02", title: "Group Meetups", desc: "Weekly and monthly group outings across Oklahoma City neighborhoods. Low pressure, high energy.", icon: Users },
-  { num: "03", title: "Experience-Based", desc: "From rooftop socials to food crawls — events built around shared experiences.", icon: Sparkles },
-];
-
-const neighborhoods = ["Midtown", "Bricktown", "Paseo Arts", "Plaza District", "Deep Deuce", "Automobile Alley", "Film Row", "Uptown 23rd"];
+const neighborhoods = [...new Set(singlesEvents.map(e => e.neighborhood))];
 
 const Singles = () => {
+  const [activeCategory, setActiveCategory] = useState<string>("All");
+  const [activeTime, setActiveTime] = useState<string>("All Events");
+
+  const filtered = useMemo(() => {
+    return singlesEvents.filter((e) => {
+      const matchCat = activeCategory === "All" || e.category === activeCategory;
+      const matchTime = activeTime === "All Events" ||
+        (activeTime === "Weekly" && e.frequency.toLowerCase().includes("weekly")) ||
+        (activeTime === "Monthly" && e.frequency.toLowerCase().includes("monthly")) ||
+        (activeTime === "Seasonal" && (e.frequency.toLowerCase().includes("seasonal") || e.frequency.toLowerCase().includes("quarterly") || e.frequency.toLowerCase().includes("bi-monthly")));
+      return matchCat && matchTime;
+    });
+  }, [activeCategory, activeTime]);
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <main>
-        <section className="pt-32 pb-20 md:pt-44 md:pb-28 bg-primary text-primary-foreground">
+        {/* Hero — distinct from other pages */}
+        <section className="pt-32 pb-12 md:pt-44 md:pb-16 bg-primary text-primary-foreground">
           <div className="container max-w-5xl">
             <ScrollReveal>
               <div className="flex items-center gap-3 mb-4">
                 <SignalChip label="Directory 01" variant="energy" />
-                <SignalChip label="Social" variant="default" />
+                <SignalChip label={`${singlesEvents.length} Events`} variant="live" pulse />
               </div>
-              <h1 className="display-hero mb-4">
-                Social Singles
-              </h1>
-              <h2 className="text-[clamp(1.5rem,4vw,3rem)] font-black tracking-[-0.03em] text-accent leading-[0.9] mb-6">Oklahoma City</h2>
+              <h1 className="display-hero mb-2">Singles Events</h1>
+              <h2 className="text-[clamp(1.2rem,3vw,2.5rem)] font-black tracking-[-0.03em] text-accent leading-[0.9] mb-4">Oklahoma City</h2>
               <p className="text-base md:text-lg text-primary-foreground/40 max-w-xl leading-relaxed">
-                Events, meetups, and social gatherings built for singles who want to meet real people in Oklahoma City.
+                Every speed dating night, mixer, social gathering, and singles activity in the metro — researched and verified.
               </p>
             </ScrollReveal>
           </div>
@@ -41,88 +49,101 @@ const Singles = () => {
         <section className="border-b border-border bg-card">
           <div className="container max-w-5xl">
             <MetricRail items={[
-              { label: "Events", value: "—", accent: true },
+              { label: "Events", value: String(singlesEvents.length), accent: true },
               { label: "Neighborhoods", value: String(neighborhoods.length) },
-              { label: "Status", value: "Building", accent: true },
-              { label: "Launch", value: "Spring 2026" },
+              { label: "Categories", value: String(singlesCategories.length - 1) },
+              { label: "Status", value: "Live", accent: true },
             ]} />
           </div>
         </section>
 
-        <section className="py-20 md:py-28 border-b border-border">
-          <div className="container max-w-3xl">
-            <ScrollReveal>
-              <div className="quote-block">
-                <p className="italic text-2xl md:text-4xl font-light text-foreground/50 leading-snug">
-                  "Connection doesn't happen<br />behind a screen."
-                </p>
-                <p className="mono-data text-muted-foreground/40 mt-6">— Social Singles Oklahoma City</p>
-              </div>
-            </ScrollReveal>
-          </div>
-        </section>
-
-        <section className="py-16 md:py-20">
+        {/* Filter bar — sticky */}
+        <section className="py-4 border-b border-border sticky top-16 md:top-20 z-30 bg-background/95 backdrop-blur-sm">
           <div className="container max-w-5xl">
-            <ScrollReveal>
-              <div className="flex items-center gap-3 mb-10">
-                <p className="label-caps text-accent tracking-[0.3em]">What You'll Find</p>
-                <div className="h-px flex-1 bg-border" />
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                <Filter size={14} className="text-muted-foreground/40 flex-shrink-0" />
+                {singlesCategories.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setActiveCategory(cat)}
+                    className={`label-caps px-3 py-2 border transition-all duration-150 flex-shrink-0 ${
+                      activeCategory === cat
+                        ? "border-accent text-accent bg-accent/10"
+                        : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
               </div>
-            </ScrollReveal>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-border">
-              {features.map((f, i) => (
-                <ScrollReveal key={f.num} delay={i * 0.06}>
-                  <div className="bg-background p-8 group hover:bg-accent/5 transition-colors h-full">
-                    <div className="flex items-center gap-3 mb-5">
-                      <span className="mono-data text-signal-secondary">({f.num})</span>
-                      <f.icon size={16} className="text-muted-foreground group-hover:text-accent transition-colors" />
-                    </div>
-                    <h3 className="text-lg font-bold tracking-tight mb-3">{f.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
-                  </div>
-                </ScrollReveal>
-              ))}
+              <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                {["All Events", "Weekly", "Monthly", "Seasonal"].map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setActiveTime(t)}
+                    className={`label-caps px-3 py-2 border transition-all duration-150 flex-shrink-0 ${
+                      activeTime === t
+                        ? "border-signal-secondary text-signal-secondary bg-signal-secondary/10"
+                        : "border-border text-muted-foreground/50 hover:text-foreground hover:border-foreground/30"
+                    }`}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </section>
 
+        {/* Event list */}
+        <section className="py-8 md:py-12">
+          <div className="container max-w-5xl">
+            <div className="flex items-center gap-3 mb-6">
+              <span className="mono-data text-muted-foreground/40">{filtered.length} Results</span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+
+            <div className="space-y-3">
+              {filtered.map((event, i) => (
+                <ScrollReveal key={event.id} delay={i * 0.03}>
+                  <EventCard event={event} index={i} />
+                </ScrollReveal>
+              ))}
+            </div>
+
+            {filtered.length === 0 && (
+              <div className="text-center py-16 border border-border">
+                <Heart size={24} className="mx-auto mb-4 text-muted-foreground/30" />
+                <p className="text-muted-foreground">No events match your filters.</p>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Neighborhoods */}
         <section className="py-12 md:py-16 border-t border-border bg-secondary/10">
           <div className="container max-w-5xl">
             <ScrollReveal>
               <div className="flex items-center gap-3 mb-6">
                 <MapPin size={14} className="text-accent" />
-                <span className="label-caps text-muted-foreground">Oklahoma City Neighborhoods</span>
+                <span className="label-caps text-muted-foreground">Neighborhoods</span>
               </div>
               <div className="flex flex-wrap gap-2">
-                {neighborhoods.map((area) => (
-                  <span key={area} className="border border-border px-3 py-2 text-sm text-muted-foreground hover:border-accent hover:text-foreground transition-colors cursor-default">{area}</span>
-                ))}
+                {neighborhoods.map((area) => {
+                  const count = singlesEvents.filter(e => e.neighborhood === area).length;
+                  return (
+                    <button
+                      key={area}
+                      onClick={() => {}}
+                      className="border border-border px-3 py-2 text-sm text-muted-foreground hover:border-accent hover:text-foreground transition-colors cursor-default flex items-center gap-2"
+                    >
+                      {area}
+                      <span className="mono-data text-accent text-[10px]">{count}</span>
+                    </button>
+                  );
+                })}
               </div>
-            </ScrollReveal>
-          </div>
-        </section>
-
-        <section className="py-12 md:py-16 border-t border-border">
-          <div className="container max-w-3xl text-center">
-            <ScrollReveal>
-              <div className="border border-accent p-8 md:p-12">
-                <span className="mono-data text-accent mb-3 block">Status</span>
-                <h2 className="display-section mb-4">Launching Spring 2026</h2>
-                <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                  Social Singles Oklahoma City is in development. Curated connection events are coming.
-                </p>
-              </div>
-            </ScrollReveal>
-          </div>
-        </section>
-
-        <section className="py-16 md:py-20 bg-primary text-primary-foreground border-t border-border">
-          <div className="container max-w-3xl text-center">
-            <ScrollReveal>
-              <Link to="/explore" className="inline-flex items-center gap-3 border border-accent text-accent label-caps py-3.5 px-8 hover:bg-accent hover:text-accent-foreground transition-all duration-150">
-                Explore All Directories <ArrowRight size={14} />
-              </Link>
             </ScrollReveal>
           </div>
         </section>
@@ -131,5 +152,41 @@ const Singles = () => {
     </div>
   );
 };
+
+function EventCard({ event, index }: { event: SinglesEvent; index: number }) {
+  const num = String(index + 1).padStart(2, "0");
+  return (
+    <a
+      href={event.source}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group flex items-start gap-4 md:gap-6 p-5 md:p-6 border border-border hover:border-accent/40 transition-all duration-150 bg-card"
+    >
+      <span className="mono-data text-signal-secondary flex-shrink-0 pt-1">({num})</span>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-1 flex-wrap">
+          <h3 className="text-base md:text-lg font-bold text-foreground tracking-tight group-hover:text-accent transition-colors">
+            {event.name}
+          </h3>
+        </div>
+        <div className="flex items-center gap-3 mb-2 flex-wrap">
+          <span className="mono-data text-muted-foreground/60">{event.venue}</span>
+          <span className="mono-data text-accent">{event.neighborhood}</span>
+          <span className="mono-data text-muted-foreground/40">{event.frequency}</span>
+          <span className="mono-data text-signal-highlight">{event.price}</span>
+        </div>
+        <p className="text-sm text-muted-foreground leading-relaxed mb-2">{event.description}</p>
+        <div className="flex items-center gap-2 flex-wrap">
+          <SignalChip label={event.category} variant={event.category === "Speed Dating" ? "energy" : event.category === "Nightlife" ? "live" : "default"} />
+          {event.ageRange && <SignalChip label={event.ageRange} variant="near" />}
+          {event.tags.slice(0, 2).map(t => (
+            <span key={t} className="mono-data text-muted-foreground/30">{t}</span>
+          ))}
+        </div>
+      </div>
+      <ExternalLink size={14} className="text-muted-foreground/20 group-hover:text-accent flex-shrink-0 mt-1 transition-colors" />
+    </a>
+  );
+}
 
 export default Singles;
