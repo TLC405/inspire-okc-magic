@@ -2,8 +2,8 @@ import { Link } from "react-router-dom";
 
 export function Footer() {
   return (
-    <footer className="mt-auto">
-      <div className="rule-heavy" />
+    <footer className="mt-auto" style={{ boxShadow: 'inset 0 2px 6px hsl(0 0% 0% / 0.04)' }}>
+      <div className="skeuo-divider" />
       <div className="container py-6 md:py-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <span className="font-black text-sm tracking-[-0.02em] text-foreground">INSPIRE</span>

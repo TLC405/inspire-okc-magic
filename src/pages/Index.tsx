@@ -23,7 +23,7 @@ const Index = () => {
       <main className="flex-1">
         {/* Masthead */}
         <div className="container pt-8 md:pt-20 pb-4 md:pb-6">
-          <div className="rule-double mb-4 md:mb-6" />
+          <div className="skeuo-divider mb-4 md:mb-6" />
           <h1 className="masthead text-foreground text-center">INSPIRE</h1>
           <p className="masthead-sub text-center text-muted-foreground mb-3 md:mb-4">Oklahoma City</p>
           <div className="rule-heavy mb-3 md:mb-4" />
@@ -42,128 +42,79 @@ const Index = () => {
           <div className="rule-thin" />
         </div>
 
-        {/* Quick-Nav Cards (mobile-first, replaces verbose teasers on small screens) */}
+        {/* Quick-Nav Cards (mobile) */}
         <div className="container py-4 md:hidden">
           <div className="grid grid-cols-3 gap-2">
-            <Link to="/singles" className="p-3 border border-border hover:bg-foreground/[0.03] transition-colors text-center">
-              <Heart size={18} className="mx-auto mb-1.5 text-accent" />
-              <p className="label-caps text-foreground text-[10px]">Singles</p>
-              <p className="dateline text-muted-foreground mt-0.5">{singlesEvents.length}</p>
-            </Link>
-            <Link to="/fitness" className="p-3 border border-border hover:bg-foreground/[0.03] transition-colors text-center">
-              <Dumbbell size={18} className="mx-auto mb-1.5 text-accent" />
-              <p className="label-caps text-foreground text-[10px]">Fitness</p>
-              <p className="dateline text-muted-foreground mt-0.5">{fitnessSpots.length}</p>
-            </Link>
-            <Link to="/volunteering" className="p-3 border border-border hover:bg-foreground/[0.03] transition-colors text-center">
-              <HandHelping size={18} className="mx-auto mb-1.5 text-accent" />
-              <p className="label-caps text-foreground text-[10px]">Volunteer</p>
-              <p className="dateline text-muted-foreground mt-0.5">{volunteerOrgs.length}</p>
-            </Link>
+            {[
+              { to: "/singles", icon: Heart, label: "Singles", count: singlesEvents.length },
+              { to: "/fitness", icon: Dumbbell, label: "Fitness", count: fitnessSpots.length },
+              { to: "/volunteering", icon: HandHelping, label: "Volunteer", count: volunteerOrgs.length },
+            ].map(({ to, icon: Icon, label, count }) => (
+              <Link key={to} to={to} className="skeuo-card p-4 text-center rounded">
+                <Icon size={20} className="mx-auto mb-2 text-accent" />
+                <p className="label-caps text-foreground text-[10px]">{label}</p>
+                <p className="dateline text-muted-foreground mt-1">{count}</p>
+              </Link>
+            ))}
           </div>
         </div>
 
         {/* Three-column teasers (desktop) */}
         <div className="container py-4 md:py-12 hidden md:block">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
-            {/* Singles Column */}
-            <div className="md:pr-6 md:border-r border-foreground/10 pb-8 md:pb-0">
-              <div className="flex items-center gap-2 mb-5">
-                <h2 className="section-head text-foreground">Singles</h2>
-                <span className="news-badge-live signal-pulse">Live</span>
-              </div>
-              <p className="dateline text-muted-foreground mb-4">{singlesEvents.length} Events · Oklahoma City</p>
-              {singlesEvents.slice(0, 3).map((evt, i) => (
-                <div key={evt.id} className="article-block">
-                  <span className="dateline text-muted-foreground/40 mr-2">{String(i + 1).padStart(2, "0")}</span>
-                  <h3 className="headline text-foreground inline">{evt.name}</h3>
-                  <p className="subheadline mt-1">{evt.venue}</p>
-                  <div className="flex flex-wrap gap-1.5 mt-2">
-                    <span className="news-badge">{evt.category}</span>
-                    <span className="news-badge">{evt.neighborhood}</span>
-                  </div>
+          <div className="grid grid-cols-3 gap-6">
+            {[
+              { title: "Singles", count: singlesEvents.length, items: singlesEvents.slice(0, 3).map(e => ({ id: e.id, name: e.name, sub: e.venue, badge: e.category })), link: "/singles", unit: "events" },
+              { title: "Fitness", count: fitnessSpots.length, items: fitnessSpots.slice(0, 3).map(s => ({ id: s.id, name: s.name, sub: s.neighborhood, badge: s.category })), link: "/fitness", unit: "spots" },
+              { title: "Volunteering", count: volunteerOrgs.length, items: volunteerOrgs.slice(0, 3).map(o => ({ id: o.id, name: o.name, sub: o.neighborhood, badge: o.category })), link: "/volunteering", unit: "orgs" },
+            ].map((col) => (
+              <div key={col.title} className="skeuo-card p-6 rounded">
+                <div className="flex items-center gap-2 mb-4">
+                  <h2 className="section-head text-foreground text-xl">{col.title}</h2>
+                  <span className="news-badge-live signal-pulse">Live</span>
                 </div>
-              ))}
-              <Link to="/singles" className="inline-flex items-center gap-2 mt-4 label-caps text-accent hover:text-foreground transition-colors">
-                View all {singlesEvents.length} events <ArrowRight size={12} />
-              </Link>
-            </div>
-
-            {/* Fitness Column */}
-            <div className="md:px-6 md:border-r border-foreground/10 pb-8 md:pb-0">
-              <div className="flex items-center gap-2 mb-5">
-                <h2 className="section-head text-foreground">Fitness</h2>
-                <span className="news-badge-live signal-pulse">Live</span>
-              </div>
-              <p className="dateline text-muted-foreground mb-4">{fitnessSpots.length} Spots · Oklahoma City</p>
-              {fitnessSpots.slice(0, 3).map((spot, i) => (
-                <div key={spot.id} className="article-block">
-                  <span className="dateline text-muted-foreground/40 mr-2">{String(i + 1).padStart(2, "0")}</span>
-                  <h3 className="headline text-foreground inline">{spot.name}</h3>
-                  <p className="subheadline mt-1">{spot.neighborhood}</p>
-                  <div className="flex flex-wrap gap-1.5 mt-2">
-                    <span className="news-badge">{spot.category}</span>
+                <p className="dateline text-muted-foreground mb-4">{col.count} {col.unit} · Oklahoma City</p>
+                {col.items.map((item, i) => (
+                  <div key={item.id} className="py-3 border-b border-foreground/[0.06] last:border-b-0">
+                    <span className="dateline text-muted-foreground/30 mr-2">{String(i + 1).padStart(2, "0")}</span>
+                    <h3 className="headline text-foreground inline text-base">{item.name}</h3>
+                    <p className="subheadline mt-0.5 text-sm">{item.sub}</p>
+                    <span className="skeuo-badge mt-1">{item.badge}</span>
                   </div>
-                </div>
-              ))}
-              <Link to="/fitness" className="inline-flex items-center gap-2 mt-4 label-caps text-accent hover:text-foreground transition-colors">
-                View all {fitnessSpots.length} spots <ArrowRight size={12} />
-              </Link>
-            </div>
-
-            {/* Volunteering Column */}
-            <div className="md:pl-6">
-              <div className="flex items-center gap-2 mb-5">
-                <h2 className="section-head text-foreground">Volunteering</h2>
-                <span className="news-badge-live signal-pulse">Live</span>
+                ))}
+                <Link to={col.link} className="inline-flex items-center gap-2 mt-4 label-caps text-accent hover:text-foreground transition-colors">
+                  View all {col.count} {col.unit} <ArrowRight size={12} />
+                </Link>
               </div>
-              <p className="dateline text-muted-foreground mb-4">{volunteerOrgs.length} Organizations · Oklahoma City</p>
-              {volunteerOrgs.slice(0, 3).map((org, i) => (
-                <div key={org.id} className="article-block">
-                  <span className="dateline text-muted-foreground/40 mr-2">{String(i + 1).padStart(2, "0")}</span>
-                  <h3 className="headline text-foreground inline">{org.name}</h3>
-                  <p className="subheadline mt-1">{org.neighborhood}</p>
-                  <div className="flex flex-wrap gap-1.5 mt-2">
-                    <span className="news-badge">{org.category}</span>
-                  </div>
-                </div>
-              ))}
-              <Link to="/volunteering" className="inline-flex items-center gap-2 mt-4 label-caps text-accent hover:text-foreground transition-colors">
-                View all {volunteerOrgs.length} orgs <ArrowRight size={12} />
-              </Link>
-            </div>
+            ))}
           </div>
         </div>
 
         {/* City Showcase Teaser */}
         <div className="container py-6 md:py-12">
-          <div className="rule-double mb-4 md:mb-6" />
+          <div className="skeuo-divider mb-4 md:mb-6" />
           <div className="flex items-center justify-between mb-4 md:mb-6">
             <h2 className="section-head text-foreground">Discover Oklahoma City</h2>
-            <Link to="/discover" className="inline-flex items-center gap-2 label-caps text-accent hover:text-foreground transition-colors">
+            <Link to="/discover" className="skeuo-btn">
               View all 100 <ArrowRight size={12} />
             </Link>
           </div>
           <p className="dateline text-muted-foreground mb-4 md:mb-6">Architecture · Policy · Sustainability · Culture · Growth</p>
 
-          {/* Horizontal scroll on mobile, 5-col on desktop */}
-          <div className="flex md:grid md:grid-cols-5 gap-0 overflow-x-auto md:overflow-visible scrollbar-hide">
+          <div className="flex md:grid md:grid-cols-5 gap-3 overflow-x-auto md:overflow-visible scrollbar-hide">
             {([
               { cat: 'architecture' as const, icon: Building2, label: 'Architecture' },
               { cat: 'policy' as const, icon: Scale, label: 'Policy' },
               { cat: 'sustainability' as const, icon: Leaf, label: 'Sustainability' },
               { cat: 'culture' as const, icon: Palette, label: 'Culture' },
               { cat: 'growth' as const, icon: TrendingUp, label: 'Growth' },
-            ]).map(({ cat, icon: Icon, label }, i) => {
+            ]).map(({ cat, icon: Icon, label }) => {
               const items = cityShowcase.filter(x => x.category === cat);
               const featured = items[0];
               return (
                 <Link
                   key={cat}
                   to={`/discover?cat=${cat}`}
-                  className={`p-4 md:p-5 min-w-[160px] md:min-w-0 border-r md:border-r-0 border-foreground/10 hover:bg-foreground/[0.02] transition-colors flex-shrink-0 md:flex-shrink ${
-                    i < 4 ? 'lg:border-r' : ''
-                  } last:border-r-0`}
+                  className="skeuo-card p-4 md:p-5 min-w-[160px] md:min-w-0 flex-shrink-0 rounded"
                 >
                   <Icon size={16} className="text-muted-foreground mb-3" />
                   <h3 className="label-caps text-foreground mb-1">{label}</h3>
@@ -178,10 +129,10 @@ const Index = () => {
               );
             })}
           </div>
-          <div className="rule-thin mt-0" />
+          <div className="rule-thin mt-6" />
         </div>
 
-        {/* Bottom edition bar — hidden on mobile */}
+        {/* Bottom edition bar */}
         <div className="container pb-8 hidden md:block">
           <div className="rule-heavy mb-4" />
           <div className="flex flex-wrap items-center justify-between gap-2">

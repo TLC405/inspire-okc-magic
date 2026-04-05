@@ -11,10 +11,9 @@ const navLinks = [
 
 export function Navbar() {
   const location = useLocation();
-  const isHome = location.pathname === "/";
 
   return (
-    <header className="border-b-2 border-foreground/10">
+    <header className="border-b border-border/50 bg-background/95 backdrop-blur-sm sticky top-0 z-50" style={{ boxShadow: '0 1px 4px hsl(0 0% 0% / 0.06), 0 4px 12px hsl(0 0% 0% / 0.03)' }}>
       <div className="container flex items-center justify-between py-3 md:py-4">
         <Link to="/" className="flex items-baseline gap-1">
           <span className="font-black text-lg md:text-xl tracking-[-0.03em] text-foreground">INSPIRE</span>
