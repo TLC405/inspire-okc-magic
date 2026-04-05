@@ -17,7 +17,7 @@ const Singles = () => {
   const filtered = useMemo(() => {
     return singlesEvents.filter((evt) => {
       const q = search.toLowerCase();
-      const matchSearch = !q || evt.name.toLowerCase().includes(q) || evt.venue.toLowerCase().includes(q) || evt.description.toLowerCase().includes(q) || evt.tags.some((t) => t.toLowerCase().includes(q)) || evt.neighborhood.toLowerCase().includes(q);
+      const matchSearch = !q || evt.name.toLowerCase().includes(q) || evt.organizer.toLowerCase().includes(q) || evt.venue.toLowerCase().includes(q) || evt.description.toLowerCase().includes(q) || evt.tags.some((t) => t.toLowerCase().includes(q)) || evt.neighborhood.toLowerCase().includes(q);
       const matchCat = category === "All" || evt.category === category;
       const matchTime = time === "All Events" || evt.frequency.toLowerCase().includes(time.toLowerCase());
       const matchHood = hood === "All Areas" || evt.neighborhood === hood;
@@ -78,7 +78,7 @@ const Singles = () => {
                 <span className="font-black text-2xl md:text-3xl text-foreground/10 leading-none mt-1 w-8 flex-shrink-0 text-right">{String(i + 1).padStart(2, "0")}</span>
                 <div className="flex-1 min-w-0">
                   <h2 className="headline text-foreground">{evt.name}</h2>
-                  <p className="subheadline mt-0.5">{evt.venue}</p>
+                  <p className="subheadline mt-0.5">{evt.organizer} · {evt.venue}</p>
                   <p className="dateline text-muted-foreground/50 mt-1">{evt.neighborhood} · {evt.frequency} · {evt.price}</p>
                   <p className="body-text mt-2">{evt.description}</p>
                   <div className="flex flex-wrap items-center gap-1.5 mt-3">
