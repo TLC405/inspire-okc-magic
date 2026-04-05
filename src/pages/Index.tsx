@@ -3,6 +3,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SearchSurface } from "@/components/SearchSurface";
 import { singlesEvents } from "@/data/singlesEvents";
+import { ListingImage } from "@/components/ListingImage";
 import { fitnessSpots } from "@/data/fitnessSpots";
 import { volunteerOrgs } from "@/data/volunteerOrgs";
 import { cityShowcase } from "@/data/cityShowcase";
@@ -207,6 +208,54 @@ const Index = () => {
           </div>
 
           <div className="rule-heavy mt-6" />
+        </div>
+
+        {/* Date Nights Showcase */}
+        <div className="container py-4 md:py-8">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="section-head text-foreground flex items-center gap-2">
+                <Heart size={18} className="text-accent" /> Date Nights
+              </h2>
+              <p className="dateline text-muted-foreground mt-1">Curated experiences for couples & adventurers</p>
+            </div>
+            <Link to="/events" className="skeuo-btn rounded">
+              All Events <ArrowRight size={12} />
+            </Link>
+          </div>
+          <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
+            {singlesEvents
+              .filter((e) => e.category === "Date Night" && e.verificationStatus === "verified")
+              .slice(0, 6)
+              .map((evt) => (
+                <Link
+                  key={evt.id}
+                  to="/events"
+                  className="skeuo-card rounded-lg overflow-hidden min-w-[260px] md:min-w-[300px] flex-shrink-0 hover:shadow-lg transition-shadow"
+                >
+                  <div className="h-36 relative">
+                    <ListingImage
+                      listingType="singles"
+                      listingId={evt.id}
+                      name={evt.name}
+                      category={evt.category}
+                      websiteUrl={evt.sources[0]?.url}
+                      className="w-full h-full"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                    <div className="absolute bottom-2 left-3 right-3">
+                      <h3 className="text-white font-bold text-sm leading-tight">{evt.name}</h3>
+                      <p className="text-white/70 text-xs mt-0.5">{evt.venue}</p>
+                    </div>
+                  </div>
+                  <div className="p-3 flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">{evt.neighborhood}</span>
+                    <span className="text-xs font-semibold text-foreground">{evt.price}</span>
+                  </div>
+                </Link>
+              ))}
+          </div>
+          <div className="rule-thin mt-6" />
         </div>
 
         {/* City Showcase Teaser */}
