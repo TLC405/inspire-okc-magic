@@ -1,175 +1,92 @@
-## Singles Integrity + AI Search Rebuild
 
-### What I found
 
-- The problem is real: the current Singles page includes broken external source URLs.
-- `Single Awareness Dinner` is pointing to a broad Eventbrite search page, not a stable event detail page.
-- The `Ermantourage` organizer link currently returns Eventbrite “Whoops” / not found.
-- The `Jigsaw Dating` organizer link also returns Eventbrite “Whoops” / not found.
-- So the app is currently publishing listings that are not atomically verified source-by-source.
-- CREATE AI THAT TRIPLE VERIFIES AND AI THAT SEARCHES ALL SOCIAL MEDIA AND USE AN 10 OUTSIDE SORUCES ON GITHUB TO MAKE THIS A PP GRANDER. 
+# AI-Powered Image Search + Agent Upgrades
 
-## Plan
+## What Changes
 
-### 1. Hard-stop content integrity on Singles
+1. **AI Image Agent** — A new edge function that uses Lovable AI to find high-quality, real image URLs for every listing (fitness spots, singles events, volunteer orgs, discover items) by searching for venue/event-specific photos and returning direct image URLs from the web.
 
-- Remove or suppress any singles listing whose source fails verification.
-- Treat forum mentions and broad search pages as discovery signals only, not publishable proof.
-- Keep only events with at least one direct, working source page.
-- Add a strict status model:
-  - `verified`
-  - `stale`
-  - `broken`
-  - `conflict`
-  - `unverified`
+2. **Image-Rich Cards Across All Pages** — Every directory card (Fitness, Singles, Volunteering, Discover) gets a thumbnail image pulled by the AI agent. Cards become visual-first with real photos of the actual venues, events, and organizations.
 
-### 2. Rebuild Singles data model around evidence
+3. **Firecrawl Integration for Deep Search** — Connect Firecrawl to scrape real venue websites and extract hero images, logos, and photos automatically. This powers both the singles verification pipeline and the fitness/volunteering image enrichment.
 
-Replace the current flat event shape with source-aware metadata:
+4. **Enhanced Singles AI with Multi-Source Discovery** — Upgrade the existing `singles-ai` edge function to use multiple search strategies: Lovable AI for knowledge-based discovery, plus Firecrawl for scraping Eventbrite, Meetup, and forum pages to find and verify real events.
 
-- event core info
-- multiple source URLs per event
-- verification status
-- last checked timestamp
-- confidence score
-- evidence notes
-- optional venue/image metadata
+5. **AI Image Cache in Database** — Store fetched image URLs in a new table so we don't re-fetch every page load. Images get associated with listing IDs and cached with timestamps.
 
-That lets the UI show what is confirmed instead of pretending everything is equally reliable.
-
-### 3. Massively upgrade Singles search
-
-Build a real search layer instead of plain text matching:
-
-- weighted ranking across event name, organizer, venue, tags, neighborhood, and source text
-- “verified only” enabled by default
-- filters for category, frequency, neighborhood, age bracket, price, source provider
-- sort by relevance, newest verification, and strongest confidence
-- “why this matched” highlights in results
-
-### 4. Upgrade Singles display into a verification-first UI
-
-Redesign cards so users can see trust instantly:
-
-- verification badge
-- last checked time
-- source chips
-- confidence meter
-- richer tags
-- expandable evidence drawer per event
-- clearer empty states when no triple-verified events exist
-
-### 5. Add AI-powered discovery and verification pipeline
-
-Implement backend support so the app can actually keep up with real event data:
-
-- Use Lovable AI for normalization, extraction, deduping, categorization, and summaries
-- Use Firecrawl for scraping candidate pages and source content
-- Optionally use Perplexity for broader discovery, but never as sole publication proof
-- Forums/social/search pages can suggest leads, but direct source pages must still verify the listing before it shows publicly
-
-### 6. Add admin/operator controls for Singles
-
-Create an admin workflow for you to manage quality:
-
-- review candidate events
-- inspect all evidence for an event
-- approve/reject/override
-- mark broken links
-- trigger re-verification
-- pin featured events
-- hide stale listings without deleting history
-
-### 7. Improve visuals without fake imagery
-
-- Show only real event/venue/source imagery when available
-- Prefer official source images or captured source previews over decorative stock
-- Add visual source panels/screenshots so you can see what the verifier found
-
-### 8. QA and safety standard
-
-- No listing appears publicly unless source verification passes
-- Broken links auto-fail
-- Conflicting source data gets flagged, not published as fact
-- If a source disappears, the card downgrades from `verified` to `stale` or `broken`
-
-## Technical details
-
-### Frontend
-
-- Rewrite `src/pages/Singles.tsx` to support:
-  - trust-first result cards
-  - evidence panel/drawer
-  - ranking + advanced filtering
-  - verified-only default behavior
-- Replace the current flat card rendering with result states tied to verification metadata
-
-### Data / types
-
-- Replace the current `src/data/singlesEvents.ts` shape with verification-aware fields
-- If backend is introduced, move Singles data from hardcoded TS into Supabase-backed records and keep only typed interfaces in the frontend
-
-### Backend
-
-Create a live verification stack with:
-
-- edge function for discovery
-- edge function for verification
-- edge function for re-checking existing events
-- edge function for AI-assisted extraction/normalization
-
-### Suggested schema
+## Architecture
 
 ```text
-singles_events
-- id
-- title
-- organizer
-- venue
-- neighborhood
-- category
-- frequency
-- price
-- age_range
-- description
-- verification_status
-- confidence_score
-- last_verified_at
-- primary_source_url
-- hero_image_url
-
-event_sources
-- id
-- event_id
-- provider
-- url
-- status
-- checked_at
-- title
-- extracted_payload
-
-event_verification_logs
-- id
-- event_id
-- result
-- notes
-- checked_at
+User loads page
+  → Frontend checks image cache (Supabase table)
+  → Cache miss → calls edge function "image-search"
+  → Edge function uses Lovable AI to generate search queries
+  → Firecrawl scrapes venue websites for real photos
+  → Returns best image URL → stored in cache → displayed in card
 ```
 
-## Files likely affected
+## Implementation Steps
 
-- `src/pages/Singles.tsx`
-- `src/data/singlesEvents.ts`
-- `src/components/...` new Singles search / evidence / badge components
-- `src/lib/...` search ranking helpers
-- `supabase/functions/...` new AI + verification functions
-- `supabase/migrations/...` new tables for live verified singles data
+### Step 1: Connect Firecrawl
+Firecrawl connector needs to be linked to enable real web scraping for images and event verification.
 
-## Implementation order
+### Step 2: Create `image-search` Edge Function
+- Accepts: listing name, category, location, optional website URL
+- Uses Firecrawl to scrape the venue's actual website for hero images
+- Falls back to Lovable AI to suggest search terms, then Firecrawl web search for photos
+- Returns: array of image URLs ranked by quality/relevance
 
-1. Stop publishing broken Singles entries
-2. Add verification-aware event model
-3. Upgrade Singles UI/search locally
-4. Add AI discovery + verification backend
-5. Add admin review tools
-6. Re-populate only with verified events
+### Step 3: Create `image_cache` Database Table
+```
+image_cache
+- id (uuid)
+- listing_type (text: 'fitness' | 'singles' | 'volunteer' | 'discover')
+- listing_id (text)
+- image_url (text)
+- source_url (text)
+- fetched_at (timestamptz)
+- quality_score (integer)
+```
+
+### Step 4: Add `imageUrl` Field to All Data Interfaces
+Update `FitnessSpot`, `SinglesEvent`, `VolunteerOrg` interfaces to include optional `imageUrl` field.
+
+### Step 5: Create `useListingImage` Hook
+React hook that checks cache first, then triggers the edge function on cache miss. Returns the image URL for a given listing.
+
+### Step 6: Upgrade All Directory Cards
+- Fitness cards: venue photo thumbnails (gym interiors, trail photos, studio shots)
+- Singles cards: event/venue photos
+- Volunteering cards: org logos or activity photos
+- Discover cards: architectural photos, skyline shots
+
+### Step 7: Upgrade Singles AI with Firecrawl
+Enhance the existing `singles-ai` edge function:
+- Add Firecrawl web search for "Oklahoma City singles events 2026"
+- Scrape Eventbrite and Meetup pages for structured event data
+- Cross-reference AI knowledge with scraped results for triple verification
+- Extract event images from scraped pages
+
+### Step 8: Batch Image Enrichment
+Add a "Refresh Images" button (admin-only concept) that triggers batch image fetching for all listings that don't have cached images yet.
+
+## Files
+
+| Action | File | Details |
+|---|---|---|
+| Create | `supabase/functions/image-search/index.ts` | AI + Firecrawl image discovery agent |
+| Create | `src/hooks/useListingImage.ts` | Cache-aware image fetcher hook |
+| Modify | `src/data/fitnessSpots.ts` | Add optional `imageUrl` to interface |
+| Modify | `src/data/singlesEvents.ts` | Add optional `imageUrl` to interface |
+| Modify | `src/data/volunteerOrgs.ts` | Add optional `imageUrl` to interface |
+| Modify | `src/pages/Workouts.tsx` | Image thumbnails on cards |
+| Modify | `src/pages/Singles.tsx` | Image thumbnails on cards |
+| Modify | `src/pages/Volunteering.tsx` | Image thumbnails on cards |
+| Modify | `src/pages/Discover.tsx` | Image thumbnails on cards |
+| Modify | `supabase/functions/singles-ai/index.ts` | Add Firecrawl scraping for deeper event discovery |
+| Create | DB migration | `image_cache` table with RLS |
+
+## Prerequisite
+
+Firecrawl connector must be linked to the project first. I'll prompt you to connect it before proceeding with implementation.
+
