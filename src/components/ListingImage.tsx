@@ -9,6 +9,8 @@ const categoryGradients: Record<string, string> = {
   "Dance": "from-fuchsia-500/30 to-pink-600/20",
   "Activity": "from-emerald-500/30 to-teal-600/20",
   "Faith": "from-amber-400/30 to-yellow-600/20",
+  "Team Building": "from-blue-500/30 to-indigo-600/20",
+  "Faith": "from-amber-400/30 to-yellow-600/20",
   "default": "from-muted/40 to-muted/20",
 };
 
