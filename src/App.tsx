@@ -23,7 +23,10 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const App = () => {
-  const [showSplash, setShowSplash] = useState(true);
+  const [showSplash, setShowSplash] = useState(() => {
+    // Only show splash on initial homepage load, not on deep links
+    return window.location.pathname === "/";
+  });
 
   return (
     <ThemeProvider>
