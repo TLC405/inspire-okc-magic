@@ -3,8 +3,10 @@ import { useSearchParams } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { fitnessSpots, fitnessCategories, categoryGroups, districts } from "@/data/fitnessSpots";
-import { ExternalLink, Search, ChevronDown, ChevronUp } from "lucide-react";
+import { ExternalLink, Search, ChevronDown, ChevronUp, SlidersHorizontal, X } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const Workouts = () => {
   const [searchParams] = useSearchParams();
@@ -33,13 +35,79 @@ const Workouts = () => {
     setOpenGroups((prev) => ({ ...prev, [group]: !prev[group] }));
   };
 
+  const activeFilters = [
+    ...(category !== "All" ? [{ label: category, clear: () => setCategory("All") }] : []),
+    ...(hood !== "All Areas" ? [{ label: hood, clear: () => setHood("All Areas") }] : []),
+  ];
+
+  const FilterPanel = () => (
+    <div className="space-y-5">
+      {/* District Select */}
+      <div>
+        <p className="dateline text-foreground/60 font-bold mb-2">District</p>
+        <Select value={hood} onValueChange={setHood}>
+          <SelectTrigger className="w-full bg-transparent border-border">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {districts.map((d) => (
+              <SelectItem key={d} value={d}>{d}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Category Groups */}
+      <div>
+        <p className="dateline text-foreground/60 font-bold mb-2">Category</p>
+        <button
+          onClick={() => setCategory("All")}
+          className={`mb-3 w-full text-left ${category === "All" ? "skeuo-chip-active" : "skeuo-chip"}`}
+        >
+          All ({fitnessSpots.length})
+        </button>
+        <div className="space-y-2">
+          {Object.entries(categoryGroups).map(([groupName, cats]) => {
+            const groupCount = fitnessSpots.filter((s) => cats.includes(s.category)).length;
+            const isOpen = openGroups[groupName] || false;
+            return (
+              <Collapsible key={groupName} open={isOpen} onOpenChange={() => toggleGroup(groupName)}>
+                <CollapsibleTrigger className="flex items-center gap-2 w-full text-left py-1.5 px-2 hover:bg-foreground/[0.03] transition-colors rounded">
+                  <span className="dateline text-foreground/60 font-bold">{groupName}</span>
+                  <span className="dateline text-muted-foreground/40">{groupCount}</span>
+                  {isOpen ? <ChevronUp size={12} className="text-muted-foreground/40 ml-auto" /> : <ChevronDown size={12} className="text-muted-foreground/40 ml-auto" />}
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="flex flex-col gap-1 pt-1 pl-2">
+                    {cats.map((c) => {
+                      const count = fitnessSpots.filter((s) => s.category === c).length;
+                      return (
+                        <button
+                          key={c}
+                          onClick={() => setCategory(c)}
+                          className={`text-left ${c === category ? "skeuo-chip-active" : "skeuo-chip"}`}
+                        >
+                          {c} ({count})
+                        </button>
+                      );
+                    })}
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       <main className="flex-1">
         {/* Header */}
         <div className="container pt-6 md:pt-12">
-          <div className="rule-double mb-4" />
+          <div className="skeuo-divider mb-4" />
           <h1 className="section-head text-foreground mb-1">Fitness</h1>
           <p className="dateline text-muted-foreground mb-2">
             Oklahoma City · {fitnessSpots.length} Spots · {fitnessCategories.length - 1} Categories
@@ -54,111 +122,97 @@ const Workouts = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search gyms, trails, classes, neighborhoods..."
-              className="search-input pl-11"
+              className="skeuo-search pl-11"
             />
           </div>
 
-          {/* District Bar — horizontal scroll */}
-          <div className="mb-4">
-            <p className="dateline text-muted-foreground/50 mb-2">District</p>
-            <div className="flex gap-1.5 overflow-x-auto pb-2 scrollbar-hide">
-              {districts.map((d) => (
-                <button
-                  key={d}
-                  onClick={() => setHood(d)}
-                  className={`whitespace-nowrap flex-shrink-0 ${d === hood ? "filter-chip-active" : "filter-chip"}`}
-                >
-                  {d}
-                </button>
-              ))}
+          {/* Active Filters + Mobile Filter Button */}
+          <div className="flex items-center gap-2 mb-4 flex-wrap">
+            {/* Mobile filter trigger */}
+            <div className="md:hidden">
+              <Sheet>
+                <SheetTrigger className="skeuo-btn">
+                  <SlidersHorizontal size={14} />
+                  Filters
+                </SheetTrigger>
+                <SheetContent side="left" className="w-80 bg-background overflow-y-auto">
+                  <SheetHeader>
+                    <SheetTitle className="section-head text-lg">Filters</SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-6">
+                    <FilterPanel />
+                  </div>
+                </SheetContent>
+              </Sheet>
             </div>
-          </div>
 
-          {/* Grouped Category Filters */}
-          <div className="mb-4">
-            <p className="dateline text-muted-foreground/50 mb-2">Category</p>
-            <button
-              onClick={() => setCategory("All")}
-              className={`mb-2 ${category === "All" ? "filter-chip-active" : "filter-chip"}`}
-            >
-              All ({fitnessSpots.length})
-            </button>
-            <div className="space-y-2">
-              {Object.entries(categoryGroups).map(([groupName, cats]) => {
-                const groupCount = fitnessSpots.filter((s) => cats.includes(s.category)).length;
-                const isOpen = openGroups[groupName] || false;
-                return (
-                  <Collapsible key={groupName} open={isOpen} onOpenChange={() => toggleGroup(groupName)}>
-                    <CollapsibleTrigger className="flex items-center gap-2 w-full text-left py-1">
-                      <span className="dateline text-foreground/60 font-bold">{groupName}</span>
-                      <span className="dateline text-muted-foreground/40">{groupCount}</span>
-                      {isOpen ? <ChevronUp size={12} className="text-muted-foreground/40" /> : <ChevronDown size={12} className="text-muted-foreground/40" />}
-                    </CollapsibleTrigger>
-                    <CollapsibleContent>
-                      <div className="flex flex-wrap gap-1.5 pt-1">
-                        {cats.map((c) => {
-                          const count = fitnessSpots.filter((s) => s.category === c).length;
-                          return (
-                            <button
-                              key={c}
-                              onClick={() => setCategory(c)}
-                              className={c === category ? "filter-chip-active" : "filter-chip"}
-                            >
-                              {c} ({count})
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </CollapsibleContent>
-                  </Collapsible>
-                );
-              })}
-            </div>
-          </div>
+            {activeFilters.map((f) => (
+              <button
+                key={f.label}
+                onClick={f.clear}
+                className="inline-flex items-center gap-1.5 skeuo-chip-active"
+              >
+                {f.label}
+                <X size={10} />
+              </button>
+            ))}
 
-          <div className="rule-heavy mb-2" />
-          <p className="dateline text-foreground font-bold mb-4">{filtered.length} Results</p>
+            <span className="dateline text-foreground font-bold ml-auto">{filtered.length} Results</span>
+          </div>
+          <div className="skeuo-divider mb-4" />
         </div>
 
-        {/* Results */}
+        {/* Content: Sidebar + Results */}
         <div className="container pb-12">
-          {filtered.map((spot, i) => (
-            <article key={spot.id} className="article-block">
-              <div className="flex items-start gap-3 md:gap-4">
-                <span className="font-black text-2xl md:text-3xl text-foreground/10 leading-none mt-1 w-8 flex-shrink-0 text-right">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <div className="flex-1 min-w-0">
-                  <h2 className="headline text-foreground">{spot.name}</h2>
-                  <p className="dateline text-muted-foreground/50 mt-1">
-                    {spot.neighborhood} · {spot.category}
-                  </p>
-                  <p className="body-text mt-2">{spot.description}</p>
-                  <div className="flex flex-wrap items-center gap-1.5 mt-3">
-                    <span className="news-badge-accent">{spot.category}</span>
-                    {spot.tags.map((t) => (
-                      <span key={t} className="news-badge">
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                <a
-                  href={spot.source}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-shrink-0 p-2 text-muted-foreground/30 hover:text-accent transition-colors"
-                >
-                  <ExternalLink size={14} />
-                </a>
+          <div className="flex gap-8">
+            {/* Desktop Sidebar */}
+            <aside className="hidden md:block w-64 flex-shrink-0">
+              <div className="sticky top-4 skeuo-card-inset p-5 rounded">
+                <FilterPanel />
               </div>
-            </article>
-          ))}
-          {filtered.length === 0 && (
-            <div className="py-16 text-center">
-              <p className="dateline text-muted-foreground">No spots match your filters</p>
+            </aside>
+
+            {/* Results */}
+            <div className="flex-1 min-w-0">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {filtered.map((spot) => (
+                  <article key={spot.id} className="skeuo-card p-5 rounded">
+                    <div className="flex items-start gap-3">
+                      <div className="w-1 self-stretch rounded-full bg-accent/30 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2">
+                          <h2 className="headline text-foreground">{spot.name}</h2>
+                          <a
+                            href={spot.source}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="skeuo-btn flex-shrink-0 !px-2 !py-1.5"
+                          >
+                            <ExternalLink size={12} />
+                          </a>
+                        </div>
+                        <p className="dateline text-muted-foreground/60 mt-1">
+                          {spot.neighborhood} · {spot.category}
+                        </p>
+                        <p className="body-text mt-2 line-clamp-2">{spot.description}</p>
+                        <div className="flex flex-wrap items-center gap-1.5 mt-3">
+                          <span className="skeuo-badge-accent">{spot.category}</span>
+                          {spot.tags.slice(0, 3).map((t) => (
+                            <span key={t} className="skeuo-badge">{t}</span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+              {filtered.length === 0 && (
+                <div className="py-16 text-center">
+                  <p className="dateline text-muted-foreground">No spots match your filters</p>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </main>
       <Footer />
