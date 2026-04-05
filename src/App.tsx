@@ -30,6 +30,7 @@ const App = () => {
               <Route path="/fitness" element={<Workouts />} />
               <Route path="/volunteering" element={<Volunteering />} />
               <Route path="/discover" element={<Discover />} />
+              <Route path="/admin" element={<Admin />} />
               {/* Redirects from old routes */}
               <Route path="/workouts" element={<Navigate to="/fitness" replace />} />
               <Route path="/explore" element={<Navigate to="/" replace />} />

@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { ThemeToggle } from "./ThemeToggle";
 import { cn } from "@/lib/utils";
+import { Settings } from "lucide-react";
 
 const navLinks = [
   { label: "Singles", href: "/singles" },
@@ -40,6 +41,9 @@ export function Navbar() {
             </Link>
           ))}
           <ThemeToggle className="text-muted-foreground hover:text-foreground" />
+          <Link to="/admin" className="text-muted-foreground hover:text-foreground transition-colors">
+            <Settings size={14} />
+          </Link>
         </nav>
       </div>
     </header>
