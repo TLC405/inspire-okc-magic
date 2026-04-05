@@ -12,6 +12,8 @@ import heroImg from "@/assets/hero-okc-skyline.jpg";
 import heroSingles from "@/assets/hero-singles.jpg";
 import heroFitness from "@/assets/hero-fitness.jpg";
 import heroVolunteer from "@/assets/hero-volunteer.jpg";
+import okcChar1 from "@/assets/okc-char-1.png";
+import okcChar2 from "@/assets/okc-char-2.png";
 
 const today = new Date();
 const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -31,7 +33,6 @@ function getDiverseSinglesTeaser(count = 4) {
     result.push(evt);
     if (result.length >= count) break;
   }
-  // If we don't have enough unique categories, fill with remaining verified
   if (result.length < count) {
     for (const evt of singlesEvents) {
       if (evt.verificationStatus !== "verified") continue;
@@ -43,6 +44,16 @@ function getDiverseSinglesTeaser(count = 4) {
   return result;
 }
 
+/** Top photos for the photo grid showcase */
+const showcasePhotos = [
+  { type: "singles", id: singlesEvents[0]?.id || "s1", name: singlesEvents[0]?.name || "Event", cat: singlesEvents[0]?.category, url: singlesEvents[0]?.sources[0]?.url },
+  { type: "fitness", id: fitnessSpots[0]?.id || "f1", name: fitnessSpots[0]?.name || "Gym", cat: fitnessSpots[0]?.category, url: fitnessSpots[0]?.source },
+  { type: "fitness", id: fitnessSpots[5]?.id || "f6", name: fitnessSpots[5]?.name || "Studio", cat: fitnessSpots[5]?.category, url: fitnessSpots[5]?.source },
+  { type: "volunteer", id: volunteerOrgs[0]?.id || "v1", name: volunteerOrgs[0]?.name || "Org", cat: volunteerOrgs[0]?.category, url: volunteerOrgs[0]?.source },
+  { type: "discover", id: cityShowcase[0]?.id || "d1", name: cityShowcase[0]?.title || "Landmark", cat: cityShowcase[0]?.category, url: cityShowcase[0]?.sourceUrl },
+  { type: "discover", id: cityShowcase[4]?.id || "d5", name: cityShowcase[4]?.title || "Landmark", cat: cityShowcase[4]?.category, url: cityShowcase[4]?.sourceUrl },
+];
+
 const Index = () => {
   const singlesTeaser = getDiverseSinglesTeaser(4);
 
@@ -51,15 +62,15 @@ const Index = () => {
       <Navbar />
 
       <main className="flex-1">
-        {/* Hero Image + Masthead */}
+        {/* ═══ Hero ═══ */}
         <div className="relative">
-          <div className="w-full h-[280px] md:h-[420px] overflow-hidden">
+          <div className="w-full h-[340px] md:h-[500px] overflow-hidden">
             <img src={heroImg} alt="Oklahoma City skyline at golden hour" className="w-full h-full object-cover object-center" width={1920} height={640} />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-background" />
           </div>
           <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
-            <h1 className="masthead text-white masthead-shadow text-center">INSPIRE</h1>
-            <p className="masthead-sub text-center text-white/90 masthead-shadow mb-2 md:mb-3">Oklahoma City</p>
+            <h1 className="masthead text-white masthead-shadow text-center text-5xl md:text-8xl">INSPIRE</h1>
+            <p className="masthead-sub text-center text-white/90 masthead-shadow mb-1 text-xl md:text-3xl tracking-[0.06em]">Oklahoma City</p>
             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mb-4">
               <span className="dateline text-white/80 masthead-shadow">{dateStr}</span>
               <span className="dateline text-white/40">·</span>
@@ -68,10 +79,12 @@ const Index = () => {
               <span className="dateline text-white font-bold masthead-shadow">{totalListings} Listings</span>
             </div>
           </div>
+          {/* Character accent */}
+          <img src={okcChar1} alt="" className="absolute bottom-2 right-4 w-16 md:w-24 opacity-80 drop-shadow-lg pointer-events-none hidden md:block" />
         </div>
 
-        {/* Search */}
-        <div className="container -mt-12 relative z-10 mb-4 md:mb-8">
+        {/* ═══ Search ═══ */}
+        <div className="container -mt-14 relative z-10 mb-4 md:mb-8">
           <div className="max-w-2xl mx-auto">
             <div className="skeuo-card p-4 md:p-6 rounded-lg">
               <SearchSurface />
@@ -79,7 +92,29 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Quick-Nav Cards (mobile) */}
+        {/* ═══ Photo Grid Showcase ═══ */}
+        <div className="container py-4 md:py-6">
+          <h2 className="section-head text-foreground text-lg md:text-xl mb-3">📸 Around the City</h2>
+          <div className="photo-grid-showcase">
+            {showcasePhotos.map((p, i) => (
+              <div key={p.id + i} className={`photo-grid-item ${i === 0 ? "photo-grid-featured" : ""}`}>
+                <ListingImage
+                  listingType={p.type}
+                  listingId={p.id}
+                  name={p.name}
+                  category={p.cat}
+                  websiteUrl={p.url}
+                  className="w-full h-full"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <span className="absolute bottom-2 left-2 text-white text-[10px] font-bold uppercase tracking-wider drop-shadow">{p.name}</span>
+              </div>
+            ))}
+          </div>
+          <div className="rule-thin mt-4" />
+        </div>
+
+        {/* ═══ Quick-Nav Cards (mobile) ═══ */}
         <div className="container py-4 md:hidden">
           <div className="grid grid-cols-3 gap-2">
             {[
@@ -88,7 +123,7 @@ const Index = () => {
               { to: "/volunteering", icon: HandHelping, label: "Volunteer", count: volunteerOrgs.length, desc: "Orgs", img: heroVolunteer },
             ].map(({ to, icon: Icon, label, count, desc, img }) => (
               <Link key={to} to={to} className="skeuo-card rounded overflow-hidden">
-                <div className="relative h-16">
+                <div className="relative h-24">
                   <img src={img} alt={label} className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-t from-card to-transparent" />
                 </div>
@@ -103,7 +138,7 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Featured Sections — newspaper broadsheet */}
+        {/* ═══ Broadsheet Columns ═══ */}
         <div className="container py-4 md:py-10 hidden md:block">
           <div className="rule-heavy mb-5" />
           
@@ -123,9 +158,18 @@ const Index = () => {
               
               {singlesTeaser.map((evt, i) => (
                 <div key={evt.id} className={`py-2.5 ${i < 3 ? "border-b border-foreground/[0.06]" : ""}`}>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-black text-foreground/10 leading-none">{String(i + 1).padStart(2, "0")}</span>
-                    <div className="min-w-0">
+                  <div className="flex items-start gap-2">
+                    <div className="w-12 h-12 rounded flex-shrink-0 overflow-hidden">
+                      <ListingImage
+                        listingType="singles"
+                        listingId={evt.id}
+                        name={evt.name}
+                        category={evt.category}
+                        websiteUrl={evt.sources[0]?.url}
+                        className="w-full h-full"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
                       <h3 className="headline text-foreground text-[15px] leading-tight truncate">{evt.name}</h3>
                       <p className="subheadline text-sm mt-0.5 truncate">{evt.venue}</p>
                       <div className="flex items-center gap-2 mt-1">
@@ -157,9 +201,18 @@ const Index = () => {
               
               {fitnessSpots.slice(0, 4).map((spot, i) => (
                 <div key={spot.id} className={`py-2.5 ${i < 3 ? "border-b border-foreground/[0.06]" : ""}`}>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-black text-foreground/10 leading-none">{String(i + 1).padStart(2, "0")}</span>
-                    <div className="min-w-0">
+                  <div className="flex items-start gap-2">
+                    <div className="w-12 h-12 rounded flex-shrink-0 overflow-hidden">
+                      <ListingImage
+                        listingType="fitness"
+                        listingId={spot.id}
+                        name={spot.name}
+                        category={spot.category}
+                        websiteUrl={spot.source}
+                        className="w-full h-full"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
                       <h3 className="headline text-foreground text-[15px] leading-tight truncate">{spot.name}</h3>
                       <p className="subheadline text-sm mt-0.5 truncate">{spot.neighborhood}</p>
                       <span className="skeuo-badge-accent mt-1">{spot.category}</span>
@@ -187,9 +240,18 @@ const Index = () => {
               
               {volunteerOrgs.slice(0, 4).map((org, i) => (
                 <div key={org.id} className={`py-2.5 ${i < 3 ? "border-b border-foreground/[0.06]" : ""}`}>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-black text-foreground/10 leading-none">{String(i + 1).padStart(2, "0")}</span>
-                    <div className="min-w-0">
+                  <div className="flex items-start gap-2">
+                    <div className="w-12 h-12 rounded flex-shrink-0 overflow-hidden">
+                      <ListingImage
+                        listingType="volunteer"
+                        listingId={org.id}
+                        name={org.name}
+                        category={org.category}
+                        websiteUrl={org.source}
+                        className="w-full h-full"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
                       <h3 className="headline text-foreground text-[15px] leading-tight truncate">{org.name}</h3>
                       <p className="subheadline text-sm mt-0.5 truncate">{org.neighborhood}</p>
                       <div className="flex gap-1.5 mt-1">
@@ -210,7 +272,7 @@ const Index = () => {
           <div className="rule-heavy mt-6" />
         </div>
 
-        {/* Date Nights Showcase */}
+        {/* ═══ Date Nights Showcase ═══ */}
         <div className="container py-4 md:py-8">
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -258,7 +320,7 @@ const Index = () => {
           <div className="rule-thin mt-6" />
         </div>
 
-        {/* City Showcase Teaser */}
+        {/* ═══ City Showcase Teaser ═══ */}
         <div className="container py-4 md:py-8">
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -296,7 +358,16 @@ const Index = () => {
           <div className="rule-thin mt-6" />
         </div>
 
-        {/* Stats Bar */}
+        {/* ═══ Character accent ═══ */}
+        <div className="container py-4 flex items-center gap-4">
+          <img src={okcChar2} alt="OKC Character" className="w-20 md:w-28 drop-shadow-lg" />
+          <div>
+            <p className="headline text-foreground text-sm md:text-base">Your guide to everything OKC</p>
+            <p className="text-xs text-muted-foreground mt-0.5">From Bricktown to Paseo — we've got it covered.</p>
+          </div>
+        </div>
+
+        {/* ═══ Stats Bar ═══ */}
         <div className="container pb-8 hidden md:block">
           <div className="skeuo-card-inset p-6 rounded-lg">
             <div className="grid grid-cols-4 gap-6 text-center">

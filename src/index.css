@@ -429,6 +429,30 @@
     box-shadow: var(--skeuo-shadow);
     border: 1px solid hsl(var(--border) / 0.3);
   }
+
+  /* ── Photo Grid Showcase ── */
+  .photo-grid-showcase {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: 120px;
+    gap: 8px;
+  }
+  .photo-grid-item {
+    @apply relative rounded overflow-hidden;
+    box-shadow: var(--skeuo-shadow);
+  }
+  .photo-grid-item img {
+    @apply w-full h-full object-cover;
+  }
+  .photo-grid-featured {
+    grid-row: span 2;
+  }
+  @media (min-width: 768px) {
+    .photo-grid-showcase {
+      grid-template-columns: repeat(4, 1fr);
+      grid-auto-rows: 140px;
+    }
+  }
 }
 
 @keyframes signal-pulse {
