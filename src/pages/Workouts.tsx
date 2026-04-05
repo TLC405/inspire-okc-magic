@@ -3,10 +3,11 @@ import { useSearchParams } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { fitnessSpots, fitnessCategories, categoryGroups, districts } from "@/data/fitnessSpots";
-import { ExternalLink, Search, ChevronDown, ChevronUp, SlidersHorizontal, X } from "lucide-react";
+import { ExternalLink, Search, ChevronDown, ChevronUp, SlidersHorizontal, X, MapPin, Dumbbell } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import heroImg from "@/assets/hero-fitness.jpg";
 
 const Workouts = () => {
   const [searchParams] = useSearchParams();
@@ -42,7 +43,6 @@ const Workouts = () => {
 
   const FilterPanel = () => (
     <div className="space-y-5">
-      {/* District Select */}
       <div>
         <p className="dateline text-foreground/60 font-bold mb-2">District</p>
         <Select value={hood} onValueChange={setHood}>
@@ -57,7 +57,6 @@ const Workouts = () => {
         </Select>
       </div>
 
-      {/* Category Groups */}
       <div>
         <p className="dateline text-foreground/60 font-bold mb-2">Category</p>
         <button
@@ -82,11 +81,7 @@ const Workouts = () => {
                     {cats.map((c) => {
                       const count = fitnessSpots.filter((s) => s.category === c).length;
                       return (
-                        <button
-                          key={c}
-                          onClick={() => setCategory(c)}
-                          className={`text-left ${c === category ? "skeuo-chip-active" : "skeuo-chip"}`}
-                        >
+                        <button key={c} onClick={() => setCategory(c)} className={`text-left ${c === category ? "skeuo-chip-active" : "skeuo-chip"}`}>
                           {c} ({count})
                         </button>
                       );
@@ -105,16 +100,20 @@ const Workouts = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       <main className="flex-1">
-        {/* Header */}
-        <div className="container pt-6 md:pt-12">
-          <div className="skeuo-divider mb-4" />
-          <h1 className="section-head text-foreground mb-1">Fitness</h1>
-          <p className="dateline text-muted-foreground mb-2">
-            Oklahoma City · {fitnessSpots.length} Spots · {fitnessCategories.length - 1} Categories
-          </p>
-          <div className="rule-thin mb-4" />
+        {/* Hero Banner */}
+        <div className="relative w-full h-[200px] md:h-[300px] overflow-hidden">
+          <img src={heroImg} alt="Fitness gym interior" className="w-full h-full object-cover" width={1920} height={512} />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 container pb-6">
+            <h1 className="section-head text-foreground text-3xl md:text-5xl drop-shadow-sm">Fitness</h1>
+            <p className="dateline text-foreground/70 mt-1 drop-shadow-sm">
+              Oklahoma City · {fitnessSpots.length} Spots · {fitnessCategories.length - 1} Categories · All Districts
+            </p>
+          </div>
+        </div>
 
-          {/* Search */}
+        {/* Search + Filters */}
+        <div className="container pt-4 md:pt-6">
           <div className="relative mb-4">
             <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/40" />
             <input
@@ -126,54 +125,49 @@ const Workouts = () => {
             />
           </div>
 
-          {/* Active Filters + Mobile Filter Button */}
           <div className="flex items-center gap-2 mb-4 flex-wrap">
-            {/* Mobile filter trigger */}
             <div className="md:hidden">
               <Sheet>
                 <SheetTrigger className="skeuo-btn">
-                  <SlidersHorizontal size={14} />
-                  Filters
+                  <SlidersHorizontal size={14} /> Filters
                 </SheetTrigger>
                 <SheetContent side="left" className="w-80 bg-background overflow-y-auto">
-                  <SheetHeader>
-                    <SheetTitle className="section-head text-lg">Filters</SheetTitle>
-                  </SheetHeader>
-                  <div className="mt-6">
-                    <FilterPanel />
-                  </div>
+                  <SheetHeader><SheetTitle className="section-head text-lg">Filters</SheetTitle></SheetHeader>
+                  <div className="mt-6"><FilterPanel /></div>
                 </SheetContent>
               </Sheet>
             </div>
-
             {activeFilters.map((f) => (
-              <button
-                key={f.label}
-                onClick={f.clear}
-                className="inline-flex items-center gap-1.5 skeuo-chip-active"
-              >
-                {f.label}
-                <X size={10} />
+              <button key={f.label} onClick={f.clear} className="inline-flex items-center gap-1.5 skeuo-chip-active">
+                {f.label} <X size={10} />
               </button>
             ))}
-
             <span className="dateline text-foreground font-bold ml-auto">{filtered.length} Results</span>
           </div>
           <div className="skeuo-divider mb-4" />
         </div>
 
-        {/* Content: Sidebar + Results */}
+        {/* Content */}
         <div className="container pb-12">
           <div className="flex gap-8">
-            {/* Desktop Sidebar */}
-            <aside className="hidden md:block w-64 flex-shrink-0">
+            <aside className="hidden md:block w-72 flex-shrink-0">
               <div className="sticky top-4 skeuo-card-inset p-5 rounded overflow-y-auto max-h-[calc(100vh-2rem)]">
                 <FilterPanel />
               </div>
             </aside>
 
-            {/* Results */}
             <div className="flex-1 min-w-0">
+              {/* Category Stats Bar */}
+              {category !== "All" && (
+                <div className="skeuo-card-inset p-4 rounded mb-4 flex items-center gap-4">
+                  <Dumbbell size={20} className="text-accent" />
+                  <div>
+                    <p className="headline text-foreground">{category}</p>
+                    <p className="dateline text-muted-foreground">{filtered.length} locations in Oklahoma City</p>
+                  </div>
+                </div>
+              )}
+
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {filtered.map((spot) => (
                   <article key={spot.id} className="skeuo-card p-5 rounded">
@@ -182,17 +176,12 @@ const Workouts = () => {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">
                           <h2 className="headline text-foreground">{spot.name}</h2>
-                          <a
-                            href={spot.source}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="skeuo-btn flex-shrink-0 !px-2 !py-1.5"
-                          >
+                          <a href={spot.source} target="_blank" rel="noopener noreferrer" className="skeuo-btn flex-shrink-0 !px-2 !py-1.5">
                             <ExternalLink size={12} />
                           </a>
                         </div>
-                        <p className="dateline text-muted-foreground/60 mt-1">
-                          {spot.neighborhood} · {spot.category}
+                        <p className="flex items-center gap-1 dateline text-muted-foreground/60 mt-1">
+                          <MapPin size={10} /> {spot.neighborhood}
                         </p>
                         <p className="body-text mt-2 line-clamp-2">{spot.description}</p>
                         <div className="flex flex-wrap items-center gap-1.5 mt-3">
@@ -207,8 +196,10 @@ const Workouts = () => {
                 ))}
               </div>
               {filtered.length === 0 && (
-                <div className="py-16 text-center">
-                  <p className="dateline text-muted-foreground">No spots match your filters</p>
+                <div className="py-16 text-center skeuo-card-inset p-8 rounded">
+                  <Dumbbell size={32} className="mx-auto mb-3 text-muted-foreground/40" />
+                  <p className="headline text-foreground mb-2">No spots match your filters</p>
+                  <p className="body-text text-muted-foreground/60">Try adjusting your search or clearing filters.</p>
                 </div>
               )}
             </div>

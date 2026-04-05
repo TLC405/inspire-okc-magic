@@ -3,9 +3,10 @@ import { useSearchParams } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { volunteerOrgs, volunteerCategories, volunteerCommitments, volunteerTypes } from "@/data/volunteerOrgs";
-import { ExternalLink, Search, SlidersHorizontal, X } from "lucide-react";
+import { ExternalLink, Search, SlidersHorizontal, X, MapPin, HandHelping } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import heroImg from "@/assets/hero-volunteer.jpg";
 
 const neighborhoods = ["All Areas", ...Array.from(new Set(volunteerOrgs.map((o) => o.neighborhood)))];
 
@@ -70,13 +71,9 @@ const Volunteering = () => {
       <div>
         <p className="dateline text-foreground/60 font-bold mb-2">Neighborhood</p>
         <Select value={hood} onValueChange={setHood}>
-          <SelectTrigger className="w-full bg-transparent border-border">
-            <SelectValue />
-          </SelectTrigger>
+          <SelectTrigger className="w-full bg-transparent border-border"><SelectValue /></SelectTrigger>
           <SelectContent>
-            {neighborhoods.map((n) => (
-              <SelectItem key={n} value={n}>{n}</SelectItem>
-            ))}
+            {neighborhoods.map((n) => (<SelectItem key={n} value={n}>{n}</SelectItem>))}
           </SelectContent>
         </Select>
       </div>
@@ -87,12 +84,19 @@ const Volunteering = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       <main className="flex-1">
-        <div className="container pt-6 md:pt-12">
-          <div className="skeuo-divider mb-4" />
-          <h1 className="section-head text-foreground mb-1">Volunteering</h1>
-          <p className="dateline text-muted-foreground mb-2">Oklahoma City · {volunteerOrgs.length} Organizations · {volunteerCategories.length - 1} Categories</p>
-          <div className="rule-thin mb-4" />
+        {/* Hero Banner */}
+        <div className="relative w-full h-[200px] md:h-[300px] overflow-hidden">
+          <img src={heroImg} alt="Volunteers packing food at a community food bank" className="w-full h-full object-cover" width={1920} height={512} />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 container pb-6">
+            <h1 className="section-head text-foreground text-3xl md:text-5xl drop-shadow-sm">Volunteering</h1>
+            <p className="dateline text-foreground/70 mt-1 drop-shadow-sm">
+              Oklahoma City · {volunteerOrgs.length} Organizations · {volunteerCategories.length - 1} Categories
+            </p>
+          </div>
+        </div>
 
+        <div className="container pt-4 md:pt-6">
           <div className="relative mb-4">
             <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/40" />
             <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search organizations, causes, neighborhoods..." className="skeuo-search pl-11" />
@@ -101,22 +105,15 @@ const Volunteering = () => {
           <div className="flex items-center gap-2 mb-4 flex-wrap">
             <div className="md:hidden">
               <Sheet>
-                <SheetTrigger className="skeuo-btn">
-                  <SlidersHorizontal size={14} />
-                  Filters
-                </SheetTrigger>
+                <SheetTrigger className="skeuo-btn"><SlidersHorizontal size={14} /> Filters</SheetTrigger>
                 <SheetContent side="left" className="w-80 bg-background overflow-y-auto">
-                  <SheetHeader>
-                    <SheetTitle className="section-head text-lg">Filters</SheetTitle>
-                  </SheetHeader>
+                  <SheetHeader><SheetTitle className="section-head text-lg">Filters</SheetTitle></SheetHeader>
                   <div className="mt-6"><FilterPanel /></div>
                 </SheetContent>
               </Sheet>
             </div>
             {activeFilters.map((f) => (
-              <button key={f.label} onClick={f.clear} className="inline-flex items-center gap-1.5 skeuo-chip-active">
-                {f.label} <X size={10} />
-              </button>
+              <button key={f.label} onClick={f.clear} className="inline-flex items-center gap-1.5 skeuo-chip-active">{f.label} <X size={10} /></button>
             ))}
             <span className="dateline text-foreground font-bold ml-auto">{filtered.length} Results</span>
           </div>
@@ -125,7 +122,7 @@ const Volunteering = () => {
 
         <div className="container pb-12">
           <div className="flex gap-8">
-            <aside className="hidden md:block w-64 flex-shrink-0">
+            <aside className="hidden md:block w-72 flex-shrink-0">
               <div className="sticky top-4 skeuo-card-inset p-5 rounded overflow-y-auto max-h-[calc(100vh-2rem)]">
                 <FilterPanel />
               </div>
@@ -144,7 +141,9 @@ const Volunteering = () => {
                             <ExternalLink size={12} />
                           </a>
                         </div>
-                        <p className="dateline text-muted-foreground/60 mt-1">{org.neighborhood} · {org.category}</p>
+                        <p className="flex items-center gap-1 dateline text-muted-foreground/60 mt-1">
+                          <MapPin size={10} /> {org.neighborhood} · {org.category}
+                        </p>
                         <p className="body-text mt-2 line-clamp-2">{org.description}</p>
                         <div className="flex flex-wrap items-center gap-1.5 mt-3">
                           <span className="skeuo-badge-accent">{org.category}</span>
@@ -157,7 +156,13 @@ const Volunteering = () => {
                   </article>
                 ))}
               </div>
-              {filtered.length === 0 && <div className="py-16 text-center"><p className="dateline text-muted-foreground">No organizations match your filters</p></div>}
+              {filtered.length === 0 && (
+                <div className="py-16 text-center skeuo-card-inset p-8 rounded">
+                  <HandHelping size={32} className="mx-auto mb-3 text-muted-foreground/40" />
+                  <p className="headline text-foreground mb-2">No organizations match your filters</p>
+                  <p className="body-text text-muted-foreground/60">Try adjusting your search or clearing some filters.</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
