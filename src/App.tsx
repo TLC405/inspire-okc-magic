@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import Index from "./pages/Index";
 import Singles from "./pages/Singles";
 import Events from "./pages/Events";
+import Admin from "./pages/Admin";
 import Workouts from "./pages/Workouts";
 import Volunteering from "./pages/Volunteering";
 import Discover from "./pages/Discover";
