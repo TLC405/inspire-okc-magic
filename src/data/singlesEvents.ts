@@ -16,7 +16,7 @@ export interface SinglesEvent {
   neighborhood: string;
   frequency: string;
   price: string;
-  category: "Speed Dating" | "Mixer" | "Social" | "Dance" | "Activity" | "Faith" | "Date Night";
+  category: "Speed Dating" | "Mixer" | "Social" | "Dance" | "Activity" | "Faith" | "Date Night" | "Team Building";
   ageRange?: string;
   description: string;
   tags: string[];
@@ -495,9 +495,128 @@ export const singlesEvents: SinglesEvent[] = [
     ],
     evidenceNotes: "Opened 2021, confirmed active with evening hours on official site.",
   },
+
+  // ═══════════════════════════════════════
+  // TEAM BUILDING — verified OKC group experiences
+  // ═══════════════════════════════════════
+  {
+    id: "tb-01",
+    name: "Escape Room OKC — The Great Heist",
+    organizer: "Escape OKC",
+    venue: "Escape OKC",
+    neighborhood: "Bricktown",
+    frequency: "Daily, bookable",
+    price: "$28-35/person",
+    category: "Team Building" as const,
+    ageRange: "All ages",
+    description: "Lock yourselves in a bank vault and argue about which wire to cut. Nothing builds trust like almost failing together. 60-minute themed rooms for 2-8 players.",
+    tags: ["escape room", "groups", "bricktown", "hilarious panic"],
+    verificationStatus: "verified" as const,
+    confidenceScore: 92,
+    lastVerifiedAt: "2026-04-05",
+    sources: [
+      { provider: "Official Website", url: "https://www.escapeokc.com/", status: "verified" as const, checkedAt: "2026-04-05", title: "Escape OKC" },
+    ],
+    evidenceNotes: "Active business in Bricktown, confirmed bookable rooms on official site.",
+  },
+  {
+    id: "tb-02",
+    name: "TopGolf Oklahoma City",
+    organizer: "TopGolf",
+    venue: "TopGolf OKC",
+    neighborhood: "NW Oklahoma City",
+    frequency: "Daily",
+    price: "$30-55/hour per bay",
+    category: "Team Building" as const,
+    description: "Whack golf balls into a giant field while eating nachos. Zero skill required, maximum trash-talking encouraged. Climate-controlled bays for groups of 6.",
+    tags: ["golf", "groups", "food & drinks", "competitive goofing"],
+    verificationStatus: "verified" as const,
+    confidenceScore: 95,
+    lastVerifiedAt: "2026-04-05",
+    sources: [
+      { provider: "Official Website", url: "https://topgolf.com/us/oklahoma-city/", status: "verified" as const, checkedAt: "2026-04-05", title: "TopGolf OKC" },
+    ],
+    evidenceNotes: "National chain, confirmed OKC location active.",
+  },
+  {
+    id: "tb-03",
+    name: "Painting with a Twist — Team Night",
+    organizer: "Painting with a Twist",
+    venue: "Painting with a Twist OKC",
+    neighborhood: "NW Oklahoma City",
+    frequency: "Weekly group bookings",
+    price: "$35-45/person",
+    category: "Team Building" as const,
+    description: "Paint a masterpiece while sipping wine. Your coworkers' art will be... interesting. BYOB, guided painting sessions perfect for groups who want to laugh at each other's talent.",
+    tags: ["painting", "BYOB", "creative", "so much laughter"],
+    verificationStatus: "verified" as const,
+    confidenceScore: 90,
+    lastVerifiedAt: "2026-04-05",
+    sources: [
+      { provider: "Official Website", url: "https://www.paintingwithatwist.com/studio/oklahoma-city/", status: "verified" as const, checkedAt: "2026-04-05", title: "Painting with a Twist OKC" },
+    ],
+    evidenceNotes: "Confirmed active location with team event booking options.",
+  },
+  {
+    id: "tb-04",
+    name: "OKC Riversport Adventures — Team Challenge",
+    organizer: "Riversport Adventures",
+    venue: "Riversport Adventures",
+    neighborhood: "Boathouse District",
+    frequency: "Seasonal (Mar-Oct)",
+    price: "$25-45/person",
+    category: "Team Building" as const,
+    description: "Zip line over the Oklahoma River, then capsize a kayak together. Bond over shared screaming. Includes whitewater rafting, zip lines, sky trail, and surf machine.",
+    tags: ["outdoor", "adventure", "river", "adrenaline bonding"],
+    verificationStatus: "verified" as const,
+    confidenceScore: 93,
+    lastVerifiedAt: "2026-04-05",
+    sources: [
+      { provider: "Official Website", url: "https://www.riversportokc.org/", status: "verified" as const, checkedAt: "2026-04-05", title: "Riversport OKC" },
+    ],
+    evidenceNotes: "Major OKC attraction, confirmed seasonal operations and group rates.",
+  },
+  {
+    id: "tb-05",
+    name: "Hatchet House OKC — Axe Throwing",
+    organizer: "Hatchet House",
+    venue: "Hatchet House OKC",
+    neighborhood: "Automobile Alley",
+    frequency: "Daily",
+    price: "$20-30/person",
+    category: "Team Building" as const,
+    description: "Throw axes at a wooden target and pretend you're a Viking. Surprisingly therapeutic and only mildly terrifying. Walk-ins welcome, group packages available.",
+    tags: ["axe throwing", "groups", "competitive", "viking energy"],
+    verificationStatus: "verified" as const,
+    confidenceScore: 88,
+    lastVerifiedAt: "2026-04-05",
+    sources: [
+      { provider: "Official Website", url: "https://www.haboraxe.com/oklahoma-city", status: "verified" as const, checkedAt: "2026-04-05", title: "Hatchet House OKC" },
+    ],
+    evidenceNotes: "Axe throwing venue in Automobile Alley area, confirmed active.",
+  },
+  {
+    id: "tb-06",
+    name: "Andy Alligator's Fun Park",
+    organizer: "Andy Alligator's",
+    venue: "Andy Alligator's Fun Park",
+    neighborhood: "Norman (OKC Metro)",
+    frequency: "Daily",
+    price: "$15-40/person",
+    category: "Team Building" as const,
+    description: "Go-karts, laser tag, mini golf, and bumper boats. Basically be 12 years old again but with your coworkers. Group packages turn any awkward team into best friends.",
+    tags: ["family fun", "go-karts", "laser tag", "inner child unleashed"],
+    verificationStatus: "verified" as const,
+    confidenceScore: 87,
+    lastVerifiedAt: "2026-04-05",
+    sources: [
+      { provider: "Official Website", url: "https://www.andyalligators.com/", status: "verified" as const, checkedAt: "2026-04-05", title: "Andy Alligator's Fun Park" },
+    ],
+    evidenceNotes: "Long-standing OKC metro family entertainment center, confirmed active.",
+  },
 ];
 
-export const singlesCategories = ["All", "Date Night", "Speed Dating", "Mixer", "Social", "Dance", "Activity", "Faith"] as const;
+export const singlesCategories = ["All", "Date Night", "Team Building", "Speed Dating", "Mixer", "Social", "Dance", "Activity", "Faith"] as const;
 export const singlesTimeFilters = ["All Events", "Weekly", "Monthly", "Seasonal"] as const;
 
 // Helper: get only publishable events (verified or stale with confidence > 60)
