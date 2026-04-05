@@ -28,6 +28,25 @@ const Admin = () => {
   const [evtSearch, setEvtSearch] = useState("");
   const [evtFilter, setEvtFilter] = useState<"all" | VerificationStatus>("all");
 
+  // Security stats
+  const verifiedEvents = singlesEvents.filter((e) => e.verificationStatus === "verified").length;
+  const staleEvents = singlesEvents.filter((e) => e.verificationStatus === "stale").length;
+  const brokenLinks = singlesEvents.flatMap((e) => e.sources).filter((s) => s.status === "broken").length;
+  const totalListings = singlesEvents.length + fitnessSpots.length + volunteerOrgs.length + cityShowcase.length;
+
+  // Events filtering
+  const filteredEvents = useMemo(() => {
+    return singlesEvents.filter((evt) => {
+      const q = evtSearch.toLowerCase();
+      const matchSearch = !q || evt.name.toLowerCase().includes(q) || evt.organizer.toLowerCase().includes(q) || evt.venue.toLowerCase().includes(q);
+      const matchFilter = evtFilter === "all" || evt.verificationStatus === evtFilter;
+      return matchSearch && matchFilter;
+    });
+  }, [evtSearch, evtFilter]);
+
+  // Date night suggestions
+  const dateNights = singlesEvents.filter((e) => e.category === "Date Night" && e.verificationStatus === "verified");
+
   const handleLogin = () => {
     if (pin === ADMIN_PIN) {
       setAuthenticated(true);
@@ -60,25 +79,6 @@ const Admin = () => {
       </div>
     );
   }
-
-  // Security stats
-  const verifiedEvents = singlesEvents.filter((e) => e.verificationStatus === "verified").length;
-  const staleEvents = singlesEvents.filter((e) => e.verificationStatus === "stale").length;
-  const brokenLinks = singlesEvents.flatMap((e) => e.sources).filter((s) => s.status === "broken").length;
-  const totalListings = singlesEvents.length + fitnessSpots.length + volunteerOrgs.length + cityShowcase.length;
-
-  // Events filtering
-  const filteredEvents = useMemo(() => {
-    return singlesEvents.filter((evt) => {
-      const q = evtSearch.toLowerCase();
-      const matchSearch = !q || evt.name.toLowerCase().includes(q) || evt.organizer.toLowerCase().includes(q) || evt.venue.toLowerCase().includes(q);
-      const matchFilter = evtFilter === "all" || evt.verificationStatus === evtFilter;
-      return matchSearch && matchFilter;
-    });
-  }, [evtSearch, evtFilter]);
-
-  // Date night suggestions
-  const dateNights = singlesEvents.filter((e) => e.category === "Date Night" && e.verificationStatus === "verified");
 
   const tabs = [
     { id: "security" as const, label: "Security", icon: Shield },
