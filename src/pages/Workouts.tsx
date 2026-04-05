@@ -167,7 +167,7 @@ const Workouts = () => {
           <div className="flex gap-8">
             {/* Desktop Sidebar */}
             <aside className="hidden md:block w-64 flex-shrink-0">
-              <div className="sticky top-4 skeuo-card-inset p-5 rounded">
+              <div className="sticky top-4 skeuo-card-inset p-5 rounded overflow-y-auto max-h-[calc(100vh-2rem)]">
                 <FilterPanel />
               </div>
             </aside>
