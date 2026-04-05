@@ -14,7 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      image_cache: {
+        Row: {
+          created_at: string
+          fetched_at: string
+          id: string
+          image_url: string
+          listing_id: string
+          listing_type: string
+          quality_score: number | null
+          source_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          fetched_at?: string
+          id?: string
+          image_url: string
+          listing_id: string
+          listing_type: string
+          quality_score?: number | null
+          source_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          fetched_at?: string
+          id?: string
+          image_url?: string
+          listing_id?: string
+          listing_type?: string
+          quality_score?: number | null
+          source_url?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
