@@ -1,129 +1,82 @@
 import { useState, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { ScrollReveal } from "@/components/ScrollReveal";
-import { SignalChip } from "@/components/SignalChip";
-import { MetricRail } from "@/components/MetricRail";
-import { ExternalLink, Filter, HandHeart, MapPin } from "lucide-react";
-import { volunteerOrgs, volunteerCategories, type VolunteerOrg } from "@/data/volunteerOrgs";
+import { volunteerOrgs, volunteerCategories } from "@/data/volunteerOrgs";
+import { ExternalLink, Search } from "lucide-react";
+
+const neighborhoods = ["All Areas", ...Array.from(new Set(volunteerOrgs.map((o) => o.neighborhood)))];
 
 const Volunteering = () => {
-  const [activeCategory, setActiveCategory] = useState<string>("All");
+  const [searchParams] = useSearchParams();
+  const [search, setSearch] = useState(searchParams.get("q") || "");
+  const [category, setCategory] = useState("All");
+  const [hood, setHood] = useState("All Areas");
 
   const filtered = useMemo(() => {
-    return volunteerOrgs.filter((o) => activeCategory === "All" || o.category === activeCategory);
-  }, [activeCategory]);
-
-  const neighborhoods = [...new Set(volunteerOrgs.map(o => o.neighborhood))];
+    return volunteerOrgs.filter((org) => {
+      const q = search.toLowerCase();
+      const matchSearch = !q || org.name.toLowerCase().includes(q) || org.description.toLowerCase().includes(q) || org.tags.some((t) => t.toLowerCase().includes(q)) || org.neighborhood.toLowerCase().includes(q) || org.category.toLowerCase().includes(q);
+      const matchCat = category === "All" || org.category === category;
+      const matchHood = hood === "All Areas" || org.neighborhood === hood;
+      return matchSearch && matchCat && matchHood;
+    });
+  }, [search, category, hood]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
-      <main>
-        <section className="pt-32 pb-12 md:pt-44 md:pb-16 bg-primary text-primary-foreground">
-          <div className="container max-w-5xl">
-            <ScrollReveal>
-              <div className="flex items-center gap-3 mb-4">
-                <SignalChip label="Directory 03" variant="free" />
-                <SignalChip label={`${volunteerOrgs.length} Organizations`} variant="live" pulse />
-              </div>
-              <h1 className="display-hero mb-2">Volunteering</h1>
-              <h2 className="text-[clamp(1.2rem,3vw,2.5rem)] font-black tracking-[-0.03em] text-signal-positive leading-[0.9] mb-4">Oklahoma City</h2>
-              <p className="text-base md:text-lg text-primary-foreground/40 max-w-xl leading-relaxed">
-                Real organizations doing real work. Find where to give your time across Oklahoma City.
-              </p>
-            </ScrollReveal>
+      <main className="flex-1">
+        <div className="container pt-8 md:pt-12">
+          <div className="rule-double mb-4" />
+          <h1 className="section-head text-foreground mb-1">Volunteering</h1>
+          <p className="dateline text-muted-foreground mb-4">Oklahoma City · {volunteerOrgs.length} Organizations · Live</p>
+          <div className="rule-thin mb-6" />
+          <div className="relative mb-6">
+            <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/40" />
+            <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search organizations, causes..." className="search-input pl-11" />
           </div>
-        </section>
-
-        <section className="border-b border-border bg-card">
-          <div className="container max-w-5xl">
-            <MetricRail items={[
-              { label: "Organizations", value: String(volunteerOrgs.length), accent: true },
-              { label: "Categories", value: String(volunteerCategories.length - 1) },
-              { label: "Areas", value: String(neighborhoods.length) },
-              { label: "Status", value: "Live", accent: true },
-            ]} />
-          </div>
-        </section>
-
-        <section className="py-4 border-b border-border sticky top-16 md:top-20 z-30 bg-background/95 backdrop-blur-sm">
-          <div className="container max-w-5xl">
-            <div className="flex items-center gap-2 overflow-x-auto pb-1">
-              <Filter size={14} className="text-muted-foreground/40 flex-shrink-0" />
-              {volunteerCategories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setActiveCategory(cat)}
-                  className={`label-caps px-3 py-2 border transition-all duration-150 flex-shrink-0 ${
-                    activeCategory === cat
-                      ? "border-signal-positive text-signal-positive bg-signal-positive/10"
-                      : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Org listings — unique layout with category accent bar */}
-        <section className="py-8 md:py-12">
-          <div className="container max-w-5xl">
-            <div className="flex items-center gap-3 mb-6">
-              <span className="mono-data text-muted-foreground/40">{filtered.length} Organizations</span>
-              <div className="h-px flex-1 bg-border" />
-            </div>
-
-            <div className="space-y-3">
-              {filtered.map((org, i) => (
-                <ScrollReveal key={org.id} delay={i * 0.03}>
-                  <a
-                    href={org.source}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex items-start gap-4 md:gap-6 p-5 md:p-6 border border-border hover:border-signal-positive/40 transition-all bg-card"
-                  >
-                    <div className="w-1 self-stretch bg-signal-positive/20 group-hover:bg-signal-positive transition-colors flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <h3 className="text-base md:text-lg font-bold text-foreground tracking-tight group-hover:text-signal-positive transition-colors">
-                          {org.name}
-                        </h3>
-                        <SignalChip label={org.category} variant="free" />
-                      </div>
-                      <p className="mono-data text-signal-positive mb-2">{org.neighborhood}</p>
-                      <p className="text-sm text-muted-foreground leading-relaxed mb-2">{org.description}</p>
-                      <div className="flex flex-wrap gap-2">
-                        {org.tags.map(t => (
-                          <span key={t} className="mono-data text-muted-foreground/30">{t}</span>
-                        ))}
-                      </div>
-                    </div>
-                    <ExternalLink size={14} className="text-muted-foreground/20 group-hover:text-signal-positive flex-shrink-0 mt-1 transition-colors" />
-                  </a>
-                </ScrollReveal>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="py-12 md:py-16 border-t border-border bg-secondary/10">
-          <div className="container max-w-5xl">
-            <ScrollReveal>
-              <div className="flex items-center gap-3 mb-6">
-                <MapPin size={14} className="text-signal-positive" />
-                <span className="label-caps text-muted-foreground">Communities Served</span>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {neighborhoods.map((area) => (
-                  <span key={area} className="border border-border px-3 py-2 text-sm text-muted-foreground hover:border-signal-positive hover:text-foreground transition-colors cursor-default">{area}</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6">
+            <div>
+              <p className="dateline text-muted-foreground/50 mb-2">Category</p>
+              <div className="flex flex-wrap gap-1.5">
+                {volunteerCategories.map((c) => (
+                  <button key={c} onClick={() => setCategory(c)} className={c === category ? "filter-chip-active" : "filter-chip"}>{c}</button>
                 ))}
               </div>
-            </ScrollReveal>
+            </div>
+            <div>
+              <p className="dateline text-muted-foreground/50 mb-2">Neighborhood</p>
+              <div className="flex flex-wrap gap-1.5">
+                {neighborhoods.map((n) => (
+                  <button key={n} onClick={() => setHood(n)} className={n === hood ? "filter-chip-active" : "filter-chip"}>{n}</button>
+                ))}
+              </div>
+            </div>
           </div>
-        </section>
+          <div className="rule-heavy mb-2" />
+          <p className="dateline text-foreground font-bold mb-4">{filtered.length} Results</p>
+        </div>
+        <div className="container pb-12">
+          {filtered.map((org, i) => (
+            <article key={org.id} className="article-block">
+              <div className="flex items-start gap-3 md:gap-4">
+                <span className="font-black text-2xl md:text-3xl text-foreground/10 leading-none mt-1 w-8 flex-shrink-0 text-right">{String(i + 1).padStart(2, "0")}</span>
+                <div className="flex-1 min-w-0">
+                  <h2 className="headline text-foreground">{org.name}</h2>
+                  <p className="dateline text-muted-foreground/50 mt-1">{org.neighborhood} · {org.category}</p>
+                  <p className="body-text mt-2">{org.description}</p>
+                  <div className="flex flex-wrap items-center gap-1.5 mt-3">
+                    <span className="news-badge-accent">{org.category}</span>
+                    {org.tags.map((t) => (<span key={t} className="news-badge">{t}</span>))}
+                  </div>
+                </div>
+                <a href={org.source} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 p-2 text-muted-foreground/30 hover:text-accent transition-colors"><ExternalLink size={14} /></a>
+              </div>
+            </article>
+          ))}
+          {filtered.length === 0 && <div className="py-16 text-center"><p className="dateline text-muted-foreground">No organizations match your filters</p></div>}
+        </div>
       </main>
       <Footer />
     </div>
