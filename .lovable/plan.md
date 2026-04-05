@@ -1,57 +1,66 @@
-# Security Panel Security Status
 
-Ran full atomic security sweep:
 
-- Database linter: 0 issues
-- Security scan: 0 vulnerabilities
-- RLS policies: Properly configured (public SELECT, service-role-only writes on `image_cache`)
-- No exposed secrets, no missing policies, no auth bypass risks
+# Events & Date Nights + Real Photo Showcase + AI Atmosphere
 
-The app currently has no authentication, so there are no user-facing auth vulnerabilities. The only table (`image_cache`) is correctly locked down.
+## What We're Building
 
-## What We Will Build
+A new **Events & Date Nights** section integrated across the app, with real AI-fetched photos embedded everywhere, creating an immersive showcase experience.
 
-### 1. Admin Panel at `/admin` (password-gated, client-side)
+## Changes
 
-A local admin dashboard with three tabs:
+### 1. Add "Date Night" Category to Singles Events Data
+- Add `"Date Night"` to the `SinglesEvent` category type union
+- Add 8 verified OKC date night entries with real source URLs:
+  - Factory Obscura immersive art (factoryobscura.com — verified)
+  - Scissortail Park sunset kayaking (scissortailpark.org — verified)  
+  - Wheeler District waterfront dinner (wheelerdistrict.com — verified)
+  - Paseo First Friday gallery walk (thepaseo.org — verified)
+  - OKC Riversport adventure date (riversportokc.org — verified)
+  - Automobile Alley cocktail crawl (automobilealley.org — verified)
+  - First Americans Museum evening (famok.org — verified)
+  - Painting with a Twist (already exists, reclassify as Date Night)
+- Update `singlesCategories` to include "Date Night"
 
-- **Security** -- Shows live security status: RLS policy summary, table count, secret count, edge function health, broken source link count from singles data, image cache stats
-- **Events Manager** -- View/filter all singles events with verification status, confidence scores, broken links highlighted in red, ability to trigger AI re-verification
-- **Date Nights** -- Curated date night ideas pulled from verified singles events + fitness activities + discover items, formatted as bookable suggestions
+### 2. New Events & Date Nights Page (`/events`)
+- Dedicated page at `/events` route showing all events + date nights
+- Visual-first layout: large hero cards with AI-fetched venue photos via `ListingImage`
+- Category tabs: "All", "Date Night", "Speed Dating", "Mixer", "Social", "Dance", "Activity", "Faith"
+- Each card shows: venue photo (full-width top), event name, venue, neighborhood, price, frequency, verification badge
+- Date Night cards get a warm rose-gold accent border and heart icon
+- "Tonight" / "This Weekend" / "This Month" quick-filter pills based on frequency
 
-Admin access uses a simple PIN code stored in localStorage (not a security boundary -- just a convenience gate since there are no real users yet).
+### 3. Embed Real Photos Everywhere with AI Image Agent
+- Every card across Fitness, Singles, Volunteering, Discover, and Events pages uses `ListingImage` component (already built) to auto-fetch real venue photos
+- Homepage column teasers: add small thumbnail next to each numbered item using `ListingImage`
+- Discover cards: add hero image area at top of each card
+- Make the `image-search` edge function prioritize venue-specific photos over generic stock
 
-### 2. Date Nights Category Added to Singles Events
+### 4. Homepage "Events & Date Nights" Section
+- Add a new section between the 3-column broadsheet and the Discover section
+- Horizontal scroll of 4-6 date night cards with large venue photos
+- Each card: full photo background, gradient overlay, event name + venue + price overlay text
+- "View All Events" CTA linking to `/events`
 
-Add a new `"Date Night"` category to the `SinglesEvent` type and populate with 6-8 verified OKC date night activities:
+### 5. Navigation Update
+- Add "Events" to the Navbar between "Singles" and "Fitness"
+- Update redirect: `/events` route now points to the new Events page instead of redirecting to `/`
 
-- Paint & Sip at Painting with a Twist (already exists as Activity, reclassify)
-- Factory Obscura immersive art experience
-- Scissortail Park sunset picnic + kayaking
-- First Americans Museum evening tours
-- Wheeler District dinner + waterfront walk
-- Paseo Arts District gallery walk (First Friday)
-- OKC Riversport adventure date (zip line, rapids)
-- Automobile Alley cocktail crawl
-
-Each entry gets real source URLs, verification status, and confidence scores.
-
-### 3. Events Page Upgrade
-
-- Add "Date Night" to the category filter chips
-- Date Night cards get a special warm gradient accent and a heart icon
-- Add "Tonight" / "This Weekend" quick filters based on frequency field
+### 6. Visual Atmosphere Upgrades
+- All listing cards site-wide get a photo header area (using existing `ListingImage` hook)
+- Cards without images show a gradient placeholder with category icon instead of blank space
+- Subtle parallax effect on homepage hero
+- Date Night cards glow with warm accent shadow on hover
 
 ## Files
 
+| Action | File | Details |
+|---|---|---|
+| Modify | `src/data/singlesEvents.ts` | Add "Date Night" to category union, add 8 verified date night entries |
+| Create | `src/pages/Events.tsx` | Visual-first events + date nights page with photo cards |
+| Modify | `src/App.tsx` | Add `/events` route, remove old redirect |
+| Modify | `src/components/Navbar.tsx` | Add "Events" nav link |
+| Modify | `src/pages/Index.tsx` | Add Events & Date Nights horizontal showcase section |
+| Modify | `src/components/ListingImage.tsx` | Improve fallback with category-colored gradient + icon |
 
-| Action | File                        | Details                                                                 |
-| ------ | --------------------------- | ----------------------------------------------------------------------- |
-| Modify | `src/data/singlesEvents.ts` | Add "Date Night" to category union, add 6-8 verified date night entries |
-| Create | `src/pages/Admin.tsx`       | Three-tab admin panel: Security, Events Manager, Date Nights            |
-| Modify | `src/App.tsx`               | Add `/admin` route                                                      |
-| Modify | `src/components/Navbar.tsx` | Add subtle admin link (gear icon, far right)                            |
-| Modify | `src/pages/Singles.tsx`     | Add "Date Night" to filter chips, warm accent styling                   |
+No new dependencies. Uses existing `ListingImage` + `useListingImage` hook + `image-search` edge function for real photos.
 
-
-No new dependencies. No database changes needed -- security panel reads from static data and edge function health checks.
