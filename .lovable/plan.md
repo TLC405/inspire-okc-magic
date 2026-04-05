@@ -1,75 +1,175 @@
+## Singles Integrity + AI Search Rebuild
 
+### What I found
 
-# Fix Scroll Bug + Verify Singles Data + Upgrade Volunteering Search
-
-## Problems Identified
-
-1. **Can't scroll after opening Combat**: The fitness sidebar uses `sticky top-4` but has no `overflow-y-auto` or `max-h`. When collapsible groups expand, the sidebar exceeds viewport height and blocks scrolling.
-
-2. **Singles "Single Awareness Dinner" links are dead**: The ADDVentures organizer page (`eventbrite.com/o/addventures-17518498737`) returns 404. Research confirms ADDVentures is real — they still post individual events. The organizer page URL needs updating. The Ladies Edition is now organized by "Ermantourage Dinner with Strangers."
-
-3. **Volunteering page is thin**: Only 10 organizations with basic search. Needs more categories, more orgs, and richer search/filter UX.
-
-4. **No photos or visual richness**: All pages are text-only cards. User wants real photos embedded.
-
----
+- The problem is real: the current Singles page includes broken external source URLs.
+- `Single Awareness Dinner` is pointing to a broad Eventbrite search page, not a stable event detail page.
+- The `Ermantourage` organizer link currently returns Eventbrite “Whoops” / not found.
+- The `Jigsaw Dating` organizer link also returns Eventbrite “Whoops” / not found.
+- So the app is currently publishing listings that are not atomically verified source-by-source.
+- CREATE AI THAT TRIPLE VERIFIES AND AI THAT SEARCHES ALL SOCIAL MEDIA AND USE AN 10 OUTSIDE SORUCES ON GITHUB TO MAKE THIS A PP GRANDER. 
 
 ## Plan
 
-### 1. Fix Fitness Sidebar Scroll Bug
+### 1. Hard-stop content integrity on Singles
 
-Add `overflow-y-auto max-h-[calc(100vh-2rem)]` to the sticky sidebar container on both desktop and mobile drawer. This lets Combat and other groups expand without blocking page scroll.
+- Remove or suppress any singles listing whose source fails verification.
+- Treat forum mentions and broad search pages as discovery signals only, not publishable proof.
+- Keep only events with at least one direct, working source page.
+- Add a strict status model:
+  - `verified`
+  - `stale`
+  - `broken`
+  - `conflict`
+  - `unverified`
 
-### 2. Fix & Verify All Singles Event Source Links
+### 2. Rebuild Singles data model around evidence
 
-**Broken links to fix:**
-- `mx-02` (Single Awareness Dinner): Change source from dead organizer page to the active event search: `https://www.eventbrite.com/d/ok--oklahoma-city/single-awareness-dinner/`
-- `mx-03` (Ladies Edition): Update organizer to "Ermantourage Dinner with Strangers", update source to `https://www.eventbrite.com/e/single-awareness-dinner-monthly-okc-ladies-edition-tickets-1982992859022`
+Replace the current flat event shape with source-aware metadata:
 
-**Verified working links (keep as-is):**
-- Pre-Dating Meetup group and pre-dating.com — confirmed active with 2025/2026 events
-- Social Singles OKC Eventbrite — confirmed active
-- Jigsaw Dating Eventbrite — needs verification
+- event core info
+- multiple source URLs per event
+- verification status
+- last checked timestamp
+- confidence score
+- evidence notes
+- optional venue/image metadata
 
-**Add new verified events found in research:**
-- "Foodies + New Friends: OKC | 30s Dinner Meet" by ADDVentures (active through Dec 2026)
-- "Dinner with Entrepreneurs: OKC" by Ermantourage OKC (active)
-- "Foodies + New Friends: Charity Edition" by ADDVentures (active)
-- Pre-Dating 50s/60s age bracket (confirmed on Meetup)
+That lets the UI show what is confirmed instead of pretending everything is equally reliable.
 
-### 3. Massively Upgrade Volunteering
+### 3. Massively upgrade Singles search
 
-Research and add 20+ more verified Oklahoma City volunteer organizations across expanded categories:
-- Add categories: **Animals**, **Health/Medical**, **Arts/Culture**, **Education**, **Disaster Relief**, **Veterans**
-- Add orgs like: Oklahoma Humane Society, CASA of Oklahoma County, Junior League of OKC, OU Medical volunteer program, Myriad Gardens volunteers, Science Museum Oklahoma, Red Cross Central Oklahoma, Infant Crisis Services, etc.
-- Add grouped category filtering matching fitness page pattern
-- Add neighborhood/district filtering
+Build a real search layer instead of plain text matching:
 
-### 4. Add Real Photos via Unsplash Embeds
+- weighted ranking across event name, organizer, venue, tags, neighborhood, and source text
+- “verified only” enabled by default
+- filters for category, frequency, neighborhood, age bracket, price, source provider
+- sort by relevance, newest verification, and strongest confidence
+- “why this matched” highlights in results
 
-Use Unsplash's free embed URLs (no API key needed) to add contextual photos to each directory page:
-- Hero/header images for each page (Oklahoma City skyline, gym interiors, community events)
-- Category header images (e.g., yoga class, boxing ring, food bank)
-- Use `source.unsplash.com` direct image URLs embedded as `<img>` tags
-- Add `imageUrl` field to data interfaces for per-item photos where available
+### 4. Upgrade Singles display into a verification-first UI
 
-### 5. Volunteering Search Upgrade
+Redesign cards so users can see trust instantly:
 
-Match the same sidebar/drawer filter pattern as Singles and Fitness:
-- Add category counts in filter chips
-- Add "Commitment" filter (one-time, weekly, monthly, flexible)
-- Add "Type" filter (hands-on, skilled, administrative, outdoor)
+- verification badge
+- last checked time
+- source chips
+- confidence meter
+- richer tags
+- expandable evidence drawer per event
+- clearer empty states when no triple-verified events exist
 
----
+### 5. Add AI-powered discovery and verification pipeline
 
-## Files
+Implement backend support so the app can actually keep up with real event data:
 
-| Action | File | Details |
-|---|---|---|
-| Modify | `src/pages/Workouts.tsx` | Fix sticky sidebar scroll with `overflow-y-auto max-h-[calc(100vh-2rem)]` |
-| Modify | `src/pages/Singles.tsx` | Same sidebar scroll fix, add photo headers |
-| Rewrite | `src/data/singlesEvents.ts` | Fix broken links, add 4+ new verified events, update organizer names |
-| Rewrite | `src/data/volunteerOrgs.ts` | Expand to 30+ orgs, add new categories, add commitment/type fields |
-| Modify | `src/pages/Volunteering.tsx` | Add grouped category filters, commitment filter, photo headers, richer cards |
-| Modify | `src/pages/Discover.tsx` | Add hero photo using Unsplash embed |
+- Use Lovable AI for normalization, extraction, deduping, categorization, and summaries
+- Use Firecrawl for scraping candidate pages and source content
+- Optionally use Perplexity for broader discovery, but never as sole publication proof
+- Forums/social/search pages can suggest leads, but direct source pages must still verify the listing before it shows publicly
 
+### 6. Add admin/operator controls for Singles
+
+Create an admin workflow for you to manage quality:
+
+- review candidate events
+- inspect all evidence for an event
+- approve/reject/override
+- mark broken links
+- trigger re-verification
+- pin featured events
+- hide stale listings without deleting history
+
+### 7. Improve visuals without fake imagery
+
+- Show only real event/venue/source imagery when available
+- Prefer official source images or captured source previews over decorative stock
+- Add visual source panels/screenshots so you can see what the verifier found
+
+### 8. QA and safety standard
+
+- No listing appears publicly unless source verification passes
+- Broken links auto-fail
+- Conflicting source data gets flagged, not published as fact
+- If a source disappears, the card downgrades from `verified` to `stale` or `broken`
+
+## Technical details
+
+### Frontend
+
+- Rewrite `src/pages/Singles.tsx` to support:
+  - trust-first result cards
+  - evidence panel/drawer
+  - ranking + advanced filtering
+  - verified-only default behavior
+- Replace the current flat card rendering with result states tied to verification metadata
+
+### Data / types
+
+- Replace the current `src/data/singlesEvents.ts` shape with verification-aware fields
+- If backend is introduced, move Singles data from hardcoded TS into Supabase-backed records and keep only typed interfaces in the frontend
+
+### Backend
+
+Create a live verification stack with:
+
+- edge function for discovery
+- edge function for verification
+- edge function for re-checking existing events
+- edge function for AI-assisted extraction/normalization
+
+### Suggested schema
+
+```text
+singles_events
+- id
+- title
+- organizer
+- venue
+- neighborhood
+- category
+- frequency
+- price
+- age_range
+- description
+- verification_status
+- confidence_score
+- last_verified_at
+- primary_source_url
+- hero_image_url
+
+event_sources
+- id
+- event_id
+- provider
+- url
+- status
+- checked_at
+- title
+- extracted_payload
+
+event_verification_logs
+- id
+- event_id
+- result
+- notes
+- checked_at
+```
+
+## Files likely affected
+
+- `src/pages/Singles.tsx`
+- `src/data/singlesEvents.ts`
+- `src/components/...` new Singles search / evidence / badge components
+- `src/lib/...` search ranking helpers
+- `supabase/functions/...` new AI + verification functions
+- `supabase/migrations/...` new tables for live verified singles data
+
+## Implementation order
+
+1. Stop publishing broken Singles entries
+2. Add verification-aware event model
+3. Upgrade Singles UI/search locally
+4. Add AI discovery + verification backend
+5. Add admin review tools
+6. Re-populate only with verified events
