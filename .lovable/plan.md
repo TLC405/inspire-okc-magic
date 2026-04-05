@@ -1,79 +1,64 @@
 
 
-# UI Depth + Skeuomorphic Polish + Simplified UX
+# Fix Scroll Bug + Verify Singles Data + Upgrade Volunteering Search
 
-## Current Problems
-- Everything is flat text on flat backgrounds — no visual depth, shadows, or texture
-- Filter sections on directory pages are confusing walls of chips and collapsibles
-- Result cards are just plain text rows with no visual separation or dimensionality
-- Homepage three-column teasers feel like a spreadsheet, not a premium product
-- No tactile/skeuomorphic feel anywhere — no embossing, insets, raised surfaces, paper textures
+## Problems Identified
 
-## Design Direction: Newspaper Skeuomorphism
+1. **Can't scroll after opening Combat**: The fitness sidebar uses `sticky top-4` but has no `overflow-y-auto` or `max-h`. When collapsible groups expand, the sidebar exceeds viewport height and blocks scrolling.
 
-Think physical newspaper meets premium iOS: raised card surfaces with subtle paper texture, inset search fields that look carved into the surface, embossed section headers, soft drop shadows on cards, subtle gradients on filter chips to make them feel like physical buttons, and warm noise/grain on backgrounds.
+2. **Singles "Single Awareness Dinner" links are dead**: The ADDVentures organizer page (`eventbrite.com/o/addventures-17518498737`) returns 404. Research confirms ADDVentures is real — they still post individual events. The organizer page URL needs updating. The Ladies Edition is now organized by "Ermantourage Dinner with Strangers."
+
+3. **Volunteering page is thin**: Only 10 organizations with basic search. Needs more categories, more orgs, and richer search/filter UX.
+
+4. **No photos or visual richness**: All pages are text-only cards. User wants real photos embedded.
 
 ---
 
 ## Plan
 
-### 1. Skeuomorphic CSS Foundation (`src/index.css`)
+### 1. Fix Fitness Sidebar Scroll Bug
 
-Add new utility classes that give physical depth:
-- **`.skeuo-card`** — raised surface with layered box-shadows (soft outer + crisp inner), subtle paper-grain background via CSS noise gradient, 1px highlight on top edge
-- **`.skeuo-card-inset`** — pressed-in/recessed surface for search inputs and filter panels (inner shadow, darker background)
-- **`.skeuo-chip`** / **`.skeuo-chip-active`** — filter chips that look like physical toggle buttons with gradient, pressed state with inset shadow
-- **`.skeuo-search`** — search input that looks carved into the surface with inner shadow and subtle border gradient
-- **Paper texture** — add a faint CSS repeating-radial-gradient noise to the background body
-- **`.skeuo-badge`** — tags/badges with subtle emboss effect (1px text-shadow for engraved look)
-- **`.skeuo-divider`** — horizontal rules with a 3D groove/ridge effect instead of flat lines
+Add `overflow-y-auto max-h-[calc(100vh-2rem)]` to the sticky sidebar container on both desktop and mobile drawer. This lets Combat and other groups expand without blocking page scroll.
 
-Update existing editorial theme colors to have slightly warmer, more textured tones.
+### 2. Fix & Verify All Singles Event Source Links
 
-### 2. Simplified Fitness Page (`src/pages/Workouts.tsx`)
+**Broken links to fix:**
+- `mx-02` (Single Awareness Dinner): Change source from dead organizer page to the active event search: `https://www.eventbrite.com/d/ok--oklahoma-city/single-awareness-dinner/`
+- `mx-03` (Ladies Edition): Update organizer to "Ermantourage Dinner with Strangers", update source to `https://www.eventbrite.com/e/single-awareness-dinner-monthly-okc-ladies-edition-tickets-1982992859022`
 
-**Simplify the filter UX:**
-- Replace the separate District bar + Category collapsibles with a **single sidebar panel** on desktop (sticky, left side) and a **slide-out drawer** on mobile (triggered by a "Filters" button)
-- The filter panel itself uses `skeuo-card-inset` styling — looks recessed into the page
-- Inside: District dropdown (select, not 19 chips), Category grouped list with counts
-- Active filters show as removable pills above results
+**Verified working links (keep as-is):**
+- Pre-Dating Meetup group and pre-dating.com — confirmed active with 2025/2026 events
+- Social Singles OKC Eventbrite — confirmed active
+- Jigsaw Dating Eventbrite — needs verification
 
-**Upgrade result cards:**
-- Each fitness spot renders inside a `skeuo-card` with raised shadow, paper-grain texture
-- Category badge gets color-coded accent strip on the left edge (like a physical tab/divider)
-- Tags use `skeuo-badge` embossed style
-- External link button gets a subtle raised button treatment
-- Remove the faint "01" numbering — replace with category icon in a small circle
+**Add new verified events found in research:**
+- "Foodies + New Friends: OKC | 30s Dinner Meet" by ADDVentures (active through Dec 2026)
+- "Dinner with Entrepreneurs: OKC" by Ermantourage OKC (active)
+- "Foodies + New Friends: Charity Edition" by ADDVentures (active)
+- Pre-Dating 50s/60s age bracket (confirmed on Meetup)
 
-### 3. Simplified Singles Page (`src/pages/Singles.tsx`)
+### 3. Massively Upgrade Volunteering
 
-Same treatment as Fitness:
-- Filter panel consolidated into sidebar/drawer instead of 3 separate grid sections
-- Result cards upgraded to `skeuo-card` with depth
-- Category/frequency/neighborhood as a single compact filter panel
+Research and add 20+ more verified Oklahoma City volunteer organizations across expanded categories:
+- Add categories: **Animals**, **Health/Medical**, **Arts/Culture**, **Education**, **Disaster Relief**, **Veterans**
+- Add orgs like: Oklahoma Humane Society, CASA of Oklahoma County, Junior League of OKC, OU Medical volunteer program, Myriad Gardens volunteers, Science Museum Oklahoma, Red Cross Central Oklahoma, Infant Crisis Services, etc.
+- Add grouped category filtering matching fitness page pattern
+- Add neighborhood/district filtering
 
-### 4. Simplified Volunteering Page (`src/pages/Volunteering.tsx`)
+### 4. Add Real Photos via Unsplash Embeds
 
-Same card + filter treatment for consistency.
+Use Unsplash's free embed URLs (no API key needed) to add contextual photos to each directory page:
+- Hero/header images for each page (Oklahoma City skyline, gym interiors, community events)
+- Category header images (e.g., yoga class, boxing ring, food bank)
+- Use `source.unsplash.com` direct image URLs embedded as `<img>` tags
+- Add `imageUrl` field to data interfaces for per-item photos where available
 
-### 5. Homepage Polish (`src/pages/Index.tsx`)
+### 5. Volunteering Search Upgrade
 
-- **Masthead area**: Add subtle paper texture background, embossed rule lines
-- **Three-column teasers**: Each column gets a `skeuo-card` treatment — raised panels with shadow, hover lift effect
-- **Search bar**: `skeuo-search` inset styling — looks carved into the page
-- **Discover section**: Cards get raised treatment with category color accent strips
-- **Quick-nav cards (mobile)**: Raised with shadow + icon, feel tappable
-
-### 6. Discover Page (`src/pages/Discover.tsx`)
-
-- Filter buttons get `skeuo-chip` treatment
-- Result cards get `skeuo-card` with category color strip
-- Consistent with other pages
-
-### 7. Navbar + Footer Polish
-
-- **Navbar**: Add subtle bottom shadow (not just border) for floating-header feel
-- **Footer**: Subtle top inner-shadow to feel grounded
+Match the same sidebar/drawer filter pattern as Singles and Fitness:
+- Add category counts in filter chips
+- Add "Commitment" filter (one-time, weekly, monthly, flexible)
+- Add "Type" filter (hands-on, skilled, administrative, outdoor)
 
 ---
 
@@ -81,12 +66,10 @@ Same card + filter treatment for consistency.
 
 | Action | File | Details |
 |---|---|---|
-| Modify | `src/index.css` | Add skeuomorphic utility classes, paper texture, emboss effects |
-| Modify | `src/pages/Workouts.tsx` | Sidebar filters, skeuo cards, simplified UX |
-| Modify | `src/pages/Singles.tsx` | Sidebar filters, skeuo cards |
-| Modify | `src/pages/Volunteering.tsx` | Sidebar filters, skeuo cards |
-| Modify | `src/pages/Index.tsx` | Raised cards, textured masthead, inset search |
-| Modify | `src/pages/Discover.tsx` | Skeuo card grid, chip filters |
-| Modify | `src/components/Navbar.tsx` | Subtle shadow depth |
-| Modify | `src/components/Footer.tsx` | Inner shadow grounding |
+| Modify | `src/pages/Workouts.tsx` | Fix sticky sidebar scroll with `overflow-y-auto max-h-[calc(100vh-2rem)]` |
+| Modify | `src/pages/Singles.tsx` | Same sidebar scroll fix, add photo headers |
+| Rewrite | `src/data/singlesEvents.ts` | Fix broken links, add 4+ new verified events, update organizer names |
+| Rewrite | `src/data/volunteerOrgs.ts` | Expand to 30+ orgs, add new categories, add commitment/type fields |
+| Modify | `src/pages/Volunteering.tsx` | Add grouped category filters, commitment filter, photo headers, richer cards |
+| Modify | `src/pages/Discover.tsx` | Add hero photo using Unsplash embed |
 
