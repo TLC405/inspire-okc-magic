@@ -1,36 +1,92 @@
 
 
-# Fix Homepage: Visible Newspaper Headline + Hero Photo
+# Fix Newspaper Headline Visibility + AI-Powered Admin Scanner & Upgrade Hub
 
-## Problems
+## Problem 1: Newspaper Headline Still Hidden
 
-1. **Newspaper headline hidden** — The hero content sits behind the sticky navbar. The masthead text ("INSPIRE OKLAHOMA CITY" style headline, date, listings count) is at the bottom of the hero but gets obscured. Need to push the main content below the navbar and add a proper newspaper-style headline section visible immediately on scroll.
+The newspaper front-page section (lines 73–107 in Index.tsx) has two layout bugs:
+- It uses `-mt-6` to tuck under the hero, which works — but then the **search bar** at line 110 uses `-mt-14`, which pulls the search bar **on top** of the headline, hiding it completely.
+- The headline section has no padding-top to clear the visual space.
 
-2. **OKC skyline photo not prominent enough** — The hero image exists but the gradient is too dark and the photo doesn't feel like the centerpiece. Need to make it more prominent and ensure the full skyline sunset is visible.
+**Fix:** Remove `-mt-14` from the search bar, add proper spacing (`mt-6`) so the newspaper headline → search bar → content flows naturally and nothing overlaps.
+
+## Problem 2: Admin Panel — AI Scanner + Upgrade Ideas
+
+Add a new **"AI Scanner"** tab to Admin that uses the Lovable AI backend to run automated checks and suggest upgrades. This replaces static checklists with a living, AI-driven command center.
+
+### AI Scanner Features
+- **Run Scan** button triggers an edge function that uses AI to analyze:
+  - **Security**: RLS coverage, auth config, exposed routes
+  - **Content**: Grammar, hidden/clipped text, broken layouts
+  - **Links & Images**: Dead URLs, missing image_cache entries, 404 sources
+  - **Events Quality**: Wrong categories, stale data, duplicates, low confidence scores
+- Results stored in a `scan_results` table for history
+- **Background monitoring**: A scheduled cron job runs scans periodically and flags new issues
+
+### Upgrade Ideas Hub (inside AI Scanner tab)
+After each scan, AI generates **5 upgrade ideas per category**:
+- **Homepage** (hero, newspaper layout, featured sections, search, feed)
+- **Discover** (feed, source badges, scrolling cards, city highlights)
+- **Dating Pages** (singles, events, date nights improvements)
+- **Operations** (admin, security, visitor logs, AI tools, automation)
+
+Each idea shows: title, description, difficulty (easy/medium/hard), and a "Request This" button.
+
+## Technical Design
+
+### Edge Function: `admin-scanner`
+- Accepts `{ action: "scan" | "upgrades", categories?: string[] }`
+- For "scan": Aggregates data counts, checks for broken sources, reviews event quality, returns findings
+- For "upgrades": Sends app context to AI, gets 5 ideas per selected category
+- Uses `google/gemini-3.1-pro-preview` with tool calling for structured output
+
+### Database: `scan_results` table
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid | PK |
+| scan_type | text | "security", "content", "links", "events" |
+| findings | jsonb | Array of issues found |
+| upgrade_ideas | jsonb | Array of suggestions |
+| created_at | timestamptz | When scan ran |
+
+RLS: Admin-only read, service-role write.
+
+### Cron Job
+- Runs every 6 hours via `pg_cron` + `pg_net`
+- Calls `admin-scanner` with `action: "scan"`
+- Results accumulate in `scan_results` for admin to review
 
 ## Changes
 
-### 1. Add Newspaper Front Page Section Below Hero (src/pages/Index.tsx)
-- Add a full-width newspaper "front page" section below the hero with:
-  - A bold **headline** in Playfair Display (e.g., "Your Guide to Oklahoma City" or the day's edition tagline)
-  - **Subheadline** with date, edition info, listing count — classic broadsheet style
-  - Decorative rules (heavy top, thin bottom) framing the headline
-- This gives the user the "full newspaper" feel they're asking for — a visible, readable headline block
+### 1. Fix Homepage Headline (src/pages/Index.tsx)
+- Remove `-mt-14` from the search bar section
+- Add `mt-6` spacing between newspaper headline and search
+- Headline is now fully visible below the hero photo
 
-### 2. Fix Hero Overlap (src/pages/Index.tsx)
-- Lighten the gradient overlay from `from-black/60` to `from-black/40` so the skyline sunset photo is more vivid
-- Keep the hero height at `340px` mobile / `500px` desktop
-- Move the dateline/listings count info from the hero overlay into the new newspaper headline section below, so nothing competes with the photo
+### 2. Create Edge Function (supabase/functions/admin-scanner/index.ts)
+- "scan" action: Checks event data quality, source links, image cache stats
+- "upgrades" action: AI generates 5 ideas per category using tool calling
+- Handles 429/402 errors
 
-### 3. Make Hero Photo the Centerpiece
-- Remove the text overlay from the hero entirely — let the OKC skyline sunset photo speak for itself as a full-bleed image
-- The newspaper headline section directly below serves as the "front page" masthead content
+### 3. Create scan_results table (migration)
+- Table with RLS for admin-only access
+
+### 4. Add AI Scanner tab to Admin (src/pages/Admin.tsx)
+- New 4th tab: "AI Scanner" with Zap icon
+- "Run Full Scan" button → shows findings grouped by category
+- "Get Upgrade Ideas" button → shows 5 ideas per app area
+- Scan history list from `scan_results` table
+- Background scan status indicator
+
+### 5. Set up cron job for background scans
+- pg_cron schedule every 6 hours
 
 ## Files
 
 | Action | File | Details |
 |---|---|---|
-| Modify | `src/pages/Index.tsx` | Remove hero text overlay, lighten gradient, add newspaper headline section below hero |
-
-No database changes. No new dependencies.
+| Modify | `src/pages/Index.tsx` | Fix search bar margin, make headline visible |
+| Create | `supabase/functions/admin-scanner/index.ts` | AI scan + upgrade ideas edge function |
+| Modify | `src/pages/Admin.tsx` | Add AI Scanner tab with scan results + upgrade ideas UI |
+| Create | Migration | `scan_results` table with admin RLS |
 
