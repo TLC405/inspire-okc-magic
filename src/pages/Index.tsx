@@ -12,7 +12,7 @@ import heroImg from "@/assets/hero-okc-skyline.jpg";
 import heroSingles from "@/assets/hero-singles.jpg";
 import heroFitness from "@/assets/hero-fitness.jpg";
 import heroVolunteer from "@/assets/hero-volunteer.jpg";
-import okcChar1 from "@/assets/okc-char-1.png";
+
 import okcChar2 from "@/assets/okc-char-2.png";
 
 const today = new Date();
