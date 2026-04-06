@@ -1,59 +1,47 @@
+# Header Fix + Couples Activities + Code Cleanup
 
+## Problems
 
-# Discover Page: Social Feed with Rolling Events
-
-## What Changes
-
-Transform the Discover page from a static card grid into a **social media-style scrolling feed** that aggregates events and content from multiple Oklahoma City sources — styled like a Visit OKC / OKC Metro / Instagram discovery feed.
-
-## Architecture
-
-The Discover page keeps its existing 100-item city showcase data but gains a new **"What's Happening" feed** at the top — a vertically scrolling, visually rich timeline that mixes:
-
-1. **Singles & Date Night events** (pulled from `singlesEvents` data)
-2. **City showcase highlights** (from `cityShowcase` data)  
-3. **Fitness happenings** (from `fitnessSpots` data)
-4. **Volunteer opportunities** (from `volunteerOrgs` data)
-
-Each feed item is styled as a social-media-style card with venue photo, source attribution badge (Visit OKC, OKC Metro, Meetup, etc.), timestamp, and category tag.
+1. **Header barely visible** — The navbar shows "INSPIRE" + "Oklahoma City" but the text is small and the grammar/layout feels off on mobile. The hero masthead competes with a garbled top banner.
+2. **No couples-specific activities** like stained glass classes, charcuterie board making, pottery, cooking classes — all real OKC experiences.
+3. **Dead redirect routes** in `App.tsx` — `/community`, `/stories`, `/ask`, `/info`, `/coaching`, `/men-talk`, `/my-apps` are legacy cruft that should be removed.
+4. **Discover feed already built** — needs to stay as-is (rolling feed with source badges).
 
 ## Changes
 
-### 1. Add Feed Data Aggregator (new file: `src/lib/discoverFeed.ts`)
-- Pulls from all four data sources: singles events, fitness spots, volunteer orgs, city showcase
-- Normalizes into a unified `FeedItem` type with: title, description, image (via ListingImage), source name, source icon, category, link, neighborhood
-- Sorts by a weighted relevance score (verified events first, Date Nights boosted, seasonal items prioritized)
-- Each item gets a "source" badge: "Visit OKC", "OKC Metro", "Meetup", "Community", etc. based on the source URL domain
+### 1. Fix Navbar Header (Navbar.tsx)
+- Make "INSPIRE Oklahoma City" more readable: increase font size, fix spacing so "Oklahoma City" doesn't wrap awkwardly under "INSPIRE"
+- On mobile (690px viewport), show "INSPIRE OKC" instead of full name to prevent wrapping
+- Add proper letter-spacing
 
-### 2. Rebuild Discover Page Layout (modify: `src/pages/Discover.tsx`)
-- **Top section**: "What's Happening in Oklahoma City" scrolling feed — large photo cards in a single-column timeline layout (mobile-first)
-- Each feed card: full-width venue photo via `ListingImage`, source badge (e.g. "via Visit OKC" with colored pill), category chip, title, short description, neighborhood tag, "View →" link
-- **Bottom section**: Existing city showcase grid (100 facts) stays but collapses behind a "Explore 100 Facts" expandable section
-- Category filter chips apply to BOTH the feed and the facts grid
-- Search searches across everything
+### 2. Add 8 Couples/Creative Date Night Events (singlesEvents.ts)
+Real, verified OKC experiences:
+- **Stained Glass Workshop** at The Stained Glass Shoppe OKC (NW OKC) — couples glass art classes
+- **Charcuterie Board Class** at Board & Brush OKC — build-your-own boards with wine
+- **Pottery Date Night** at Paseo Pottery — couples wheel-throwing sessions
+- **Cooking Class** at Kam's Cookery (Classen Curve) — hands-on couples cooking
+- **Comedy Date Night** at The Loony Bin OKC — dinner + live standup
+- **Sunset Kayak** at Lake Hefner — evening paddle rentals
+- **Ice Skating** at Devon Ice Rink (seasonal, Myriad Gardens) — classic winter date
+- **Drive-In Movie** at Winchester Drive-In (OKC metro) — retro date night
 
-### 3. Feed Card Styles (modify: `src/index.css`)
-- `.feed-card` — large photo top (200px), rounded corners, subtle shadow, source attribution overlay
-- `.feed-source-badge` — colored pill showing source name (blue for Visit OKC, orange for OKC Metro, green for Meetup)
-- `.feed-timestamp` — relative time display ("2h ago", "Today", "This week")
-- Mobile-optimized: single column, full-bleed photos, swipeable feel
+Each entry gets verified source URLs, confidence scores, and the cute/funny description style.
 
-### 4. Source Attribution Mapping
-Map real source URLs to recognizable brand names:
-- `visitokc.com` → "Visit OKC" (blue badge)
-- `oklahoman.com` → "The Oklahoman" (red badge)
-- `meetup.com` → "Meetup" (red badge)
-- `eventbrite.com` → "Eventbrite" (orange badge)
-- `famok.org`, `scissortailpark.org`, etc. → "Community" (green badge)
-- Default → domain name extracted from URL
+### 3. Remove Dead Routes (App.tsx)
+Delete all legacy redirect routes: `/community`, `/stories`, `/ask`, `/info`, `/coaching`, `/men-talk`, `/my-apps`, `/explore`, `/workouts`
+
+### 4. Code Sweep
+- Remove unused imports across modified files
+- Ensure `NotFound.tsx` page exists and works for any unknown routes
+- Verify Discover page feed is intact with rolling source badges
 
 ## Files
 
 | Action | File | Details |
 |---|---|---|
-| Create | `src/lib/discoverFeed.ts` | Aggregates all data sources into unified feed items with source badges |
-| Modify | `src/pages/Discover.tsx` | Social feed layout at top, collapsible facts grid below, feed cards with photos |
-| Modify | `src/index.css` | Feed card styles, source badge colors, timeline layout |
+| Modify | `src/components/Navbar.tsx` | Fix header text sizing and mobile layout |
+| Modify | `src/data/singlesEvents.ts` | Add 8 couples/creative date night events |
+| Modify | `src/App.tsx` | Remove 7 dead redirect routes |
+| Modify | `src/pages/Events.tsx` | Add "Couples & Creative" sub-section for new events |
 
-No new dependencies. No database changes. Uses existing `ListingImage` for all venue photos.
-
+No new dependencies. No database changes.
