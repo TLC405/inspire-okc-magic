@@ -87,13 +87,19 @@ const Singles = () => {
   const [verifiedOnly, setVerifiedOnly] = useState(true);
   const [sortBy, setSortBy] = useState<"relevance" | "confidence" | "newest">("relevance");
 
-  const results = useMemo(
-    () => searchAndRank(singlesEvents, search, { category, time, hood, verifiedOnly, sortBy }),
-    [search, category, time, hood, verifiedOnly, sortBy]
+  // Only show singles-relevant categories: Speed Dating, Mixer
+  const singlesOnly = useMemo(
+    () => singlesEvents.filter((e) => ["Speed Dating", "Mixer"].includes(e.category)),
+    []
   );
 
-  const verifiedCount = singlesEvents.filter((e) => e.verificationStatus === "verified").length;
-  const staleCount = singlesEvents.filter((e) => e.verificationStatus === "stale").length;
+  const results = useMemo(
+    () => searchAndRank(singlesOnly, search, { category, time, hood, verifiedOnly, sortBy }),
+    [singlesOnly, search, category, time, hood, verifiedOnly, sortBy]
+  );
+
+  const verifiedCount = singlesOnly.filter((e) => e.verificationStatus === "verified").length;
+  const staleCount = singlesOnly.filter((e) => e.verificationStatus === "stale").length;
 
   const activeFilters = [
     ...(category !== "All" ? [{ label: category, clear: () => setCategory("All") }] : []),
