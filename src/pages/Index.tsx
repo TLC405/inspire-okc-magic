@@ -12,7 +12,7 @@ import heroImg from "@/assets/hero-okc-skyline.jpg";
 import heroSingles from "@/assets/hero-singles.jpg";
 import heroFitness from "@/assets/hero-fitness.jpg";
 import heroVolunteer from "@/assets/hero-volunteer.jpg";
-import okcChar1 from "@/assets/okc-char-1.png";
+
 import okcChar2 from "@/assets/okc-char-2.png";
 
 const today = new Date();
@@ -66,7 +66,7 @@ const Index = () => {
         <div className="relative">
           <div className="w-full h-[340px] md:h-[500px] overflow-hidden">
             <img src={heroImg} alt="Oklahoma City skyline at golden hour" className="w-full h-full object-cover object-center" width={1920} height={640} />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-background" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background" />
           </div>
           <div className="absolute inset-0 flex flex-col items-center justify-end pb-16 px-4">
             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mb-4">
@@ -77,8 +77,6 @@ const Index = () => {
               <span className="dateline text-white font-bold masthead-shadow">{totalListings} Listings</span>
             </div>
           </div>
-          {/* Character accent */}
-          <img src={okcChar1} alt="" className="absolute bottom-2 right-4 w-16 md:w-24 opacity-80 drop-shadow-lg pointer-events-none hidden md:block" />
         </div>
 
         {/* ═══ Search ═══ */}
