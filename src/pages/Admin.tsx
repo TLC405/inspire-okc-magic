@@ -8,10 +8,9 @@ import { volunteerOrgs } from "@/data/volunteerOrgs";
 import { cityShowcase } from "@/data/cityShowcase";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  Shield, ShieldCheck, ShieldAlert, AlertTriangle, Clock, Lock,
-  Heart, Search, ExternalLink, MapPin, Eye, Database, Server, Key,
-  CheckCircle2, XCircle, Image, RefreshCw, LogOut, UserPlus, Fingerprint,
-  Globe, Zap, Bug, Activity, Users
+  Shield, ShieldCheck, ShieldAlert, AlertTriangle, Search, MapPin, Eye, Database, Key,
+  CheckCircle2, XCircle, RefreshCw, LogOut, UserPlus, Fingerprint,
+  Globe, Activity, Users
 } from "lucide-react";
 
 const statusColors: Record<VerificationStatus, string> = {
@@ -29,10 +28,10 @@ const Admin = () => {
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const [authError, setAuthError] = useState("");
   const [authMsg, setAuthMsg] = useState("");
-  const [tab, setTab] = useState<"security" | "events" | "dates" | "images" | "threats" | "visitors">("security");
+  const [tab, setTab] = useState<"visitors" | "security" | "events">("visitors");
   const [evtSearch, setEvtSearch] = useState("");
   const [evtFilter, setEvtFilter] = useState<"all" | VerificationStatus>("all");
-  const [imageStats, setImageStats] = useState<{ total: number; byType: Record<string, number>; duplicates: number; flagged: string[] } | null>(null);
+  const [imageStats, setImageStats] = useState<any>(null);
   const [loadingImages, setLoadingImages] = useState(false);
   const [bootstrapping, setBootstrapping] = useState(false);
   const [visitors, setVisitors] = useState<any[]>([]);
@@ -53,28 +52,6 @@ const Admin = () => {
   }, [evtSearch, evtFilter]);
 
   const dateNights = singlesEvents.filter((e) => e.category === "Date Night" && e.verificationStatus === "verified");
-
-  useEffect(() => {
-    if (tab === "images" && !imageStats && isAdmin) {
-      setLoadingImages(true);
-      supabase.from("image_cache").select("*").then(({ data }) => {
-        if (!data) { setLoadingImages(false); return; }
-        const byType: Record<string, number> = {};
-        const urlCounts: Record<string, number> = {};
-        const flagged: string[] = [];
-        data.forEach((row) => {
-          byType[row.listing_type] = (byType[row.listing_type] || 0) + 1;
-          urlCounts[row.image_url] = (urlCounts[row.image_url] || 0) + 1;
-          if (row.image_url.includes("wikipedia.org/wiki/File:") || row.image_url.includes("okc.gov/Home/ShowPublished")) {
-            flagged.push(`${row.listing_type}/${row.listing_id}: generic URL`);
-          }
-        });
-        const duplicates = Object.values(urlCounts).filter(c => c > 3).length;
-        setImageStats({ total: data.length, byType, duplicates, flagged: flagged.slice(0, 20) });
-        setLoadingImages(false);
-      });
-    }
-  }, [tab, imageStats, isAdmin]);
 
   useEffect(() => {
     if (tab === "visitors" && visitors.length === 0 && isAdmin) {
@@ -191,12 +168,9 @@ const Admin = () => {
   }
 
   const tabs = [
-    { id: "security" as const, label: "Security", icon: Shield },
-    { id: "threats" as const, label: "Threats", icon: Bug },
     { id: "visitors" as const, label: "Visitors", icon: Users },
+    { id: "security" as const, label: "Security", icon: Shield },
     { id: "events" as const, label: "Events", icon: Eye },
-    { id: "dates" as const, label: "Date Nights", icon: Heart },
-    { id: "images" as const, label: "Images", icon: Image },
   ];
 
   return (
@@ -228,6 +202,87 @@ const Admin = () => {
         </div>
 
         <div className="skeuo-card rounded-lg p-6">
+          {/* VISITORS TAB */}
+          {tab === "visitors" && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <StatCard icon={Users} label="Total Visits" value={String(visitors.length)} sub="Last 200 logged" color="text-accent" />
+                <StatCard icon={Globe} label="Unique IPs" value={String(new Set(visitors.map((v: any) => v.ip_address)).size)} sub="Distinct addresses" color="text-emerald-500" />
+                <StatCard icon={MapPin} label="Cities" value={String(new Set(visitors.filter((v: any) => v.city).map((v: any) => v.city)).size)} sub="Distinct locations" color="text-blue-500" />
+                <StatCard icon={Activity} label="Today" value={String(visitors.filter((v: any) => new Date(v.created_at).toDateString() === new Date().toDateString()).length)} sub="Visits today" color="text-amber-500" />
+              </div>
+              <button onClick={() => { setVisitors([]); setLoadingVisitors(true); supabase.from("visitor_logs").select("*").order("created_at", { ascending: false }).limit(200).then(({ data }) => { setVisitors(data || []); setLoadingVisitors(false); }); }} className="skeuo-btn">
+                <RefreshCw size={12} /> Refresh Visitor Data
+              </button>
+              {loadingVisitors ? (
+                <div className="flex items-center justify-center py-12">
+                  <RefreshCw size={20} className="animate-spin text-accent mr-2" />
+                  <span className="text-sm text-muted-foreground">Loading visitor data…</span>
+                </div>
+              ) : (
+                <div className="skeuo-card-inset p-4 rounded">
+                  <h3 className="label-caps text-foreground mb-3">Recent Visitors</h3>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="border-b border-border/50">
+                          <th className="text-left py-2 pr-3 text-muted-foreground font-medium">IP Address</th>
+                          <th className="text-left py-2 pr-3 text-muted-foreground font-medium">Location</th>
+                          <th className="text-left py-2 pr-3 text-muted-foreground font-medium">Coords</th>
+                          <th className="text-left py-2 pr-3 text-muted-foreground font-medium">Page</th>
+                          <th className="text-left py-2 pr-3 text-muted-foreground font-medium">Referrer</th>
+                          <th className="text-left py-2 pr-3 text-muted-foreground font-medium">User Agent</th>
+                          <th className="text-left py-2 text-muted-foreground font-medium">Time</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {(() => {
+                          const ipCounts: Record<string, number> = {};
+                          visitors.forEach((v: any) => { ipCounts[v.ip_address] = (ipCounts[v.ip_address] || 0) + 1; });
+                          return visitors.map((v: any) => {
+                            const isRepeat = ipCounts[v.ip_address] > 2;
+                            return (
+                              <tr key={v.id} className={`border-b border-border/20 hover:bg-muted/20 ${isRepeat ? "bg-amber-500/5" : ""}`}>
+                                <td className={`py-2 pr-3 font-mono ${isRepeat ? "text-amber-500 font-bold" : "text-foreground"}`}>
+                                  {v.ip_address}
+                                  {isRepeat && <span className="text-[9px] ml-1">×{ipCounts[v.ip_address]}</span>}
+                                </td>
+                                <td className="py-2 pr-3 text-muted-foreground">
+                                  {[v.city, v.region, v.country].filter(Boolean).join(", ") || "—"}
+                                </td>
+                                <td className="py-2 pr-3">
+                                  {v.latitude && v.longitude ? (
+                                    <a href={`https://maps.google.com/?q=${v.latitude},${v.longitude}`} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline text-[10px]">
+                                      {Number(v.latitude).toFixed(4)}, {Number(v.longitude).toFixed(4)} ↗
+                                    </a>
+                                  ) : <span className="text-muted-foreground">—</span>}
+                                </td>
+                                <td className="py-2 pr-3 text-accent">{v.page_path || "—"}</td>
+                                <td className="py-2 pr-3 text-muted-foreground max-w-[150px] truncate">{v.referrer || "—"}</td>
+                                <td className="py-2 pr-3 text-muted-foreground max-w-[300px] text-[10px] break-all">{v.user_agent || "—"}</td>
+                                <td className="py-2 text-muted-foreground whitespace-nowrap">{new Date(v.created_at).toLocaleString()}</td>
+                              </tr>
+                            );
+                          });
+                        })()}
+                        {visitors.length === 0 && (
+                          <tr><td colSpan={7} className="py-8 text-center text-muted-foreground">No visitors logged yet</td></tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+              <div className="skeuo-card-inset p-3 rounded">
+                <p className="text-[10px] text-muted-foreground">
+                  <strong className="text-foreground">🔒 Kali / Pen Testing:</strong> Visitor logs require the live deployed URL — offline/local Kali scans won't register here.
+                  Test against <span className="font-mono text-accent">inspire-okc-magic.lovable.app</span> to see results.
+                  Repeat IPs (3+) are highlighted in amber for scanning detection.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* SECURITY TAB */}
           {tab === "security" && (
             <div className="space-y-6">
@@ -235,59 +290,33 @@ const Admin = () => {
                 <StatCard icon={Database} label="Tables" value="3" sub="image_cache, profiles, user_roles" color="text-accent" />
                 <StatCard icon={Shield} label="RLS Status" value="✓ All" sub="Every table has RLS" color="text-emerald-500" />
                 <StatCard icon={Key} label="Auth" value="Active" sub="Email + password, role-based" color="text-accent" />
-                <StatCard icon={Server} label="Listings" value={String(totalListings)} sub="All directories" color="text-foreground" />
+                <StatCard icon={Activity} label="Threat Level" value="Low" sub="No user-generated content" color="text-emerald-500" />
               </div>
               <div className="skeuo-card-inset p-4 rounded">
-                <h3 className="label-caps text-foreground mb-3">Security Hardening Checklist</h3>
+                <h3 className="label-caps text-foreground mb-3">Security Checklist</h3>
                 <div className="space-y-2">
-                  <CheckItem ok label="Authentication required for admin" detail="Supabase Auth with email verification" />
-                  <CheckItem ok label="Role-based access control (RBAC)" detail="Admin role checked server-side via has_role()" />
-                  <CheckItem ok label="No hardcoded credentials" detail="PIN-based auth removed, proper auth in place" />
-                  <CheckItem ok label="No localStorage auth tokens" detail="Session managed by Supabase SDK (httpOnly)" />
-                  <CheckItem ok label="RLS on all tables" detail="image_cache, profiles, user_roles" />
+                  <CheckItem ok label="Authentication required for admin" detail="Auth with email verification" />
+                  <CheckItem ok label="Role-based access control (RBAC)" detail="Admin role checked server-side" />
+                  <CheckItem ok label="No hardcoded credentials" detail="Proper auth in place" />
+                  <CheckItem ok label="RLS on all tables" detail="image_cache, profiles, user_roles, visitor_logs" />
                   <CheckItem ok label="Privilege escalation blocked" detail="Only service_role can assign roles" />
-                  <CheckItem ok label="Edge functions use CORS headers" detail="4 functions validated" />
-                  <CheckItem ok label="Input validation on forms" detail="Email format, password length enforced" />
-                  <CheckItem ok label="No exposed API secrets" detail="All private keys in environment variables" />
+                  <CheckItem ok label="No exposed API secrets" detail="Private keys in environment variables" />
                   <CheckItem ok={brokenLinks === 0} label={`Broken source links: ${brokenLinks}`} detail={brokenLinks > 0 ? "Some event sources return 404" : "All sources responding"} />
                 </div>
               </div>
               <div className="skeuo-card-inset p-4 rounded">
-                <h3 className="label-caps text-foreground mb-3">Data Summary</h3>
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  <div><p className="text-3xl font-black text-emerald-500">{verifiedEvents}</p><p className="dateline text-muted-foreground">Verified</p></div>
-                  <div><p className="text-3xl font-black text-amber-500">{staleEvents}</p><p className="dateline text-muted-foreground">Stale</p></div>
-                  <div><p className="text-3xl font-black text-red-400">{brokenLinks}</p><p className="dateline text-muted-foreground">Broken</p></div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* THREAT MONITOR TAB */}
-          {tab === "threats" && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <StatCard icon={Shield} label="Attack Surface" value="Minimal" sub="Static data + read-only DB" color="text-emerald-500" />
-                <StatCard icon={Globe} label="Public Endpoints" value="4" sub="Edge functions (CORS'd)" color="text-accent" />
-                <StatCard icon={Activity} label="Threat Level" value="Low" sub="No user-generated content" color="text-emerald-500" />
-              </div>
-
-              <div className="skeuo-card-inset p-4 rounded">
                 <h3 className="label-caps text-foreground mb-3">🛡️ Protection Layers</h3>
                 <div className="space-y-3">
-                  <ThreatRow title="SQL Injection" status="protected" detail="Supabase SDK uses parameterized queries. No raw SQL anywhere." />
-                  <ThreatRow title="XSS (Cross-Site Scripting)" status="protected" detail="React auto-escapes JSX. No dangerouslySetInnerHTML. No user-generated HTML." />
-                  <ThreatRow title="CSRF" status="protected" detail="Supabase uses JWT tokens in headers, not cookies. CSRF not applicable." />
-                  <ThreatRow title="Privilege Escalation" status="protected" detail="Roles stored in server-side table. Only service_role can modify. Client cannot self-promote." />
-                  <ThreatRow title="Brute Force Login" status="protected" detail="Supabase Auth has built-in rate limiting on login attempts." />
-                  <ThreatRow title="Data Exfiltration" status="protected" detail="RLS on all tables. Users can only read their own data. Public data is intentionally public." />
-                  <ThreatRow title="API Key Exposure" status="protected" detail="Only the anon (publishable) key is in client code. Service role key is server-side only." />
-                  <ThreatRow title="Dependency Vulnerabilities" status="monitored" detail="Run npm audit periodically. No known high-severity issues." />
-                  <ThreatRow title="Man-in-the-Middle" status="protected" detail="All traffic over HTTPS. Supabase enforces TLS." />
-                  <ThreatRow title="Session Hijacking" status="protected" detail="Supabase uses short-lived JWTs with refresh tokens. No localStorage session storage." />
+                  <ThreatRow title="SQL Injection" status="protected" detail="Parameterized queries via SDK." />
+                  <ThreatRow title="XSS" status="protected" detail="React auto-escapes. No dangerouslySetInnerHTML." />
+                  <ThreatRow title="CSRF" status="protected" detail="JWT in headers, not cookies." />
+                  <ThreatRow title="Privilege Escalation" status="protected" detail="Roles server-side only." />
+                  <ThreatRow title="Brute Force" status="protected" detail="Built-in rate limiting." />
+                  <ThreatRow title="Data Exfiltration" status="protected" detail="RLS on all tables." />
+                  <ThreatRow title="MITM" status="protected" detail="HTTPS + TLS enforced." />
+                  <ThreatRow title="Session Hijacking" status="protected" detail="Short-lived JWTs with refresh tokens." />
                 </div>
               </div>
-
               <div className="skeuo-card-inset p-4 rounded">
                 <h3 className="label-caps text-foreground mb-3">🔒 RLS Policy Matrix</h3>
                 <div className="overflow-x-auto">
@@ -313,63 +342,6 @@ const Admin = () => {
             </div>
           )}
 
-          {/* VISITORS TAB */}
-          {tab === "visitors" && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <StatCard icon={Users} label="Total Visits" value={String(visitors.length)} sub="Last 200 logged" color="text-accent" />
-                <StatCard icon={Globe} label="Unique IPs" value={String(new Set(visitors.map((v: any) => v.ip_address)).size)} sub="Distinct addresses" color="text-emerald-500" />
-                <StatCard icon={MapPin} label="Cities" value={String(new Set(visitors.filter((v: any) => v.city).map((v: any) => v.city)).size)} sub="Distinct locations" color="text-blue-500" />
-                <StatCard icon={Activity} label="Today" value={String(visitors.filter((v: any) => new Date(v.created_at).toDateString() === new Date().toDateString()).length)} sub="Visits today" color="text-amber-500" />
-              </div>
-              {loadingVisitors ? (
-                <div className="flex items-center justify-center py-12">
-                  <RefreshCw size={20} className="animate-spin text-accent mr-2" />
-                  <span className="text-sm text-muted-foreground">Loading visitor data…</span>
-                </div>
-              ) : (
-                <div className="skeuo-card-inset p-4 rounded">
-                  <h3 className="label-caps text-foreground mb-3">Recent Visitors</h3>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-xs">
-                      <thead>
-                        <tr className="border-b border-border/50">
-                          <th className="text-left py-2 pr-3 text-muted-foreground font-medium">IP Address</th>
-                          <th className="text-left py-2 pr-3 text-muted-foreground font-medium">Location</th>
-                          <th className="text-left py-2 pr-3 text-muted-foreground font-medium">Page</th>
-                          <th className="text-left py-2 pr-3 text-muted-foreground font-medium">Device</th>
-                          <th className="text-left py-2 text-muted-foreground font-medium">Time</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {visitors.map((v: any) => (
-                          <tr key={v.id} className="border-b border-border/20 hover:bg-muted/20">
-                            <td className="py-2 pr-3 font-mono text-foreground">{v.ip_address}</td>
-                            <td className="py-2 pr-3 text-muted-foreground">
-                              {[v.city, v.region, v.country].filter(Boolean).join(", ") || "—"}
-                              {v.latitude && v.longitude && (
-                                <span className="text-[9px] text-muted-foreground/50 ml-1">({Number(v.latitude).toFixed(2)}, {Number(v.longitude).toFixed(2)})</span>
-                              )}
-                            </td>
-                            <td className="py-2 pr-3 text-accent">{v.page_path || "—"}</td>
-                            <td className="py-2 pr-3 text-muted-foreground truncate max-w-[200px]">{v.user_agent?.split("(")[0]?.trim() || "—"}</td>
-                            <td className="py-2 text-muted-foreground whitespace-nowrap">{new Date(v.created_at).toLocaleString()}</td>
-                          </tr>
-                        ))}
-                        {visitors.length === 0 && (
-                          <tr><td colSpan={5} className="py-8 text-center text-muted-foreground">No visitors logged yet</td></tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-              <button onClick={() => { setVisitors([]); setLoadingVisitors(true); supabase.from("visitor_logs").select("*").order("created_at", { ascending: false }).limit(200).then(({ data }) => { setVisitors(data || []); setLoadingVisitors(false); }); }} className="skeuo-btn">
-                <RefreshCw size={12} /> Refresh
-              </button>
-            </div>
-          )}
-
           {/* EVENTS TAB */}
           {tab === "events" && (
             <div className="space-y-4">
@@ -390,76 +362,6 @@ const Admin = () => {
               <div className="space-y-2">
                 {filteredEvents.map((evt) => (<EventRow key={evt.id} event={evt} />))}
               </div>
-            </div>
-          )}
-
-          {/* DATE NIGHTS TAB */}
-          {tab === "dates" && (
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">{dateNights.length} verified date night experiences</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {dateNights.map((evt) => (
-                  <div key={evt.id} className="skeuo-card-inset p-4 rounded border-l-4 border-l-rose-400/50">
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <h3 className="headline text-foreground text-sm">{evt.name}</h3>
-                        <p className="text-xs text-muted-foreground mt-0.5">{evt.venue}</p>
-                        <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
-                          <MapPin size={10} />{evt.neighborhood}
-                          <span className="text-foreground/20">·</span>
-                          <Clock size={10} />{evt.frequency}
-                          <span className="text-foreground/20">·</span>
-                          <span className="font-semibold text-foreground">{evt.price}</span>
-                        </div>
-                      </div>
-                      <span className="text-xs font-bold text-emerald-500">{evt.confidenceScore}%</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{evt.description}</p>
-                    {evt.sources[0]?.url && (
-                      <a href={evt.sources[0].url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-accent hover:underline mt-2">
-                        Visit <ExternalLink size={10} />
-                      </a>
-                    )}
-                  </div>
-                ))}
-                {dateNights.length === 0 && (
-                  <div className="py-8 text-center text-muted-foreground col-span-2">
-                    <Heart size={24} className="mx-auto mb-2 opacity-30" />
-                    <p>No verified date nights yet</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* IMAGE CACHE TAB */}
-          {tab === "images" && (
-            <div className="space-y-6">
-              {loadingImages ? (
-                <div className="flex items-center justify-center py-12">
-                  <RefreshCw size={20} className="animate-spin text-accent mr-2" />
-                  <span className="text-sm text-muted-foreground">Loading image cache…</span>
-                </div>
-              ) : imageStats ? (
-                <>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <StatCard icon={Image} label="Total" value={String(imageStats.total)} sub="Cached images" color="text-accent" />
-                    <StatCard icon={Database} label="Fitness" value={String(imageStats.byType["fitness"] || 0)} sub="Venue photos" color="text-emerald-500" />
-                    <StatCard icon={Database} label="Volunteer" value={String(imageStats.byType["volunteer"] || 0)} sub="Org photos" color="text-blue-500" />
-                    <StatCard icon={Database} label="Discover" value={String(imageStats.byType["discover"] || 0)} sub="City showcase" color="text-amber-500" />
-                  </div>
-                  <div className="skeuo-card-inset p-4 rounded">
-                    <h3 className="label-caps text-foreground mb-3">Quality Report</h3>
-                    <div className="space-y-2">
-                      <CheckItem ok={imageStats.duplicates === 0} label={`Duplicate URLs (3+): ${imageStats.duplicates}`} detail={imageStats.duplicates > 0 ? "Same image for many listings" : "No excessive duplicates"} />
-                      <CheckItem ok={imageStats.flagged.length === 0} label={`Flagged generic: ${imageStats.flagged.length}`} detail={imageStats.flagged.length > 0 ? "Wikipedia/generic banners" : "All direct URLs"} />
-                    </div>
-                  </div>
-                  <button onClick={() => setImageStats(null)} className="skeuo-btn"><RefreshCw size={12} /> Refresh</button>
-                </>
-              ) : (
-                <p className="text-sm text-muted-foreground">Failed to load image cache data</p>
-              )}
             </div>
           )}
         </div>

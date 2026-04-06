@@ -59,7 +59,7 @@ export function Navbar() {
               className="font-black tracking-[-0.03em] leading-[0.85] text-foreground"
               style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(2.5rem, 7vw, 4.5rem)" }}
             >
-              THE INSPIRE
+              INSPIRE
             </h1>
             <div className="flex items-center justify-center gap-2 mt-1">
               <span className="block w-8 md:w-14 h-[1px] bg-foreground/30" />
