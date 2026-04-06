@@ -161,6 +161,30 @@ export type Database = {
         }
         Relationships: []
       }
+      scan_results: {
+        Row: {
+          created_at: string
+          findings: Json | null
+          id: string
+          scan_type: string
+          upgrade_ideas: Json | null
+        }
+        Insert: {
+          created_at?: string
+          findings?: Json | null
+          id?: string
+          scan_type: string
+          upgrade_ideas?: Json | null
+        }
+        Update: {
+          created_at?: string
+          findings?: Json | null
+          id?: string
+          scan_type?: string
+          upgrade_ideas?: Json | null
+        }
+        Relationships: []
+      }
       suppressed_emails: {
         Row: {
           created_at: string
