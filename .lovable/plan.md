@@ -1,48 +1,54 @@
 
-# Header Fix + Couples Activities + Code Cleanup
 
-## Problems
+# Newspaper-Style Unified Header
 
-1. **Header barely visible** — The navbar shows "INSPIRE" + "Oklahoma City" but the text is small and the grammar/layout feels off on mobile. The hero masthead competes with a garbled top banner.
-2. **No couples-specific activities** like stained glass classes, charcuterie board making, pottery, cooking classes — all real OKC experiences.
-3. **Dead redirect routes** in `App.tsx` — `/community`, `/stories`, `/ask`, `/info`, `/coaching`, `/men-talk`, `/my-apps` are legacy cruft that should be removed.
-4. **Discover feed already built** — needs to stay as-is (rolling feed with source badges).
+## What Changes
 
-## Changes
+Remove the separate "INSPIRE OKC" branding from the navbar and merge the entire header into a single, realistic newspaper masthead bar. The navbar becomes the newspaper's top strip — like a real broadsheet where the nameplate, date, navigation, and edition info all live together in one cohesive band.
 
-### 1. Fix Navbar Header (Navbar.tsx)
-- Make "INSPIRE Oklahoma City" more readable: increase font size, fix spacing so "Oklahoma City" doesn't wrap awkwardly under "INSPIRE"
-- On mobile (690px viewport), show "INSPIRE OKC" instead of full name to prevent wrapping
-- Add proper letter-spacing
+## Design
 
-### 2. Add 8 Couples/Creative Date Night Events (singlesEvents.ts)
-Real, verified OKC experiences:
-- **Stained Glass Workshop** at The Stained Glass Shoppe OKC (NW OKC) — couples glass art classes
-- **Charcuterie Board Class** at Board & Brush OKC — build-your-own boards with wine
-- **Pottery Date Night** at Paseo Pottery — couples wheel-throwing sessions
-- **Cooking Class** at Kam's Cookery (Classen Curve) — hands-on couples cooking
-- **Comedy Date Night** at The Loony Bin OKC — dinner + live standup
-- **Sunset Kayak** at Lake Hefner — evening paddle rentals
-- **Ice Skating** at Devon Ice Rink (seasonal, Myriad Gardens) — classic winter date
-- **Drive-In Movie** at Winchester Drive-In (OKC metro) — retro date night
+```text
+┌──────────────────────────────────────────────────────────┐
+│  Vol. I · No. 42          ══════════════════             │
+│                     INSPIRE                              │
+│               OKLAHOMA CITY                              │
+│  Apr 6, 2026 · Sunday    Singles | Events | Fitness ...  │
+│  ─────────────────────────────────────────────────────── │
+└──────────────────────────────────────────────────────────┘
+```
 
-Each entry gets verified source URLs, confidence scores, and the cute/funny description style.
+The masthead text ("INSPIRE" + "OKLAHOMA CITY") is centered in Playfair Display with decorative rules above and below. The date/edition sits left, nav links sit right — all in one header block. A thin double-rule border at the bottom gives the authentic newspaper edge. No more floating "INSPIRE OKC" text that competes with the hero.
 
-### 3. Remove Dead Routes (App.tsx)
-Delete all legacy redirect routes: `/community`, `/stories`, `/ask`, `/info`, `/coaching`, `/men-talk`, `/my-apps`, `/explore`, `/workouts`
+## Technical Details
 
-### 4. Code Sweep
-- Remove unused imports across modified files
-- Ensure `NotFound.tsx` page exists and works for any unknown routes
-- Verify Discover page feed is intact with rolling source badges
+### 1. Rebuild Navbar (src/components/Navbar.tsx)
+- Remove the `<Link to="/">INSPIRE / Oklahoma City</Link>` logo block entirely
+- Replace with a stacked newspaper masthead layout:
+  - Top row: small "Vol. I" left, decorative flourish center, settings/theme right
+  - Center: "INSPIRE" in `masthead` class (Playfair Display, large)
+  - Below: "OKLAHOMA CITY" in `masthead-sub` class with letter-spacing
+  - Bottom row: date left, nav links center-right, all separated by a thin rule
+- Use `border-b-2 border-double border-foreground` for the authentic bottom rule
+- Keep sticky positioning, reduce padding
+
+### 2. Remove Hero Masthead Duplication (src/pages/Index.tsx)
+- Remove the "INSPIRE" and "Oklahoma City" text from the hero overlay (lines 72-73) since they now live in the navbar
+- Keep the hero image, gradient, date/listings info, and search bar
+- The hero becomes a clean photo with the search overlay only
+
+### 3. Newspaper Header Styles (src/index.css)
+- Add `.newspaper-rule` class for thin decorative horizontal rules
+- Add `.newspaper-header` with the warm newsprint background matching the editorial theme
+- Size the masthead appropriately for the navbar context (smaller than the old hero version)
 
 ## Files
 
 | Action | File | Details |
 |---|---|---|
-| Modify | `src/components/Navbar.tsx` | Fix header text sizing and mobile layout |
-| Modify | `src/data/singlesEvents.ts` | Add 8 couples/creative date night events |
-| Modify | `src/App.tsx` | Remove 7 dead redirect routes |
-| Modify | `src/pages/Events.tsx` | Add "Couples & Creative" sub-section for new events |
+| Modify | `src/components/Navbar.tsx` | Full rebuild as newspaper masthead with integrated nav |
+| Modify | `src/pages/Index.tsx` | Remove duplicate masthead text from hero section |
+| Modify | `src/index.css` | Add newspaper rule and header utility classes |
 
 No new dependencies. No database changes.
+
