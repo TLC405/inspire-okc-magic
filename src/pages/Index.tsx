@@ -68,9 +68,7 @@ const Index = () => {
             <img src={heroImg} alt="Oklahoma City skyline at golden hour" className="w-full h-full object-cover object-center" width={1920} height={640} />
             <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-background" />
           </div>
-          <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
-            <h1 className="masthead text-white masthead-shadow text-center text-5xl md:text-8xl">INSPIRE</h1>
-            <p className="masthead-sub text-center text-white/90 masthead-shadow mb-1 text-xl md:text-3xl tracking-[0.06em]">Oklahoma City</p>
+          <div className="absolute inset-0 flex flex-col items-center justify-end pb-16 px-4">
             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mb-4">
               <span className="dateline text-white/80 masthead-shadow">{dateStr}</span>
               <span className="dateline text-white/40">·</span>
