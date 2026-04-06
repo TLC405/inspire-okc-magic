@@ -11,7 +11,7 @@ import {
   Shield, ShieldCheck, ShieldAlert, AlertTriangle, Clock, Lock,
   Heart, Search, ExternalLink, MapPin, Eye, Database, Server, Key,
   CheckCircle2, XCircle, Image, RefreshCw, LogOut, UserPlus, Fingerprint,
-  Globe, Zap, Bug, Activity
+  Globe, Zap, Bug, Activity, Users
 } from "lucide-react";
 
 const statusColors: Record<VerificationStatus, string> = {
@@ -29,12 +29,14 @@ const Admin = () => {
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const [authError, setAuthError] = useState("");
   const [authMsg, setAuthMsg] = useState("");
-  const [tab, setTab] = useState<"security" | "events" | "dates" | "images" | "threats">("security");
+  const [tab, setTab] = useState<"security" | "events" | "dates" | "images" | "threats" | "visitors">("security");
   const [evtSearch, setEvtSearch] = useState("");
   const [evtFilter, setEvtFilter] = useState<"all" | VerificationStatus>("all");
   const [imageStats, setImageStats] = useState<{ total: number; byType: Record<string, number>; duplicates: number; flagged: string[] } | null>(null);
   const [loadingImages, setLoadingImages] = useState(false);
   const [bootstrapping, setBootstrapping] = useState(false);
+  const [visitors, setVisitors] = useState<any[]>([]);
+  const [loadingVisitors, setLoadingVisitors] = useState(false);
 
   const verifiedEvents = singlesEvents.filter((e) => e.verificationStatus === "verified").length;
   const staleEvents = singlesEvents.filter((e) => e.verificationStatus === "stale").length;
@@ -73,6 +75,16 @@ const Admin = () => {
       });
     }
   }, [tab, imageStats, isAdmin]);
+
+  useEffect(() => {
+    if (tab === "visitors" && visitors.length === 0 && isAdmin) {
+      setLoadingVisitors(true);
+      supabase.from("visitor_logs").select("*").order("created_at", { ascending: false }).limit(200).then(({ data }) => {
+        setVisitors(data || []);
+        setLoadingVisitors(false);
+      });
+    }
+  }, [tab, isAdmin]);
 
   const handleAuth = async () => {
     setAuthError("");
@@ -180,10 +192,11 @@ const Admin = () => {
 
   const tabs = [
     { id: "security" as const, label: "Security", icon: Shield },
-    { id: "threats" as const, label: "Threat Monitor", icon: Bug },
+    { id: "threats" as const, label: "Threats", icon: Bug },
+    { id: "visitors" as const, label: "Visitors", icon: Users },
     { id: "events" as const, label: "Events", icon: Eye },
     { id: "dates" as const, label: "Date Nights", icon: Heart },
-    { id: "images" as const, label: "Image Cache", icon: Image },
+    { id: "images" as const, label: "Images", icon: Image },
   ];
 
   return (
@@ -292,10 +305,68 @@ const Admin = () => {
                       <RLSRow table="image_cache" read="Public" write="Service only" update="Service only" delete="Service only" />
                       <RLSRow table="profiles" read="Own only" write="Own only" update="Own only" delete="—" />
                       <RLSRow table="user_roles" read="Own + Admin" write="Service only" update="—" delete="Service only" />
+                      <RLSRow table="visitor_logs" read="Admin only" write="Service only" update="—" delete="Service only" />
                     </tbody>
                   </table>
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* VISITORS TAB */}
+          {tab === "visitors" && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <StatCard icon={Users} label="Total Visits" value={String(visitors.length)} sub="Last 200 logged" color="text-accent" />
+                <StatCard icon={Globe} label="Unique IPs" value={String(new Set(visitors.map((v: any) => v.ip_address)).size)} sub="Distinct addresses" color="text-emerald-500" />
+                <StatCard icon={MapPin} label="Cities" value={String(new Set(visitors.filter((v: any) => v.city).map((v: any) => v.city)).size)} sub="Distinct locations" color="text-blue-500" />
+                <StatCard icon={Activity} label="Today" value={String(visitors.filter((v: any) => new Date(v.created_at).toDateString() === new Date().toDateString()).length)} sub="Visits today" color="text-amber-500" />
+              </div>
+              {loadingVisitors ? (
+                <div className="flex items-center justify-center py-12">
+                  <RefreshCw size={20} className="animate-spin text-accent mr-2" />
+                  <span className="text-sm text-muted-foreground">Loading visitor data…</span>
+                </div>
+              ) : (
+                <div className="skeuo-card-inset p-4 rounded">
+                  <h3 className="label-caps text-foreground mb-3">Recent Visitors</h3>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="border-b border-border/50">
+                          <th className="text-left py-2 pr-3 text-muted-foreground font-medium">IP Address</th>
+                          <th className="text-left py-2 pr-3 text-muted-foreground font-medium">Location</th>
+                          <th className="text-left py-2 pr-3 text-muted-foreground font-medium">Page</th>
+                          <th className="text-left py-2 pr-3 text-muted-foreground font-medium">Device</th>
+                          <th className="text-left py-2 text-muted-foreground font-medium">Time</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {visitors.map((v: any) => (
+                          <tr key={v.id} className="border-b border-border/20 hover:bg-muted/20">
+                            <td className="py-2 pr-3 font-mono text-foreground">{v.ip_address}</td>
+                            <td className="py-2 pr-3 text-muted-foreground">
+                              {[v.city, v.region, v.country].filter(Boolean).join(", ") || "—"}
+                              {v.latitude && v.longitude && (
+                                <span className="text-[9px] text-muted-foreground/50 ml-1">({Number(v.latitude).toFixed(2)}, {Number(v.longitude).toFixed(2)})</span>
+                              )}
+                            </td>
+                            <td className="py-2 pr-3 text-accent">{v.page_path || "—"}</td>
+                            <td className="py-2 pr-3 text-muted-foreground truncate max-w-[200px]">{v.user_agent?.split("(")[0]?.trim() || "—"}</td>
+                            <td className="py-2 text-muted-foreground whitespace-nowrap">{new Date(v.created_at).toLocaleString()}</td>
+                          </tr>
+                        ))}
+                        {visitors.length === 0 && (
+                          <tr><td colSpan={5} className="py-8 text-center text-muted-foreground">No visitors logged yet</td></tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+              <button onClick={() => { setVisitors([]); setLoadingVisitors(true); supabase.from("visitor_logs").select("*").order("created_at", { ascending: false }).limit(200).then(({ data }) => { setVisitors(data || []); setLoadingVisitors(false); }); }} className="skeuo-btn">
+                <RefreshCw size={12} /> Refresh
+              </button>
             </div>
           )}
 
