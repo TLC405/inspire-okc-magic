@@ -10,8 +10,8 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   Shield, ShieldCheck, ShieldAlert, AlertTriangle, Clock, Lock,
   Heart, Search, ExternalLink, MapPin, Eye, Database, Server, Key,
-  CheckCircle2, XCircle, Image, RefreshCw, LogOut, UserPlus, Fingerprint,
-  Globe, Zap, Bug, Activity, Users
+  CheckCircle2, XCircle, RefreshCw, LogOut, UserPlus, Fingerprint,
+  Globe, Activity, Users
 } from "lucide-react";
 
 const statusColors: Record<VerificationStatus, string> = {
