@@ -31,17 +31,7 @@ const App = () => {
               <Route path="/volunteering" element={<Volunteering />} />
               <Route path="/discover" element={<Discover />} />
               <Route path="/admin" element={<Admin />} />
-              {/* Redirects from old routes */}
               <Route path="/workouts" element={<Navigate to="/fitness" replace />} />
-              <Route path="/explore" element={<Navigate to="/" replace />} />
-              {/* /events is now a real route */}
-              <Route path="/community" element={<Navigate to="/" replace />} />
-              <Route path="/stories" element={<Navigate to="/" replace />} />
-              <Route path="/ask" element={<Navigate to="/" replace />} />
-              <Route path="/info" element={<Navigate to="/" replace />} />
-              <Route path="/coaching" element={<Navigate to="/" replace />} />
-              <Route path="/men-talk" element={<Navigate to="/" replace />} />
-              <Route path="/my-apps" element={<Navigate to="/" replace />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
