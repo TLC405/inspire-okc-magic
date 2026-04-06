@@ -11,7 +11,7 @@ import {
   Shield, ShieldCheck, ShieldAlert, AlertTriangle, Clock, Lock,
   Heart, Search, ExternalLink, MapPin, Eye, Database, Server, Key,
   CheckCircle2, XCircle, Image, RefreshCw, LogOut, UserPlus, Fingerprint,
-  Globe, Zap, Bug, Activity
+  Globe, Zap, Bug, Activity, Users
 } from "lucide-react";
 
 const statusColors: Record<VerificationStatus, string> = {
@@ -29,12 +29,14 @@ const Admin = () => {
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const [authError, setAuthError] = useState("");
   const [authMsg, setAuthMsg] = useState("");
-  const [tab, setTab] = useState<"security" | "events" | "dates" | "images" | "threats">("security");
+  const [tab, setTab] = useState<"security" | "events" | "dates" | "images" | "threats" | "visitors">("security");
   const [evtSearch, setEvtSearch] = useState("");
   const [evtFilter, setEvtFilter] = useState<"all" | VerificationStatus>("all");
   const [imageStats, setImageStats] = useState<{ total: number; byType: Record<string, number>; duplicates: number; flagged: string[] } | null>(null);
   const [loadingImages, setLoadingImages] = useState(false);
   const [bootstrapping, setBootstrapping] = useState(false);
+  const [visitors, setVisitors] = useState<any[]>([]);
+  const [loadingVisitors, setLoadingVisitors] = useState(false);
 
   const verifiedEvents = singlesEvents.filter((e) => e.verificationStatus === "verified").length;
   const staleEvents = singlesEvents.filter((e) => e.verificationStatus === "stale").length;
@@ -73,6 +75,16 @@ const Admin = () => {
       });
     }
   }, [tab, imageStats, isAdmin]);
+
+  useEffect(() => {
+    if (tab === "visitors" && visitors.length === 0 && isAdmin) {
+      setLoadingVisitors(true);
+      supabase.from("visitor_logs").select("*").order("created_at", { ascending: false }).limit(200).then(({ data }) => {
+        setVisitors(data || []);
+        setLoadingVisitors(false);
+      });
+    }
+  }, [tab, isAdmin]);
 
   const handleAuth = async () => {
     setAuthError("");
@@ -180,10 +192,11 @@ const Admin = () => {
 
   const tabs = [
     { id: "security" as const, label: "Security", icon: Shield },
-    { id: "threats" as const, label: "Threat Monitor", icon: Bug },
+    { id: "threats" as const, label: "Threats", icon: Bug },
+    { id: "visitors" as const, label: "Visitors", icon: Users },
     { id: "events" as const, label: "Events", icon: Eye },
     { id: "dates" as const, label: "Date Nights", icon: Heart },
-    { id: "images" as const, label: "Image Cache", icon: Image },
+    { id: "images" as const, label: "Images", icon: Image },
   ];
 
   return (
