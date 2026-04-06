@@ -16,6 +16,23 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+const AppInner = () => {
+  useVisitorLog();
+  return (
+    <Routes>
+      <Route path="/" element={<Index />} />
+      <Route path="/singles" element={<Singles />} />
+      <Route path="/events" element={<Events />} />
+      <Route path="/fitness" element={<Workouts />} />
+      <Route path="/volunteering" element={<Volunteering />} />
+      <Route path="/discover" element={<Discover />} />
+      <Route path="/admin" element={<Admin />} />
+      <Route path="/workouts" element={<Navigate to="/fitness" replace />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+};
+
 const App = () => {
   return (
     <ThemeProvider>
