@@ -62,19 +62,46 @@ const Index = () => {
       <Navbar />
 
       <main className="flex-1">
-        {/* ═══ Hero ═══ */}
+        {/* ═══ Hero Photo ═══ */}
         <div className="relative">
           <div className="w-full h-[340px] md:h-[500px] overflow-hidden">
             <img src={heroImg} alt="Oklahoma City skyline at golden hour" className="w-full h-full object-cover object-center" width={1920} height={640} />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-background" />
           </div>
-          <div className="absolute inset-0 flex flex-col items-center justify-end pb-16 px-4">
-            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mb-4">
-              <span className="dateline text-white/80 masthead-shadow">{dateStr}</span>
-              <span className="dateline text-white/40">·</span>
-              <span className="dateline text-white/80 masthead-shadow">{dayStr}</span>
-              <span className="dateline text-white/40">·</span>
-              <span className="dateline text-white font-bold masthead-shadow">{totalListings} Listings</span>
+        </div>
+
+        {/* ═══ Newspaper Front Page Headline ═══ */}
+        <div className="container relative z-10 -mt-6">
+          <div className="bg-background border-t-[4px] border-foreground pt-4 pb-3">
+            {/* Top rule with decorative dots */}
+            <div className="flex items-center justify-center gap-3 mb-2">
+              <span className="block flex-1 h-[1px] bg-foreground/30" />
+              <span className="font-mono text-[9px] tracking-[0.3em] uppercase text-muted-foreground">✦ {dayStr} ✦</span>
+              <span className="block flex-1 h-[1px] bg-foreground/30" />
+            </div>
+
+            {/* Main headline */}
+            <h2
+              className="text-center font-black tracking-[-0.02em] leading-[0.9] text-foreground"
+              style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 5vw, 3.2rem)" }}
+            >
+              Your Guide to Oklahoma City
+            </h2>
+
+            {/* Subhead dateline */}
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mt-2">
+              <span className="dateline text-muted-foreground">{dateStr}</span>
+              <span className="text-foreground/20">·</span>
+              <span className="dateline text-foreground font-bold">{totalListings} Listings</span>
+              <span className="text-foreground/20">·</span>
+              <span className="dateline text-muted-foreground">Singles · Fitness · Volunteering · Date Nights</span>
+            </div>
+
+            {/* Bottom rule */}
+            <div className="flex items-center gap-3 mt-3">
+              <span className="block flex-1 h-[2px] bg-foreground" />
+              <span className="font-mono text-[8px] tracking-[0.2em] uppercase text-muted-foreground">Oklahoma City</span>
+              <span className="block flex-1 h-[2px] bg-foreground" />
             </div>
           </div>
         </div>
