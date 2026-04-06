@@ -305,6 +305,7 @@ const Admin = () => {
                       <RLSRow table="image_cache" read="Public" write="Service only" update="Service only" delete="Service only" />
                       <RLSRow table="profiles" read="Own only" write="Own only" update="Own only" delete="—" />
                       <RLSRow table="user_roles" read="Own + Admin" write="Service only" update="—" delete="Service only" />
+                      <RLSRow table="visitor_logs" read="Admin only" write="Service only" update="—" delete="Service only" />
                     </tbody>
                   </table>
                 </div>
