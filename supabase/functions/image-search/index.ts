@@ -110,7 +110,7 @@ serve(async (req) => {
             method: "POST",
             headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
             body: JSON.stringify({
-              model: "google/gemini-3-flash-preview",
+              model: "google/gemini-3.1-pro-preview",
               messages: [
                 { role: "system", content: "You find real, publicly accessible image URLs for businesses and places. Return ONLY a direct image URL (jpg/png/webp) that is publicly accessible. If you cannot find one with high confidence, return NONE." },
                 { role: "user", content: `Find a real photo URL for: ${name} in ${location || "Oklahoma City, OK"}. Category: ${category || "business"}. ${websiteUrl ? `Website: ${websiteUrl}` : ""}` },

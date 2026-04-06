@@ -11,7 +11,7 @@ async function aiDiscover(query: string, apiKey: string) {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "google/gemini-3-flash-preview",
+      model: "google/gemini-3.1-pro-preview",
       messages: [
         {
           role: "system",
@@ -96,7 +96,7 @@ async function aiExtractEvents(markdown: string, sourceUrl: string, apiKey: stri
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "google/gemini-3.1-pro-preview",
         messages: [
           { role: "system", content: "Extract singles events from this webpage content. Only extract real, specific events with dates/venues. Return via tool call." },
           { role: "user", content: `Source: ${sourceUrl}\n\n${markdown.slice(0, 4000)}` },
@@ -242,7 +242,7 @@ serve(async (req) => {
         method: "POST",
         headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
+          model: "google/gemini-3.1-pro-preview",
           messages: [
             {
               role: "system",
