@@ -1,42 +1,36 @@
 
 
-# Fix App Name + Simplify Admin + Kali Testing Info
+# Fix Homepage: Visible Newspaper Headline + Hero Photo
 
 ## Problems
 
-1. **Wrong title** — Header says "THE INSPIRE" but the app is called **"Inspire Oklahoma City"**
-2. **Admin panel too confusing** — Too many tabs, unclear what things mean. Need to simplify and make the Visitors/IP tab the default and most prominent
-3. **Kali Linux testing data** — User wants to see IPs and visitor info from penetration testing done offline with Kali
+1. **Newspaper headline hidden** — The hero content sits behind the sticky navbar. The masthead text ("INSPIRE OKLAHOMA CITY" style headline, date, listings count) is at the bottom of the hero but gets obscured. Need to push the main content below the navbar and add a proper newspaper-style headline section visible immediately on scroll.
+
+2. **OKC skyline photo not prominent enough** — The hero image exists but the gradient is too dark and the photo doesn't feel like the centerpiece. Need to make it more prominent and ensure the full skyline sunset is visible.
 
 ## Changes
 
-### 1. Fix App Name in Navbar (src/components/Navbar.tsx)
-- Change "THE INSPIRE" → "INSPIRE"
-- Change subtitle "Oklahoma City" → "OKLAHOMA CITY" (keep as-is, it's already there)
-- Together they read as "INSPIRE OKLAHOMA CITY" — the correct app name
-- Keep the newspaper aesthetic (Playfair Display, decorative rules, Vol/Issue)
+### 1. Add Newspaper Front Page Section Below Hero (src/pages/Index.tsx)
+- Add a full-width newspaper "front page" section below the hero with:
+  - A bold **headline** in Playfair Display (e.g., "Your Guide to Oklahoma City" or the day's edition tagline)
+  - **Subheadline** with date, edition info, listing count — classic broadsheet style
+  - Decorative rules (heavy top, thin bottom) framing the headline
+- This gives the user the "full newspaper" feel they're asking for — a visible, readable headline block
 
-### 2. Simplify Admin Panel (src/pages/Admin.tsx)
-- Reduce from 6 tabs to 3: **Visitors** (default), **Security**, **Events**
-- Merge "Threats" into Security tab
-- Remove separate "Date Nights" and "Images" tabs (low value, adds confusion)
-- Make **Visitors** the default tab — this is what the user checks most
-- Add a "Refresh" button prominently at top of visitors tab
-- Show visitor table with: IP, City/Region/Country, Lat/Lon, User Agent (full), Page, Referrer, Timestamp
-- Add a note about Kali testing: when testing offline with Kali, visitors won't log because the edge function needs internet. For local pen testing, the user should test against the live deployed URL
+### 2. Fix Hero Overlap (src/pages/Index.tsx)
+- Lighten the gradient overlay from `from-black/60` to `from-black/40` so the skyline sunset photo is more vivid
+- Keep the hero height at `340px` mobile / `500px` desktop
+- Move the dateline/listings count info from the hero overlay into the new newspaper headline section below, so nothing competes with the photo
 
-### 3. Visitor Table Enhancements
-- Show full user agent string (not truncated)
-- Show coordinates as clickable Google Maps links
-- Add referrer column
-- Color-code IPs that appear multiple times (potential scanning)
+### 3. Make Hero Photo the Centerpiece
+- Remove the text overlay from the hero entirely — let the OKC skyline sunset photo speak for itself as a full-bleed image
+- The newspaper headline section directly below serves as the "front page" masthead content
 
 ## Files
 
 | Action | File | Details |
 |---|---|---|
-| Modify | `src/components/Navbar.tsx` | Change "THE INSPIRE" → "INSPIRE" |
-| Modify | `src/pages/Admin.tsx` | Simplify to 3 tabs, default to Visitors, enhance IP table |
+| Modify | `src/pages/Index.tsx` | Remove hero text overlay, lighten gradient, add newspaper headline section below hero |
 
 No database changes. No new dependencies.
 
