@@ -29,7 +29,7 @@ const Admin = () => {
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const [authError, setAuthError] = useState("");
   const [authMsg, setAuthMsg] = useState("");
-  const [tab, setTab] = useState<"security" | "events" | "dates" | "images" | "threats" | "visitors">("security");
+  const [tab, setTab] = useState<"visitors" | "security" | "events">("visitors");
   const [evtSearch, setEvtSearch] = useState("");
   const [evtFilter, setEvtFilter] = useState<"all" | VerificationStatus>("all");
   const [imageStats, setImageStats] = useState<{ total: number; byType: Record<string, number>; duplicates: number; flagged: string[] } | null>(null);
