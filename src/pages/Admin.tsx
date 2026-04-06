@@ -8,8 +8,7 @@ import { volunteerOrgs } from "@/data/volunteerOrgs";
 import { cityShowcase } from "@/data/cityShowcase";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  Shield, ShieldCheck, ShieldAlert, AlertTriangle, Clock, Lock,
-  Heart, Search, ExternalLink, MapPin, Eye, Database, Server, Key,
+  Shield, ShieldCheck, ShieldAlert, AlertTriangle, Search, MapPin, Eye, Database, Key,
   CheckCircle2, XCircle, RefreshCw, LogOut, UserPlus, Fingerprint,
   Globe, Activity, Users
 } from "lucide-react";
