@@ -312,6 +312,63 @@ const Admin = () => {
             </div>
           )}
 
+          {/* VISITORS TAB */}
+          {tab === "visitors" && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <StatCard icon={Users} label="Total Visits" value={String(visitors.length)} sub="Last 200 logged" color="text-accent" />
+                <StatCard icon={Globe} label="Unique IPs" value={String(new Set(visitors.map((v: any) => v.ip_address)).size)} sub="Distinct addresses" color="text-emerald-500" />
+                <StatCard icon={MapPin} label="Cities" value={String(new Set(visitors.filter((v: any) => v.city).map((v: any) => v.city)).size)} sub="Distinct locations" color="text-blue-500" />
+                <StatCard icon={Activity} label="Today" value={String(visitors.filter((v: any) => new Date(v.created_at).toDateString() === new Date().toDateString()).length)} sub="Visits today" color="text-amber-500" />
+              </div>
+              {loadingVisitors ? (
+                <div className="flex items-center justify-center py-12">
+                  <RefreshCw size={20} className="animate-spin text-accent mr-2" />
+                  <span className="text-sm text-muted-foreground">Loading visitor data…</span>
+                </div>
+              ) : (
+                <div className="skeuo-card-inset p-4 rounded">
+                  <h3 className="label-caps text-foreground mb-3">Recent Visitors</h3>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="border-b border-border/50">
+                          <th className="text-left py-2 pr-3 text-muted-foreground font-medium">IP Address</th>
+                          <th className="text-left py-2 pr-3 text-muted-foreground font-medium">Location</th>
+                          <th className="text-left py-2 pr-3 text-muted-foreground font-medium">Page</th>
+                          <th className="text-left py-2 pr-3 text-muted-foreground font-medium">Device</th>
+                          <th className="text-left py-2 text-muted-foreground font-medium">Time</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {visitors.map((v: any) => (
+                          <tr key={v.id} className="border-b border-border/20 hover:bg-muted/20">
+                            <td className="py-2 pr-3 font-mono text-foreground">{v.ip_address}</td>
+                            <td className="py-2 pr-3 text-muted-foreground">
+                              {[v.city, v.region, v.country].filter(Boolean).join(", ") || "—"}
+                              {v.latitude && v.longitude && (
+                                <span className="text-[9px] text-muted-foreground/50 ml-1">({Number(v.latitude).toFixed(2)}, {Number(v.longitude).toFixed(2)})</span>
+                              )}
+                            </td>
+                            <td className="py-2 pr-3 text-accent">{v.page_path || "—"}</td>
+                            <td className="py-2 pr-3 text-muted-foreground truncate max-w-[200px]">{v.user_agent?.split("(")[0]?.trim() || "—"}</td>
+                            <td className="py-2 text-muted-foreground whitespace-nowrap">{new Date(v.created_at).toLocaleString()}</td>
+                          </tr>
+                        ))}
+                        {visitors.length === 0 && (
+                          <tr><td colSpan={5} className="py-8 text-center text-muted-foreground">No visitors logged yet</td></tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+              <button onClick={() => { setVisitors([]); setLoadingVisitors(true); supabase.from("visitor_logs").select("*").order("created_at", { ascending: false }).limit(200).then(({ data }) => { setVisitors(data || []); setLoadingVisitors(false); }); }} className="skeuo-btn">
+                <RefreshCw size={12} /> Refresh
+              </button>
+            </div>
+          )}
+
           {/* EVENTS TAB */}
           {tab === "events" && (
             <div className="space-y-4">
