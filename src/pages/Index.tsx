@@ -107,7 +107,7 @@ const Index = () => {
         </div>
 
         {/* ═══ Search ═══ */}
-        <div className="container -mt-14 relative z-10 mb-4 md:mb-8">
+        <div className="container mt-6 relative z-10 mb-4 md:mb-8">
           <div className="max-w-2xl mx-auto">
             <div className="skeuo-card p-4 md:p-6 rounded-lg">
               <SearchSurface />

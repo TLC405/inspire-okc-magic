@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   Shield, ShieldCheck, ShieldAlert, AlertTriangle, Search, MapPin, Eye, Database, Key,
   CheckCircle2, XCircle, RefreshCw, LogOut, UserPlus, Fingerprint,
-  Globe, Activity, Users
+  Globe, Activity, Users, Zap, Lightbulb, Loader2
 } from "lucide-react";
 
 const statusColors: Record<VerificationStatus, string> = {
@@ -21,6 +21,18 @@ const statusColors: Record<VerificationStatus, string> = {
   unverified: "text-muted-foreground",
 };
 
+const severityColors: Record<string, string> = {
+  critical: "text-red-500 bg-red-500/10",
+  warning: "text-amber-500 bg-amber-500/10",
+  info: "text-blue-500 bg-blue-500/10",
+};
+
+const difficultyColors: Record<string, string> = {
+  easy: "text-emerald-500 bg-emerald-500/10",
+  medium: "text-amber-500 bg-amber-500/10",
+  hard: "text-red-500 bg-red-500/10",
+};
+
 const Admin = () => {
   const { user, loading, isAdmin, signIn, signUp, signOut, bootstrapAdmin } = useAuth();
   const [email, setEmail] = useState("");
@@ -28,7 +40,7 @@ const Admin = () => {
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const [authError, setAuthError] = useState("");
   const [authMsg, setAuthMsg] = useState("");
-  const [tab, setTab] = useState<"visitors" | "security" | "events">("visitors");
+  const [tab, setTab] = useState<"visitors" | "security" | "events" | "scanner">("visitors");
   const [evtSearch, setEvtSearch] = useState("");
   const [evtFilter, setEvtFilter] = useState<"all" | VerificationStatus>("all");
   const [imageStats, setImageStats] = useState<any>(null);
@@ -36,6 +48,14 @@ const Admin = () => {
   const [bootstrapping, setBootstrapping] = useState(false);
   const [visitors, setVisitors] = useState<any[]>([]);
   const [loadingVisitors, setLoadingVisitors] = useState(false);
+
+  // Scanner state
+  const [scanning, setScanning] = useState(false);
+  const [scanFindings, setScanFindings] = useState<any>(null);
+  const [loadingUpgrades, setLoadingUpgrades] = useState(false);
+  const [upgradeIdeas, setUpgradeIdeas] = useState<any>(null);
+  const [scanHistory, setScanHistory] = useState<any[]>([]);
+  const [scanError, setScanError] = useState("");
 
   const verifiedEvents = singlesEvents.filter((e) => e.verificationStatus === "verified").length;
   const staleEvents = singlesEvents.filter((e) => e.verificationStatus === "stale").length;
@@ -62,6 +82,52 @@ const Admin = () => {
       });
     }
   }, [tab, isAdmin]);
+
+  // Load scan history when scanner tab opens
+  useEffect(() => {
+    if (tab === "scanner" && isAdmin && scanHistory.length === 0) {
+      supabase.from("scan_results").select("*").order("created_at", { ascending: false }).limit(20).then(({ data }) => {
+        setScanHistory(data || []);
+      });
+    }
+  }, [tab, isAdmin]);
+
+  const runScan = async () => {
+    setScanning(true);
+    setScanError("");
+    setScanFindings(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-scanner", {
+        body: { action: "scan" },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setScanFindings(data.findings);
+      // Refresh history
+      const { data: history } = await supabase.from("scan_results").select("*").order("created_at", { ascending: false }).limit(20);
+      setScanHistory(history || []);
+    } catch (e: any) {
+      setScanError(e.message || "Scan failed");
+    }
+    setScanning(false);
+  };
+
+  const getUpgrades = async () => {
+    setLoadingUpgrades(true);
+    setScanError("");
+    setUpgradeIdeas(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-scanner", {
+        body: { action: "upgrades", categories: ["homepage", "discover", "dating", "operations"] },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setUpgradeIdeas(data.categories || []);
+    } catch (e: any) {
+      setScanError(e.message || "Failed to get upgrades");
+    }
+    setLoadingUpgrades(false);
+  };
 
   const handleAuth = async () => {
     setAuthError("");
@@ -114,21 +180,8 @@ const Admin = () => {
               <button onClick={() => setAuthMode("login")} className={`flex-1 py-2 text-xs font-semibold rounded ${authMode === "login" ? "bg-accent/20 text-accent" : "text-muted-foreground"}`}>Sign In</button>
               <button onClick={() => setAuthMode("signup")} className={`flex-1 py-2 text-xs font-semibold rounded ${authMode === "signup" ? "bg-accent/20 text-accent" : "text-muted-foreground"}`}>Sign Up</button>
             </div>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email"
-              className="w-full px-4 py-2.5 bg-muted/30 border border-border/50 rounded text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-accent mb-2"
-            />
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleAuth()}
-              placeholder="Password (min 8 chars)"
-              className="w-full px-4 py-2.5 bg-muted/30 border border-border/50 rounded text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-accent mb-3"
-            />
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="w-full px-4 py-2.5 bg-muted/30 border border-border/50 rounded text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-accent mb-2" />
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleAuth()} placeholder="Password (min 8 chars)" className="w-full px-4 py-2.5 bg-muted/30 border border-border/50 rounded text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-accent mb-3" />
             {authError && <p className="text-xs text-red-400 mb-2">{authError}</p>}
             {authMsg && <p className="text-xs text-emerald-500 mb-2">{authMsg}</p>}
             <button onClick={handleAuth} className="skeuo-btn w-full justify-center">
@@ -171,6 +224,7 @@ const Admin = () => {
     { id: "visitors" as const, label: "Visitors", icon: Users },
     { id: "security" as const, label: "Security", icon: Shield },
     { id: "events" as const, label: "Events", icon: Eye },
+    { id: "scanner" as const, label: "AI Scanner", icon: Zap },
   ];
 
   return (
@@ -335,6 +389,7 @@ const Admin = () => {
                       <RLSRow table="profiles" read="Own only" write="Own only" update="Own only" delete="—" />
                       <RLSRow table="user_roles" read="Own + Admin" write="Service only" update="—" delete="Service only" />
                       <RLSRow table="visitor_logs" read="Admin only" write="Service only" update="—" delete="Service only" />
+                      <RLSRow table="scan_results" read="Admin only" write="Service only" update="Service only" delete="Service only" />
                     </tbody>
                   </table>
                 </div>
@@ -361,6 +416,116 @@ const Admin = () => {
               <p className="dateline text-muted-foreground">{filteredEvents.length} events</p>
               <div className="space-y-2">
                 {filteredEvents.map((evt) => (<EventRow key={evt.id} event={evt} />))}
+              </div>
+            </div>
+          )}
+
+          {/* AI SCANNER TAB */}
+          {tab === "scanner" && (
+            <div className="space-y-6">
+              {/* Action buttons */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button onClick={runScan} disabled={scanning} className="skeuo-btn flex-1 justify-center">
+                  {scanning ? <><Loader2 size={14} className="animate-spin" /> Scanning…</> : <><Zap size={14} /> Run Full Scan</>}
+                </button>
+                <button onClick={getUpgrades} disabled={loadingUpgrades} className="skeuo-btn flex-1 justify-center">
+                  {loadingUpgrades ? <><Loader2 size={14} className="animate-spin" /> Generating…</> : <><Lightbulb size={14} /> Get Upgrade Ideas</>}
+                </button>
+              </div>
+
+              {scanError && (
+                <div className="skeuo-card-inset p-3 rounded border border-red-400/30">
+                  <p className="text-xs text-red-400">{scanError}</p>
+                </div>
+              )}
+
+              {/* Scan Findings */}
+              {scanFindings && (
+                <div className="space-y-4">
+                  <h3 className="label-caps text-foreground">Scan Results</h3>
+                  {Object.entries(scanFindings).map(([category, findings]: [string, any]) => (
+                    <div key={category} className="skeuo-card-inset p-4 rounded">
+                      <h4 className="text-sm font-bold text-foreground capitalize mb-3 flex items-center gap-2">
+                        {category === "security" && <Shield size={14} />}
+                        {category === "content" && <Eye size={14} />}
+                        {category === "links" && <Globe size={14} />}
+                        {category === "events" && <Activity size={14} />}
+                        {category}
+                        <span className="text-[10px] text-muted-foreground font-normal">({Array.isArray(findings) ? findings.length : 0} findings)</span>
+                      </h4>
+                      <div className="space-y-2">
+                        {Array.isArray(findings) && findings.map((f: any, i: number) => (
+                          <div key={i} className="flex items-start gap-2 py-1.5 border-b border-border/20 last:border-0">
+                            <span className={`text-[9px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded flex-shrink-0 mt-0.5 ${severityColors[f.severity] || "text-muted-foreground bg-muted/30"}`}>
+                              {f.severity}
+                            </span>
+                            <div>
+                              <p className="text-sm font-medium text-foreground">{f.title}</p>
+                              <p className="text-xs text-muted-foreground">{f.detail}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Upgrade Ideas */}
+              {upgradeIdeas && Array.isArray(upgradeIdeas) && (
+                <div className="space-y-4">
+                  <h3 className="label-caps text-foreground">Upgrade Ideas</h3>
+                  {upgradeIdeas.map((cat: any, ci: number) => (
+                    <div key={ci} className="skeuo-card-inset p-4 rounded">
+                      <h4 className="text-sm font-bold text-foreground capitalize mb-3 flex items-center gap-2">
+                        <Lightbulb size={14} className="text-amber-500" />
+                        {cat.name}
+                      </h4>
+                      <div className="space-y-3">
+                        {cat.ideas?.map((idea: any, ii: number) => (
+                          <div key={ii} className="flex items-start gap-3 py-2 border-b border-border/20 last:border-0">
+                            <span className={`text-[9px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded flex-shrink-0 mt-0.5 ${difficultyColors[idea.difficulty] || "text-muted-foreground bg-muted/30"}`}>
+                              {idea.difficulty}
+                            </span>
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-foreground">{idea.title}</p>
+                              <p className="text-xs text-muted-foreground mt-0.5">{idea.description}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Scan History */}
+              {scanHistory.length > 0 && (
+                <div className="skeuo-card-inset p-4 rounded">
+                  <h3 className="label-caps text-foreground mb-3">Scan History</h3>
+                  <div className="space-y-2">
+                    {scanHistory.map((s: any) => (
+                      <div key={s.id} className="flex items-center justify-between py-2 border-b border-border/20 last:border-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground uppercase tracking-wider font-medium">{s.scan_type}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {s.findings && typeof s.findings === "object" ? `${Object.values(s.findings).flat().length} findings` : ""}
+                            {s.upgrade_ideas && typeof s.upgrade_ideas === "object" && (s.upgrade_ideas as any).categories ? ` · ${((s.upgrade_ideas as any).categories || []).length} categories` : ""}
+                          </span>
+                        </div>
+                        <span className="text-[10px] text-muted-foreground">{new Date(s.created_at).toLocaleString()}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Background monitoring info */}
+              <div className="skeuo-card-inset p-3 rounded">
+                <p className="text-[10px] text-muted-foreground">
+                  <strong className="text-foreground">⚡ Background Monitoring:</strong> Automated scans run every 6 hours and results appear in scan history above.
+                  Manual scans run immediately with fresh AI analysis.
+                </p>
               </div>
             </div>
           )}
