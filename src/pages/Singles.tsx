@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import heroImg from "@/assets/hero-singles.jpg";
 import { ListingImage } from "@/components/ListingImage";
 
-const neighborhoods = ["All Areas", ...Array.from(new Set(singlesEvents.map((e) => e.neighborhood)))];
+const neighborhoods = ["All Areas", ...Array.from(new Set(singlesEvents.filter(e => ["Speed Dating", "Mixer"].includes(e.category)).map((e) => e.neighborhood)))];
 
 const statusConfig: Record<VerificationStatus, { icon: typeof ShieldCheck; label: string; cls: string }> = {
   verified: { icon: ShieldCheck, label: "Verified", cls: "text-emerald-600 dark:text-emerald-400" },
@@ -131,7 +131,7 @@ const Singles = () => {
       <div>
         <p className="dateline text-foreground/60 font-bold mb-2">Category</p>
         <div className="flex flex-col gap-1">
-          {singlesCategories.map((c) => (
+          {["All", "Speed Dating", "Mixer"].map((c) => (
             <button key={c} onClick={() => setCategory(c)} className={`text-left ${c === category ? "skeuo-chip-active" : "skeuo-chip"}`}>{c}</button>
           ))}
         </div>
