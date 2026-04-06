@@ -32,7 +32,7 @@ const Admin = () => {
   const [tab, setTab] = useState<"visitors" | "security" | "events">("visitors");
   const [evtSearch, setEvtSearch] = useState("");
   const [evtFilter, setEvtFilter] = useState<"all" | VerificationStatus>("all");
-  const [imageStats, setImageStats] = useState<{ total: number; byType: Record<string, number>; duplicates: number; flagged: string[] } | null>(null);
+  const [imageStats, setImageStats] = useState<any>(null);
   const [loadingImages, setLoadingImages] = useState(false);
   const [bootstrapping, setBootstrapping] = useState(false);
   const [visitors, setVisitors] = useState<any[]>([]);
@@ -53,28 +53,6 @@ const Admin = () => {
   }, [evtSearch, evtFilter]);
 
   const dateNights = singlesEvents.filter((e) => e.category === "Date Night" && e.verificationStatus === "verified");
-
-  useEffect(() => {
-    if (tab === "images" && !imageStats && isAdmin) {
-      setLoadingImages(true);
-      supabase.from("image_cache").select("*").then(({ data }) => {
-        if (!data) { setLoadingImages(false); return; }
-        const byType: Record<string, number> = {};
-        const urlCounts: Record<string, number> = {};
-        const flagged: string[] = [];
-        data.forEach((row) => {
-          byType[row.listing_type] = (byType[row.listing_type] || 0) + 1;
-          urlCounts[row.image_url] = (urlCounts[row.image_url] || 0) + 1;
-          if (row.image_url.includes("wikipedia.org/wiki/File:") || row.image_url.includes("okc.gov/Home/ShowPublished")) {
-            flagged.push(`${row.listing_type}/${row.listing_id}: generic URL`);
-          }
-        });
-        const duplicates = Object.values(urlCounts).filter(c => c > 3).length;
-        setImageStats({ total: data.length, byType, duplicates, flagged: flagged.slice(0, 20) });
-        setLoadingImages(false);
-      });
-    }
-  }, [tab, imageStats, isAdmin]);
 
   useEffect(() => {
     if (tab === "visitors" && visitors.length === 0 && isAdmin) {
@@ -191,12 +169,9 @@ const Admin = () => {
   }
 
   const tabs = [
-    { id: "security" as const, label: "Security", icon: Shield },
-    { id: "threats" as const, label: "Threats", icon: Bug },
     { id: "visitors" as const, label: "Visitors", icon: Users },
+    { id: "security" as const, label: "Security", icon: Shield },
     { id: "events" as const, label: "Events", icon: Eye },
-    { id: "dates" as const, label: "Date Nights", icon: Heart },
-    { id: "images" as const, label: "Images", icon: Image },
   ];
 
   return (
