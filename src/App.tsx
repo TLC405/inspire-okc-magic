@@ -8,6 +8,7 @@ import { useVisitorLog } from "@/hooks/useVisitorLog";
 import Index from "./pages/Index";
 import Singles from "./pages/Singles";
 import Events from "./pages/Events";
+import DateNights from "./pages/DateNights";
 import Admin from "./pages/Admin";
 import Workouts from "./pages/Workouts";
 import Volunteering from "./pages/Volunteering";
@@ -23,6 +24,7 @@ const AppInner = () => {
       <Route path="/" element={<Index />} />
       <Route path="/singles" element={<Singles />} />
       <Route path="/events" element={<Events />} />
+      <Route path="/date-nights" element={<DateNights />} />
       <Route path="/fitness" element={<Workouts />} />
       <Route path="/volunteering" element={<Volunteering />} />
       <Route path="/discover" element={<Discover />} />

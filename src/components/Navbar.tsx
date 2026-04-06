@@ -6,6 +6,7 @@ import { Settings } from "lucide-react";
 const navLinks = [
   { label: "Singles", href: "/singles" },
   { label: "Events", href: "/events" },
+  { label: "Date Nights", href: "/date-nights" },
   { label: "Fitness", href: "/fitness" },
   { label: "Volunteering", href: "/volunteering" },
   { label: "Discover", href: "/discover" },
