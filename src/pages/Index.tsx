@@ -42,10 +42,36 @@ function getDiverseSinglesTeaser(count = 4) {
   return result;
 }
 
+function getDiverseFitnessTeaser(count = 4) {
+  const priorityCategories = ["Yoga", "Gym", "HIIT", "Climbing", "Boxing", "Pilates", "Cycling", "Martial Arts", "Outdoor", "CrossFit"];
+  const result: typeof fitnessSpots = [];
+  const seen = new Set<string>();
+  for (const cat of priorityCategories) {
+    if (result.length >= count) break;
+    const spot = fitnessSpots.find(s => s.category === cat && !seen.has(s.id));
+    if (spot) {
+      seen.add(spot.id);
+      result.push(spot);
+    }
+  }
+  if (result.length < count) {
+    for (const spot of fitnessSpots) {
+      if (seen.has(spot.id)) continue;
+      result.push(spot);
+      seen.add(spot.id);
+      if (result.length >= count) break;
+    }
+  }
+  return result;
+}
+
+// Pick diverse showcase photos — avoid duplicating categories
+const yogaSpot = fitnessSpots.find(s => s.category === "Yoga");
+const gymSpot = fitnessSpots.find(s => s.category === "Gym");
 const showcasePhotos = [
   { type: "singles", id: singlesEvents[0]?.id || "s1", name: singlesEvents[0]?.name || "Event", cat: singlesEvents[0]?.category, url: singlesEvents[0]?.sources[0]?.url },
-  { type: "fitness", id: fitnessSpots[0]?.id || "f1", name: fitnessSpots[0]?.name || "Gym", cat: fitnessSpots[0]?.category, url: fitnessSpots[0]?.source },
-  { type: "fitness", id: fitnessSpots[5]?.id || "f6", name: fitnessSpots[5]?.name || "Studio", cat: fitnessSpots[5]?.category, url: fitnessSpots[5]?.source },
+  { type: "fitness", id: yogaSpot?.id || "f-yoga", name: yogaSpot?.name || "Yoga Studio", cat: yogaSpot?.category || "Yoga", url: yogaSpot?.source },
+  { type: "fitness", id: gymSpot?.id || "f-gym", name: gymSpot?.name || "Gym", cat: gymSpot?.category || "Gym", url: gymSpot?.source },
   { type: "volunteer", id: volunteerOrgs[0]?.id || "v1", name: volunteerOrgs[0]?.name || "Org", cat: volunteerOrgs[0]?.category, url: volunteerOrgs[0]?.source },
   { type: "discover", id: cityShowcase[0]?.id || "d1", name: cityShowcase[0]?.title || "Landmark", cat: cityShowcase[0]?.category, url: cityShowcase[0]?.sourceUrl },
   { type: "discover", id: cityShowcase[4]?.id || "d5", name: cityShowcase[4]?.title || "Landmark", cat: cityShowcase[4]?.category, url: cityShowcase[4]?.sourceUrl },
@@ -243,7 +269,7 @@ const Index = () => {
               </div>
               <p className="dateline text-muted-foreground mb-3">29 categories · All districts · Staff Report</p>
 
-              {fitnessSpots.slice(0, 4).map((spot, i) => (
+              {getDiverseFitnessTeaser(4).map((spot, i) => (
                 <div key={spot.id} className={`py-2.5 ${i < 3 ? "border-b border-foreground/[0.06]" : ""}`}>
                   <div className="flex items-start gap-2">
                     <span className="font-mono text-[10px] text-muted-foreground/30 mt-1 font-bold">{i + 1}.</span>
