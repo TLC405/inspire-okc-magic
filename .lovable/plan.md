@@ -1,92 +1,36 @@
 
 
-# Fix Newspaper Headline Visibility + AI-Powered Admin Scanner & Upgrade Hub
+# Fix Fitness Page Variety + Missing Card Images
 
-## Problem 1: Newspaper Headline Still Hidden
+## Problems Identified
 
-The newspaper front-page section (lines 73–107 in Index.tsx) has two layout bugs:
-- It uses `-mt-6` to tuck under the hero, which works — but then the **search bar** at line 110 uses `-mt-14`, which pulls the search bar **on top** of the headline, hiding it completely.
-- The headline section has no padding-top to clear the visual space.
+1. **Homepage fitness column shows all CrossFit**: `fitnessSpots.slice(0, 4)` grabs the first 4 entries, which are all CrossFit boxes (the data file starts with 10 CrossFit entries). Need a `getDiverseFitnessTeaser()` function like the existing `getDiverseSinglesTeaser()`.
 
-**Fix:** Remove `-mt-14` from the search bar, add proper spacing (`mt-6`) so the newspaper headline → search bar → content flows naturally and nothing overlaps.
+2. **Missing images on cards**: When an image URL fails to load (404, CORS, etc.), the `onError` handler in `ListingImage.tsx` just hides the `<img>` element (`style.display = "none"`), leaving a blank space instead of showing the gradient+icon fallback.
 
-## Problem 2: Admin Panel — AI Scanner + Upgrade Ideas
-
-Add a new **"AI Scanner"** tab to Admin that uses the Lovable AI backend to run automated checks and suggest upgrades. This replaces static checklists with a living, AI-driven command center.
-
-### AI Scanner Features
-- **Run Scan** button triggers an edge function that uses AI to analyze:
-  - **Security**: RLS coverage, auth config, exposed routes
-  - **Content**: Grammar, hidden/clipped text, broken layouts
-  - **Links & Images**: Dead URLs, missing image_cache entries, 404 sources
-  - **Events Quality**: Wrong categories, stale data, duplicates, low confidence scores
-- Results stored in a `scan_results` table for history
-- **Background monitoring**: A scheduled cron job runs scans periodically and flags new issues
-
-### Upgrade Ideas Hub (inside AI Scanner tab)
-After each scan, AI generates **5 upgrade ideas per category**:
-- **Homepage** (hero, newspaper layout, featured sections, search, feed)
-- **Discover** (feed, source badges, scrolling cards, city highlights)
-- **Dating Pages** (singles, events, date nights improvements)
-- **Operations** (admin, security, visitor logs, AI tools, automation)
-
-Each idea shows: title, description, difficulty (easy/medium/hard), and a "Request This" button.
-
-## Technical Design
-
-### Edge Function: `admin-scanner`
-- Accepts `{ action: "scan" | "upgrades", categories?: string[] }`
-- For "scan": Aggregates data counts, checks for broken sources, reviews event quality, returns findings
-- For "upgrades": Sends app context to AI, gets 5 ideas per selected category
-- Uses `google/gemini-3.1-pro-preview` with tool calling for structured output
-
-### Database: `scan_results` table
-| Column | Type | Notes |
-|---|---|---|
-| id | uuid | PK |
-| scan_type | text | "security", "content", "links", "events" |
-| findings | jsonb | Array of issues found |
-| upgrade_ideas | jsonb | Array of suggestions |
-| created_at | timestamptz | When scan ran |
-
-RLS: Admin-only read, service-role write.
-
-### Cron Job
-- Runs every 6 hours via `pg_cron` + `pg_net`
-- Calls `admin-scanner` with `action: "scan"`
-- Results accumulate in `scan_results` for admin to review
+3. **Edge function BOOT_ERROR**: The `image-search` function is intermittently returning 503 BOOT_ERROR. This is a cold-start/deployment issue — not a code fix, but the fallback handling needs to be better so users see a nice placeholder instead of broken cards.
 
 ## Changes
 
-### 1. Fix Homepage Headline (src/pages/Index.tsx)
-- Remove `-mt-14` from the search bar section
-- Add `mt-6` spacing between newspaper headline and search
-- Headline is now fully visible below the hero photo
+### 1. Add diverse fitness teaser on homepage (src/pages/Index.tsx)
+- Create `getDiverseFitnessTeaser(count)` that picks one spot from different categories (Yoga, Gym, CrossFit, HIIT, Outdoor, etc.) — same pattern as `getDiverseSinglesTeaser`
+- Replace `fitnessSpots.slice(0, 4)` with this function
+- Also fix `showcasePhotos` array to pick diverse entries instead of index 0 and 5 (both CrossFit)
 
-### 2. Create Edge Function (supabase/functions/admin-scanner/index.ts)
-- "scan" action: Checks event data quality, source links, image cache stats
-- "upgrades" action: AI generates 5 ideas per category using tool calling
-- Handles 429/402 errors
+### 2. Fix ListingImage fallback on error (src/components/ListingImage.tsx)
+- Replace the `onError` handler that hides the image. Instead, use React state to track load failure and render the gradient+icon fallback when the image fails to load
+- This ensures every card always shows either a real image or a nice styled placeholder — never a blank space
 
-### 3. Create scan_results table (migration)
-- Table with RLS for admin-only access
-
-### 4. Add AI Scanner tab to Admin (src/pages/Admin.tsx)
-- New 4th tab: "AI Scanner" with Zap icon
-- "Run Full Scan" button → shows findings grouped by category
-- "Get Upgrade Ideas" button → shows 5 ideas per app area
-- Scan history list from `scan_results` table
-- Background scan status indicator
-
-### 5. Set up cron job for background scans
-- pg_cron schedule every 6 hours
+### 3. Add more fitness category gradients (src/components/ListingImage.tsx)
+- Add gradient colors for fitness categories: CrossFit, Gym, Yoga, HIIT, Outdoor, Running, Climbing, Boxing, etc.
+- This makes fallback placeholders visually distinct per category instead of all showing the same gray
 
 ## Files
 
 | Action | File | Details |
 |---|---|---|
-| Modify | `src/pages/Index.tsx` | Fix search bar margin, make headline visible |
-| Create | `supabase/functions/admin-scanner/index.ts` | AI scan + upgrade ideas edge function |
-| Modify | `src/pages/Admin.tsx` | Add AI Scanner tab with scan results + upgrade ideas UI |
-| Create | Migration | `scan_results` table with admin RLS |
+| Modify | `src/pages/Index.tsx` | Add `getDiverseFitnessTeaser()`, fix showcase photo picks |
+| Modify | `src/components/ListingImage.tsx` | Fix onError to show fallback, add fitness category gradients |
+
+No database or backend changes needed.
 
