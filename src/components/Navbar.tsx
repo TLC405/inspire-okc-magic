@@ -1,30 +1,57 @@
 import { Link, useLocation } from "react-router-dom";
 import { ThemeToggle } from "./ThemeToggle";
 import { cn } from "@/lib/utils";
-import { Settings } from "lucide-react";
-import { useRef, useEffect } from "react";
+import { Settings, Clock, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
+import { useRef, useEffect, useState, useCallback } from "react";
+import { useWeather } from "@/hooks/useWeather";
+import { useLiveClock } from "@/hooks/useLiveClock";
 
 const navLinks = [
-  { label: "Singles", href: "/singles", numeral: "I" },
-  { label: "Events", href: "/events", numeral: "II" },
-  { label: "Date Nights", href: "/date-nights", numeral: "III" },
-  { label: "Fitness", href: "/fitness", numeral: "IV" },
-  { label: "Volunteering", href: "/volunteering", numeral: "V" },
-  { label: "Discover", href: "/discover", numeral: "VI" },
+  { label: "Singles", href: "/singles", numeral: "I", desk: "Social" },
+  { label: "Events", href: "/events", numeral: "II", desk: "Culture" },
+  { label: "Date Nights", href: "/date-nights", numeral: "III", desk: "Romance" },
+  { label: "Fitness", href: "/fitness", numeral: "IV", desk: "Wellness" },
+  { label: "Volunteering", href: "/volunteering", numeral: "V", desk: "Community" },
+  { label: "Discover", href: "/discover", numeral: "VI", desk: "Metro" },
 ];
 
 const today = new Date();
 const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const fullMonths = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const dateStr = `${monthNames[today.getMonth()]} ${today.getDate()}, ${today.getFullYear()}`;
+const fullDateStr = `${dayNames[today.getDay()]}, ${fullMonths[today.getMonth()]} ${today.getDate()}, ${today.getFullYear()}`;
 const dayName = dayNames[today.getDay()];
 const issueNo = Math.floor((today.getTime() - new Date("2026-01-01").getTime()) / 86400000) + 1;
-const hour = today.getHours();
-const edition = hour < 12 ? "Morning Edition" : hour < 17 ? "Afternoon Edition" : "Final Edition";
+
+// Rotating headlines for the ticker
+const tickerHeadlines = [
+  "YOUR GUIDE TO OKLAHOMA CITY",
+  "COMMUNITY · CULTURE · CONNECTION",
+  "ALL THE CITY'S NEWS THAT INSPIRES",
+  `${dayName.toUpperCase()} IN OKLAHOMA CITY`,
+  "DISCOVER WHAT'S HAPPENING TODAY",
+];
 
 export function Navbar() {
   const location = useLocation();
   const navScrollRef = useRef<HTMLDivElement>(null);
+  const weather = useWeather();
+  const { timeStr, edition } = useLiveClock();
+  const [tickerIdx, setTickerIdx] = useState(0);
+  const [mobileNavIdx, setMobileNavIdx] = useState(0);
+
+  // Ticker rotation
+  useEffect(() => {
+    const t = setInterval(() => setTickerIdx(p => (p + 1) % tickerHeadlines.length), 4000);
+    return () => clearInterval(t);
+  }, []);
+
+  // Set mobile nav index to active link
+  useEffect(() => {
+    const idx = navLinks.findIndex(l => l.href === location.pathname);
+    if (idx >= 0) setMobileNavIdx(idx);
+  }, [location.pathname]);
 
   // Auto-scroll active nav link into view on mobile
   useEffect(() => {
@@ -36,111 +63,168 @@ export function Navbar() {
     }
   }, [location.pathname]);
 
+  const navPrev = useCallback(() => {
+    setMobileNavIdx(p => (p - 1 + navLinks.length) % navLinks.length);
+  }, []);
+  const navNext = useCallback(() => {
+    setMobileNavIdx(p => (p + 1) % navLinks.length);
+  }, []);
+
   return (
     <header className="bg-background sticky top-0 z-50">
       {/* Top thick rule */}
-      <div className="h-[3px] bg-foreground" />
+      <div className="h-[4px] bg-foreground" />
       <div className="h-[1px] bg-foreground/30 mt-[2px]" />
 
       <div className="container">
-        {/* Upper utility row */}
-        <div className="flex items-center justify-between py-1.5 border-b border-foreground/15">
-          <div className="flex items-center gap-3">
-            <span className="font-mono text-[9px] tracking-[0.15em] uppercase text-muted-foreground">
-              Vol. I · No. {issueNo}
+        {/* ═══ UPPER UTILITY BAR ═══ */}
+        <div className="flex items-center justify-between py-1 border-b border-foreground/15">
+          {/* Left: Category / Section tag */}
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-[8px] md:text-[9px] tracking-[0.15em] uppercase text-foreground font-bold bg-foreground/5 px-1.5 py-0.5 border border-foreground/10">
+              City Guide
             </span>
-            <span className="hidden sm:inline font-mono text-[9px] tracking-[0.12em] text-muted-foreground/60">
-              ✦
-            </span>
-            <span className="hidden sm:inline font-mono text-[9px] tracking-[0.12em] uppercase text-muted-foreground/70">
-              Fair · 72°F
+            <span className="hidden sm:inline text-foreground/15 text-[6px]">|</span>
+            <span className="hidden sm:inline font-mono text-[7px] md:text-[8px] tracking-[0.12em] uppercase text-muted-foreground">
+              Community & Culture
             </span>
           </div>
-          <span className="font-mono text-[9px] tracking-[0.15em] uppercase text-foreground/70 font-semibold hidden sm:inline">
-            {edition}
-          </span>
-          <div className="flex items-center gap-3">
-            <span className="font-mono text-[9px] tracking-[0.15em] uppercase text-muted-foreground hidden md:inline">
-              {dayName} · {dateStr}
+
+          {/* Center: Vol / Issue */}
+          <div className="hidden md:flex items-center gap-2">
+            <span className="font-mono text-[8px] tracking-[0.15em] uppercase text-muted-foreground">
+              Vol. I, No. {issueNo}
             </span>
+            <span className="text-foreground/15 text-[6px]">·</span>
+            <span className="font-mono text-[8px] tracking-[0.12em] uppercase text-muted-foreground/60">
+              Printed in Oklahoma
+            </span>
+          </div>
+
+          {/* Right: Live info cluster */}
+          <div className="flex items-center gap-2 md:gap-3">
+            {/* Weather */}
+            {weather && (
+              <span className="flex items-center gap-1 font-mono text-[8px] md:text-[9px] tracking-[0.1em] uppercase text-muted-foreground">
+                <span className="text-[10px]">{weather.icon}</span>
+                <span className="hidden sm:inline font-semibold">{weather.description}</span>
+                <span className="font-bold text-foreground">{weather.temperature}°F</span>
+              </span>
+            )}
+            <span className="text-foreground/15 text-[6px]">|</span>
+            {/* Time */}
+            <span className="flex items-center gap-1 font-mono text-[8px] md:text-[9px] tracking-[0.1em] text-muted-foreground">
+              <Clock size={8} className="text-muted-foreground/50" />
+              <span className="font-semibold text-foreground/80">{timeStr}</span>
+            </span>
+            <span className="text-foreground/15 text-[6px] hidden sm:inline">|</span>
+            {/* Location */}
+            <span className="hidden sm:flex items-center gap-0.5 font-mono text-[8px] tracking-[0.1em] uppercase text-muted-foreground">
+              <MapPin size={7} className="text-muted-foreground/50" />
+              OKC
+            </span>
+            <span className="text-foreground/15 text-[6px] hidden md:inline">|</span>
+            {/* Theme + Admin */}
             <ThemeToggle className="text-muted-foreground hover:text-foreground" />
             <Link to="/admin" className="text-muted-foreground hover:text-foreground transition-colors">
-              <Settings size={11} />
+              <Settings size={10} />
             </Link>
           </div>
         </div>
 
-        {/* Double rule above nameplate */}
-        <div className="h-[2px] bg-foreground mt-1" />
+        {/* ═══ DOUBLE RULE ABOVE NAMEPLATE ═══ */}
+        <div className="h-[3px] bg-foreground mt-1" />
         <div className="h-[1px] bg-foreground/20 mt-[2px]" />
 
-        {/* Nameplate */}
-        <div className="py-3 md:py-4 text-center">
-          <Link to="/" className="inline-block">
-            {/* Corner ornament + Est. line */}
-            <div className="flex items-center justify-center gap-3 mb-1">
-              <span className="block w-10 md:w-16 h-[1px] bg-foreground/30" />
-              <span className="font-mono text-[7px] md:text-[8px] tracking-[0.35em] uppercase text-muted-foreground">
+        {/* ═══ NAMEPLATE ═══ */}
+        <div className="py-2 md:py-4 text-center">
+          <Link to="/" className="inline-block group">
+            {/* Ornamental flourish */}
+            <div className="flex items-center justify-center gap-3 mb-0.5">
+              <span className="block w-8 md:w-16 h-[1px] bg-foreground/30 group-hover:bg-foreground/50 transition-colors" />
+              <span className="font-mono text-[6px] md:text-[8px] tracking-[0.35em] uppercase text-muted-foreground">
                 ❧ Est. 2026 ❧
               </span>
-              <span className="block w-10 md:w-16 h-[1px] bg-foreground/30" />
+              <span className="block w-8 md:w-16 h-[1px] bg-foreground/30 group-hover:bg-foreground/50 transition-colors" />
             </div>
 
-            {/* Main title */}
+            {/* Main title — INSPIRE */}
             <h1
-              className="font-black tracking-[-0.03em] leading-[0.85] text-foreground"
-              style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(2.2rem, 7vw, 4.5rem)" }}
+              className="font-black tracking-[-0.03em] leading-[0.82] text-foreground group-hover:tracking-[-0.02em] transition-all duration-300"
+              style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(2rem, 7vw, 4.5rem)" }}
             >
               INSPIRE
             </h1>
 
-            {/* Subtitle */}
+            {/* Subtitle — Oklahoma City */}
             <div className="flex items-center justify-center gap-2 mt-0.5">
-              <span className="block w-6 md:w-12 h-[1px] bg-foreground/25" />
+              <span className="block w-5 md:w-12 h-[1px] bg-foreground/25" />
               <p
                 className="tracking-[0.25em] uppercase text-foreground/60 font-semibold leading-none"
-                style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(0.5rem, 1.5vw, 0.75rem)" }}
+                style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(0.45rem, 1.5vw, 0.75rem)" }}
               >
                 Oklahoma City
               </p>
-              <span className="block w-6 md:w-12 h-[1px] bg-foreground/25" />
+              <span className="block w-5 md:w-12 h-[1px] bg-foreground/25" />
             </div>
 
             {/* Motto */}
             <p
-              className="mt-1 text-muted-foreground/60 italic"
-              style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(0.5rem, 1.2vw, 0.65rem)", letterSpacing: "0.05em" }}
+              className="mt-0.5 text-muted-foreground/50 italic"
+              style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(0.45rem, 1.1vw, 0.6rem)", letterSpacing: "0.05em" }}
             >
               "All the City's News That Inspires"
             </p>
           </Link>
         </div>
 
-        {/* Double rule below nameplate */}
-        <div className="h-[2px] bg-foreground" />
+        {/* ═══ DOUBLE RULE BELOW NAMEPLATE ═══ */}
+        <div className="h-[3px] bg-foreground" />
         <div className="h-[1px] bg-foreground/20 mt-[2px]" />
 
-        {/* Navigation row — horizontal scroll on mobile */}
+        {/* ═══ DATE + EDITION BAR ═══ */}
+        <div className="flex items-center justify-between py-1 border-b border-foreground/10">
+          <span className="font-mono text-[7px] md:text-[8px] tracking-[0.12em] uppercase text-muted-foreground">
+            <span className="hidden md:inline">{fullDateStr}</span>
+            <span className="md:hidden">{dayName} · {dateStr}</span>
+          </span>
+          {/* Ticker */}
+          <span
+            className="font-mono text-[7px] md:text-[8px] tracking-[0.2em] uppercase text-foreground/50 font-semibold transition-opacity duration-700"
+            key={tickerIdx}
+            style={{ animation: "fadeInUp 0.6s ease-out" }}
+          >
+            {tickerHeadlines[tickerIdx]}
+          </span>
+          <span className="font-mono text-[7px] md:text-[8px] tracking-[0.15em] uppercase text-foreground/60 font-bold">
+            {edition}
+          </span>
+        </div>
+
+        {/* ═══ NAVIGATION — Desktop: full row, Mobile: carousel card ═══ */}
+
+        {/* Desktop nav */}
         <div
           ref={navScrollRef}
-          className="flex items-center md:justify-center py-2 overflow-x-auto scrollbar-hide"
+          className="hidden md:flex items-center justify-center py-2"
         >
-          <nav className="flex items-center gap-3 md:gap-5 px-1">
+          <nav className="flex items-center gap-5">
             {navLinks.map((link, i) => (
-              <span key={link.href} className="flex items-center gap-3 md:gap-5 flex-shrink-0">
-                {i > 0 && <span className="text-foreground/15 text-[8px] hidden sm:inline">✦</span>}
+              <span key={link.href} className="flex items-center gap-5 flex-shrink-0">
+                {i > 0 && <span className="text-foreground/15 text-[8px]">✦</span>}
                 <Link
                   to={link.href}
                   data-active={location.pathname === link.href}
                   className={cn(
-                    "font-mono text-[9px] md:text-[10px] tracking-[0.15em] uppercase py-1 transition-colors duration-100 relative flex items-center gap-1.5 whitespace-nowrap",
+                    "font-mono text-[10px] tracking-[0.15em] uppercase py-1 transition-colors duration-100 relative flex items-center gap-1.5 whitespace-nowrap group",
                     location.pathname === link.href
                       ? "text-foreground font-bold"
                       : "text-muted-foreground hover:text-foreground"
                   )}
                 >
-                  <span className="text-[7px] md:text-[8px] text-muted-foreground/40 font-normal">{link.numeral}</span>
+                  <span className="text-[8px] text-muted-foreground/40 font-normal">{link.numeral}</span>
                   {link.label}
+                  <span className="text-[6px] text-muted-foreground/30 font-normal hidden lg:inline">({link.desk})</span>
                   {location.pathname === link.href && (
                     <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-foreground" />
                   )}
@@ -149,11 +233,63 @@ export function Navbar() {
             ))}
           </nav>
         </div>
+
+        {/* Mobile nav carousel */}
+        <div className="md:hidden flex items-center justify-between py-1.5 gap-1">
+          <button onClick={navPrev} className="text-muted-foreground/50 hover:text-foreground p-1 flex-shrink-0" aria-label="Previous section">
+            <ChevronLeft size={14} />
+          </button>
+
+          <div className="flex-1 flex items-center justify-center overflow-hidden">
+            <Link
+              to={navLinks[mobileNavIdx].href}
+              className={cn(
+                "flex flex-col items-center gap-0 py-0.5 px-4 transition-all duration-300 rounded border",
+                location.pathname === navLinks[mobileNavIdx].href
+                  ? "border-foreground/20 bg-foreground/5"
+                  : "border-transparent"
+              )}
+              style={{ animation: "fadeInUp 0.3s ease-out" }}
+            >
+              <span className="font-mono text-[6px] tracking-[0.2em] uppercase text-muted-foreground/50">
+                Section {navLinks[mobileNavIdx].numeral} · {navLinks[mobileNavIdx].desk} Desk
+              </span>
+              <span className="font-mono text-[11px] tracking-[0.18em] uppercase text-foreground font-bold">
+                {navLinks[mobileNavIdx].label}
+              </span>
+            </Link>
+          </div>
+
+          <button onClick={navNext} className="text-muted-foreground/50 hover:text-foreground p-1 flex-shrink-0" aria-label="Next section">
+            <ChevronRight size={14} />
+          </button>
+
+          {/* Dots indicator */}
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex gap-1">
+            {navLinks.map((_, i) => (
+              <span
+                key={i}
+                className={cn(
+                  "w-1 h-1 rounded-full transition-all duration-300",
+                  i === mobileNavIdx ? "bg-foreground/60 w-2.5" : "bg-foreground/15"
+                )}
+              />
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Bottom thick + thin rule */}
-      <div className="h-[2px] bg-foreground" />
+      <div className="h-[3px] bg-foreground" />
       <div className="h-[1px] bg-foreground/15 mt-[1px]" />
+
+      {/* Inline animation keyframes */}
+      <style>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(4px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </header>
   );
 }
