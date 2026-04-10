@@ -7,12 +7,11 @@ import { ListingImage } from "@/components/ListingImage";
 import { fitnessSpots } from "@/data/fitnessSpots";
 import { volunteerOrgs } from "@/data/volunteerOrgs";
 import { cityShowcase } from "@/data/cityShowcase";
-import { ArrowRight, Building2, Scale, Leaf, Palette, TrendingUp, Heart, Dumbbell, HandHelping, MapPin, Clock, Users } from "lucide-react";
-import heroImg from "@/assets/hero-okc-skyline.jpg";
+import { ArrowRight, Building2, Scale, Leaf, Palette, TrendingUp, Heart, Dumbbell, HandHelping } from "lucide-react";
+import { HeroCarousel } from "@/components/HeroCarousel";
 import heroSingles from "@/assets/hero-singles.jpg";
 import heroFitness from "@/assets/hero-fitness.jpg";
 import heroVolunteer from "@/assets/hero-volunteer.jpg";
-
 import okcChar2 from "@/assets/okc-char-2.png";
 
 const today = new Date();
@@ -22,7 +21,6 @@ const dateStr = `${monthNames[today.getMonth()]} ${today.getDate()}, ${today.get
 const dayStr = `${dayNames[today.getDay()]} Edition`;
 const totalListings = singlesEvents.length + fitnessSpots.length + volunteerOrgs.length;
 
-/** Pick one verified event per unique category for diverse teasers */
 function getDiverseSinglesTeaser(count = 4) {
   const seen = new Set<string>();
   const result: typeof singlesEvents = [];
@@ -44,7 +42,6 @@ function getDiverseSinglesTeaser(count = 4) {
   return result;
 }
 
-/** Top photos for the photo grid showcase */
 const showcasePhotos = [
   { type: "singles", id: singlesEvents[0]?.id || "s1", name: singlesEvents[0]?.name || "Event", cat: singlesEvents[0]?.category, url: singlesEvents[0]?.sources[0]?.url },
   { type: "fitness", id: fitnessSpots[0]?.id || "f1", name: fitnessSpots[0]?.name || "Gym", cat: fitnessSpots[0]?.category, url: fitnessSpots[0]?.source },
@@ -54,6 +51,35 @@ const showcasePhotos = [
   { type: "discover", id: cityShowcase[4]?.id || "d5", name: cityShowcase[4]?.title || "Landmark", cat: cityShowcase[4]?.category, url: cityShowcase[4]?.sourceUrl },
 ];
 
+/** Decorative section header with ornaments */
+function SectionHeader({ title, subtitle, icon: Icon }: { title: string; subtitle: string; icon?: React.ElementType }) {
+  return (
+    <div className="mb-4">
+      <div className="h-[2px] bg-foreground mb-2" />
+      <div className="flex items-center gap-2">
+        {Icon && <Icon size={16} className="text-accent" />}
+        <h2 className="section-head text-foreground text-lg md:text-xl">{title}</h2>
+        <span className="text-foreground/20 text-xs ml-1">✦</span>
+      </div>
+      <p className="dateline text-muted-foreground mt-1">{subtitle}</p>
+      <div className="h-[1px] bg-foreground/15 mt-2" />
+    </div>
+  );
+}
+
+/** Folio line decoration between sections */
+function FolioLine({ page, note }: { page: string; note?: string }) {
+  return (
+    <div className="flex items-center justify-center gap-3 py-3">
+      <span className="block flex-1 h-[1px] bg-foreground/10" />
+      <span className="font-mono text-[8px] tracking-[0.2em] uppercase text-muted-foreground/50">
+        {page}{note && ` · ${note}`}
+      </span>
+      <span className="block flex-1 h-[1px] bg-foreground/10" />
+    </div>
+  );
+}
+
 const Index = () => {
   const singlesTeaser = getDiverseSinglesTeaser(4);
 
@@ -62,25 +88,20 @@ const Index = () => {
       <Navbar />
 
       <main className="flex-1">
-        {/* ═══ Hero Photo ═══ */}
+        {/* ═══ Hero Photo Carousel ═══ */}
         <div className="relative">
-          <div className="w-full h-[340px] md:h-[500px] overflow-hidden">
-            <img src={heroImg} alt="Oklahoma City skyline at golden hour" className="w-full h-full object-cover object-center" width={1920} height={640} />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-background" />
-          </div>
+          <HeroCarousel />
         </div>
 
         {/* ═══ Newspaper Front Page Headline ═══ */}
         <div className="container relative z-10 -mt-6">
           <div className="bg-background border-t-[4px] border-foreground pt-4 pb-3">
-            {/* Top rule with decorative dots */}
             <div className="flex items-center justify-center gap-3 mb-2">
               <span className="block flex-1 h-[1px] bg-foreground/30" />
               <span className="font-mono text-[9px] tracking-[0.3em] uppercase text-muted-foreground">✦ {dayStr} ✦</span>
               <span className="block flex-1 h-[1px] bg-foreground/30" />
             </div>
 
-            {/* Main headline */}
             <h2
               className="text-center font-black tracking-[-0.02em] leading-[0.9] text-foreground"
               style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 5vw, 3.2rem)" }}
@@ -88,7 +109,6 @@ const Index = () => {
               Your Guide to Oklahoma City
             </h2>
 
-            {/* Subhead dateline */}
             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mt-2">
               <span className="dateline text-muted-foreground">{dateStr}</span>
               <span className="text-foreground/20">·</span>
@@ -97,7 +117,6 @@ const Index = () => {
               <span className="dateline text-muted-foreground">Singles · Fitness · Volunteering · Date Nights</span>
             </div>
 
-            {/* Bottom rule */}
             <div className="flex items-center gap-3 mt-3">
               <span className="block flex-1 h-[2px] bg-foreground" />
               <span className="font-mono text-[8px] tracking-[0.2em] uppercase text-muted-foreground">Oklahoma City</span>
@@ -115,20 +134,15 @@ const Index = () => {
           </div>
         </div>
 
+        <FolioLine page="Page A1" note="Front Page" />
+
         {/* ═══ Photo Grid Showcase ═══ */}
         <div className="container py-4 md:py-6">
-          <h2 className="section-head text-foreground text-lg md:text-xl mb-3">📸 Around the City</h2>
+          <SectionHeader title="📸 Around the City" subtitle="Staff Photography · Community Highlights" />
           <div className="photo-grid-showcase">
             {showcasePhotos.map((p, i) => (
               <div key={p.id + i} className={`photo-grid-item ${i === 0 ? "photo-grid-featured" : ""}`}>
-                <ListingImage
-                  listingType={p.type}
-                  listingId={p.id}
-                  name={p.name}
-                  category={p.cat}
-                  websiteUrl={p.url}
-                  className="w-full h-full"
-                />
+                <ListingImage listingType={p.type} listingId={p.id} name={p.name} category={p.cat} websiteUrl={p.url} className="w-full h-full" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 <span className="absolute bottom-2 left-2 text-white text-[10px] font-bold uppercase tracking-wider drop-shadow">{p.name}</span>
               </div>
@@ -161,13 +175,22 @@ const Index = () => {
           </div>
         </div>
 
+        <FolioLine page="Page A2" note="Broadsheet" />
+
         {/* ═══ Broadsheet Columns ═══ */}
         <div className="container py-4 md:py-10 hidden md:block">
-          <div className="rule-heavy mb-5" />
-          
+          <div className="rule-heavy mb-1" />
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <span className="font-mono text-[8px] tracking-[0.3em] uppercase text-muted-foreground">❧ Community Desk ❧</span>
+          </div>
+
           <div className="grid grid-cols-3 gap-0">
             {/* Singles Column */}
-            <div className="pr-6 border-r border-foreground/10">
+            <div className="pr-6 border-r border-foreground/15">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="font-black text-2xl text-foreground/20 leading-none">1</span>
+                <div className="h-[1px] flex-1 bg-foreground/10" />
+              </div>
               <div className="relative mb-4 rounded overflow-hidden">
                 <img src={heroSingles} alt="OKC Singles Events" className="column-lead-img" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
@@ -177,20 +200,14 @@ const Index = () => {
                   <span className="news-badge-live signal-pulse text-[8px] ml-auto">Live</span>
                 </div>
               </div>
-              <p className="dateline text-muted-foreground mb-3">{singlesEvents.length} verified events</p>
-              
+              <p className="dateline text-muted-foreground mb-3">{singlesEvents.length} verified events · Staff Report</p>
+
               {singlesTeaser.map((evt, i) => (
                 <div key={evt.id} className={`py-2.5 ${i < 3 ? "border-b border-foreground/[0.06]" : ""}`}>
                   <div className="flex items-start gap-2">
+                    <span className="font-mono text-[10px] text-muted-foreground/30 mt-1 font-bold">{i + 1}.</span>
                     <div className="w-12 h-12 rounded flex-shrink-0 overflow-hidden">
-                      <ListingImage
-                        listingType="singles"
-                        listingId={evt.id}
-                        name={evt.name}
-                        category={evt.category}
-                        websiteUrl={evt.sources[0]?.url}
-                        className="w-full h-full"
-                      />
+                      <ListingImage listingType="singles" listingId={evt.id} name={evt.name} category={evt.category} websiteUrl={evt.sources[0]?.url} className="w-full h-full" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <h3 className="headline text-foreground text-[15px] leading-tight truncate">{evt.name}</h3>
@@ -203,14 +220,18 @@ const Index = () => {
                   </div>
                 </div>
               ))}
-              
+
               <Link to="/singles" className="inline-flex items-center gap-2 mt-3 skeuo-btn rounded">
                 All {singlesEvents.length} events <ArrowRight size={12} />
               </Link>
             </div>
 
             {/* Fitness Column */}
-            <div className="px-6 border-r border-foreground/10">
+            <div className="px-6 border-r border-foreground/15">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="font-black text-2xl text-foreground/20 leading-none">2</span>
+                <div className="h-[1px] flex-1 bg-foreground/10" />
+              </div>
               <div className="relative mb-4 rounded overflow-hidden">
                 <img src={heroFitness} alt="OKC Fitness Spots" className="column-lead-img" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
@@ -220,20 +241,14 @@ const Index = () => {
                   <span className="news-badge text-[8px] bg-white/20 text-white ml-auto">{fitnessSpots.length}+</span>
                 </div>
               </div>
-              <p className="dateline text-muted-foreground mb-3">29 categories · All districts</p>
-              
+              <p className="dateline text-muted-foreground mb-3">29 categories · All districts · Staff Report</p>
+
               {fitnessSpots.slice(0, 4).map((spot, i) => (
                 <div key={spot.id} className={`py-2.5 ${i < 3 ? "border-b border-foreground/[0.06]" : ""}`}>
                   <div className="flex items-start gap-2">
+                    <span className="font-mono text-[10px] text-muted-foreground/30 mt-1 font-bold">{i + 1}.</span>
                     <div className="w-12 h-12 rounded flex-shrink-0 overflow-hidden">
-                      <ListingImage
-                        listingType="fitness"
-                        listingId={spot.id}
-                        name={spot.name}
-                        category={spot.category}
-                        websiteUrl={spot.source}
-                        className="w-full h-full"
-                      />
+                      <ListingImage listingType="fitness" listingId={spot.id} name={spot.name} category={spot.category} websiteUrl={spot.source} className="w-full h-full" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <h3 className="headline text-foreground text-[15px] leading-tight truncate">{spot.name}</h3>
@@ -243,7 +258,7 @@ const Index = () => {
                   </div>
                 </div>
               ))}
-              
+
               <Link to="/fitness" className="inline-flex items-center gap-2 mt-3 skeuo-btn rounded">
                 All {fitnessSpots.length} spots <ArrowRight size={12} />
               </Link>
@@ -251,6 +266,10 @@ const Index = () => {
 
             {/* Volunteering Column */}
             <div className="pl-6">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="font-black text-2xl text-foreground/20 leading-none">3</span>
+                <div className="h-[1px] flex-1 bg-foreground/10" />
+              </div>
               <div className="relative mb-4 rounded overflow-hidden">
                 <img src={heroVolunteer} alt="OKC Volunteering" className="column-lead-img" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
@@ -259,20 +278,14 @@ const Index = () => {
                   <span className="label-caps text-white text-[10px]">Volunteer</span>
                 </div>
               </div>
-              <p className="dateline text-muted-foreground mb-3">{volunteerOrgs.length} organizations</p>
-              
+              <p className="dateline text-muted-foreground mb-3">{volunteerOrgs.length} organizations · Community Desk</p>
+
               {volunteerOrgs.slice(0, 4).map((org, i) => (
                 <div key={org.id} className={`py-2.5 ${i < 3 ? "border-b border-foreground/[0.06]" : ""}`}>
                   <div className="flex items-start gap-2">
+                    <span className="font-mono text-[10px] text-muted-foreground/30 mt-1 font-bold">{i + 1}.</span>
                     <div className="w-12 h-12 rounded flex-shrink-0 overflow-hidden">
-                      <ListingImage
-                        listingType="volunteer"
-                        listingId={org.id}
-                        name={org.name}
-                        category={org.category}
-                        websiteUrl={org.source}
-                        className="w-full h-full"
-                      />
+                      <ListingImage listingType="volunteer" listingId={org.id} name={org.name} category={org.category} websiteUrl={org.source} className="w-full h-full" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <h3 className="headline text-foreground text-[15px] leading-tight truncate">{org.name}</h3>
@@ -285,7 +298,7 @@ const Index = () => {
                   </div>
                 </div>
               ))}
-              
+
               <Link to="/volunteering" className="inline-flex items-center gap-2 mt-3 skeuo-btn rounded">
                 All {volunteerOrgs.length} orgs <ArrowRight size={12} />
               </Link>
@@ -295,15 +308,28 @@ const Index = () => {
           <div className="rule-heavy mt-6" />
         </div>
 
+        <FolioLine page="Page A3" note="Lifestyle" />
+
+        {/* ═══ Pull Quote ═══ */}
+        <div className="container py-4 md:py-6 hidden md:block">
+          <div className="max-w-xl mx-auto text-center py-6">
+            <span className="text-5xl text-foreground/15 leading-none" style={{ fontFamily: "'Playfair Display', serif" }}>"</span>
+            <p
+              className="text-foreground/70 italic leading-relaxed -mt-4"
+              style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1rem, 2vw, 1.3rem)" }}
+            >
+              From Bricktown to Paseo, from first dates to last reps — this is your city, curated.
+            </p>
+            <span className="text-5xl text-foreground/15 leading-none" style={{ fontFamily: "'Playfair Display', serif" }}>"</span>
+            <p className="dateline text-muted-foreground mt-2">— The Editors</p>
+          </div>
+          <div className="rule-thin" />
+        </div>
+
         {/* ═══ Date Nights Showcase ═══ */}
         <div className="container py-4 md:py-8">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="section-head text-foreground flex items-center gap-2">
-                <Heart size={18} className="text-accent" /> Date Nights
-              </h2>
-              <p className="dateline text-muted-foreground mt-1">Curated experiences for couples & adventurers</p>
-            </div>
+          <SectionHeader title="Date Nights" subtitle="Curated experiences for couples & adventurers" icon={Heart} />
+          <div className="flex items-center justify-end mb-3">
             <Link to="/events" className="skeuo-btn rounded">
               All Events <ArrowRight size={12} />
             </Link>
@@ -319,14 +345,7 @@ const Index = () => {
                   className="skeuo-card rounded-lg overflow-hidden min-w-[260px] md:min-w-[300px] flex-shrink-0 hover:shadow-lg transition-shadow"
                 >
                   <div className="h-36 relative">
-                    <ListingImage
-                      listingType="singles"
-                      listingId={evt.id}
-                      name={evt.name}
-                      category={evt.category}
-                      websiteUrl={evt.sources[0]?.url}
-                      className="w-full h-full"
-                    />
+                    <ListingImage listingType="singles" listingId={evt.id} name={evt.name} category={evt.category} websiteUrl={evt.sources[0]?.url} className="w-full h-full" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
                     <div className="absolute bottom-2 left-3 right-3">
                       <h3 className="text-white font-bold text-sm leading-tight">{evt.name}</h3>
@@ -343,13 +362,12 @@ const Index = () => {
           <div className="rule-thin mt-6" />
         </div>
 
+        <FolioLine page="Page A4" note="City & Culture" />
+
         {/* ═══ City Showcase Teaser ═══ */}
         <div className="container py-4 md:py-8">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="section-head text-foreground">Discover Oklahoma City</h2>
-              <p className="dateline text-muted-foreground mt-1">Architecture · Policy · Sustainability · Culture · Growth</p>
-            </div>
+          <SectionHeader title="Discover Oklahoma City" subtitle="Architecture · Policy · Sustainability · Culture · Growth" />
+          <div className="flex items-center justify-end mb-3">
             <Link to="/discover" className="skeuo-btn rounded">
               View all 100 <ArrowRight size={12} />
             </Link>
@@ -381,11 +399,13 @@ const Index = () => {
           <div className="rule-thin mt-6" />
         </div>
 
+        <FolioLine page="Page B1" note="Back Page" />
+
         {/* ═══ Character accent ═══ */}
         <div className="container py-4 flex items-center gap-4">
           <img src={okcChar2} alt="OKC Character" className="w-20 md:w-28 drop-shadow-lg" />
           <div>
-            <p className="headline text-foreground text-sm md:text-base">Your guide to everything OKC</p>
+            <p className="headline text-foreground text-sm md:text-base">Your guide to everything Oklahoma City</p>
             <p className="text-xs text-muted-foreground mt-0.5">From Bricktown to Paseo — we've got it covered.</p>
           </div>
         </div>
