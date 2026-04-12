@@ -1,8 +1,10 @@
 import { Link, useLocation } from "react-router-dom";
 import { ThemeToggle } from "./ThemeToggle";
 import { cn } from "@/lib/utils";
-import { Settings, Clock, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
-import { useRef, useEffect, useState, useCallback } from "react";
+import { Settings, Clock, MapPin } from "lucide-react";
+import { useRef, useEffect, useState } from "react";
+import { useWeather } from "@/hooks/useWeather";
+import { useLiveClock } from "@/hooks/useLiveClock";
 import { useWeather } from "@/hooks/useWeather";
 import { useLiveClock } from "@/hooks/useLiveClock";
 
@@ -39,7 +41,6 @@ export function Navbar() {
   const weather = useWeather();
   const { timeStr, edition } = useLiveClock();
   const [tickerIdx, setTickerIdx] = useState(0);
-  const [mobileNavIdx, setMobileNavIdx] = useState(0);
 
   // Ticker rotation
   useEffect(() => {
@@ -47,13 +48,7 @@ export function Navbar() {
     return () => clearInterval(t);
   }, []);
 
-  // Set mobile nav index to active link
-  useEffect(() => {
-    const idx = navLinks.findIndex(l => l.href === location.pathname);
-    if (idx >= 0) setMobileNavIdx(idx);
-  }, [location.pathname]);
-
-  // Auto-scroll active nav link into view on mobile
+  // Auto-scroll active nav link into view on desktop
   useEffect(() => {
     if (navScrollRef.current) {
       const active = navScrollRef.current.querySelector('[data-active="true"]');
@@ -62,13 +57,6 @@ export function Navbar() {
       }
     }
   }, [location.pathname]);
-
-  const navPrev = useCallback(() => {
-    setMobileNavIdx(p => (p - 1 + navLinks.length) % navLinks.length);
-  }, []);
-  const navNext = useCallback(() => {
-    setMobileNavIdx(p => (p + 1) % navLinks.length);
-  }, []);
 
   return (
     <header className="bg-background sticky top-0 z-50">
@@ -234,49 +222,6 @@ export function Navbar() {
           </nav>
         </div>
 
-        {/* Mobile nav carousel */}
-        <div className="md:hidden flex items-center justify-between py-1.5 gap-1">
-          <button onClick={navPrev} className="text-muted-foreground/50 hover:text-foreground p-1 flex-shrink-0" aria-label="Previous section">
-            <ChevronLeft size={14} />
-          </button>
-
-          <div className="flex-1 flex items-center justify-center overflow-hidden">
-            <Link
-              to={navLinks[mobileNavIdx].href}
-              className={cn(
-                "flex flex-col items-center gap-0 py-0.5 px-4 transition-all duration-300 rounded border",
-                location.pathname === navLinks[mobileNavIdx].href
-                  ? "border-foreground/20 bg-foreground/5"
-                  : "border-transparent"
-              )}
-              style={{ animation: "fadeInUp 0.3s ease-out" }}
-            >
-              <span className="font-mono text-[6px] tracking-[0.2em] uppercase text-muted-foreground/50">
-                Section {navLinks[mobileNavIdx].numeral} · {navLinks[mobileNavIdx].desk} Desk
-              </span>
-              <span className="font-mono text-[11px] tracking-[0.18em] uppercase text-foreground font-bold">
-                {navLinks[mobileNavIdx].label}
-              </span>
-            </Link>
-          </div>
-
-          <button onClick={navNext} className="text-muted-foreground/50 hover:text-foreground p-1 flex-shrink-0" aria-label="Next section">
-            <ChevronRight size={14} />
-          </button>
-
-          {/* Dots indicator */}
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex gap-1">
-            {navLinks.map((_, i) => (
-              <span
-                key={i}
-                className={cn(
-                  "w-1 h-1 rounded-full transition-all duration-300",
-                  i === mobileNavIdx ? "bg-foreground/60 w-2.5" : "bg-foreground/15"
-                )}
-              />
-            ))}
-          </div>
-        </div>
       </div>
 
       {/* Bottom thick + thin rule */}
