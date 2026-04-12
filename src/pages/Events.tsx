@@ -5,27 +5,27 @@ import { singlesEvents, singlesCategories, getPublishableEvents } from "@/data/s
 import { ListingImage } from "@/components/ListingImage";
 import { ExternalLink, Heart, Search, Clock, MapPin, Shield, ShieldAlert, Users, Sparkles, Zap } from "lucide-react";
 
-const categoryEmojis: Record<string, string> = {
-  "All": "✨",
-  "Date Night": "❤️",
-  "Team Building": "🤝",
-  "Speed Dating": "⚡",
-  "Mixer": "🍸",
-  "Social": "🎉",
-  "Dance": "💃",
-  "Activity": "🎯",
-  "Faith": "🙏",
+const categoryLabels: Record<string, string> = {
+  "All": "All Categories",
+  "Date Night": "Date Night",
+  "Team Building": "Team Building",
+  "Speed Dating": "Speed Dating",
+  "Mixer": "Mixer",
+  "Social": "Social",
+  "Dance": "Dance",
+  "Activity": "Activity",
+  "Faith": "Faith",
 };
 
-const funTaglines: Record<string, string> = {
-  "Date Night": "Because Netflix & Chill gets old 🍿",
-  "Team Building": "Bond with humans IRL (scary, we know) 😅",
-  "Speed Dating": "3 minutes to make an impression. No pressure.",
-  "Mixer": "Mingle like your extroverted alter ego",
-  "Social": "Show up. Say hi. That's literally it.",
-  "Dance": "Two left feet? Perfect, you'll fit right in 🕺",
-  "Activity": "Do stuff together. It's called friendship.",
-  "Faith": "Community with a higher purpose 🙌",
+const editorialTaglines: Record<string, string> = {
+  "Date Night": "Curated evenings for couples and adventurers across the metro",
+  "Team Building": "Group experiences designed for real connection, not corporate clichés",
+  "Speed Dating": "Structured introductions for singles on a schedule",
+  "Mixer": "Low-pressure social gatherings across Oklahoma City",
+  "Social": "Community events open to everyone — no RSVP required",
+  "Dance": "From ballroom to bachata, the city's best dance floors",
+  "Activity": "Hands-on group experiences beyond the usual happy hour",
+  "Faith": "Community gatherings rooted in shared values and purpose",
 };
 
 const Events = () => {
