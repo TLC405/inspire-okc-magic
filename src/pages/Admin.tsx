@@ -3,14 +3,15 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { useAuth } from "@/hooks/useAuth";
 import { singlesEvents, type SinglesEvent, type VerificationStatus } from "@/data/singlesEvents";
-import { fitnessSpots } from "@/data/fitnessSpots";
-import { volunteerOrgs } from "@/data/volunteerOrgs";
+import { fitnessSpots, type FitnessSpot } from "@/data/fitnessSpots";
+import { volunteerOrgs, type VolunteerOrg } from "@/data/volunteerOrgs";
 import { cityShowcase } from "@/data/cityShowcase";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Shield, ShieldCheck, ShieldAlert, AlertTriangle, Search, MapPin, Eye, Database, Key,
   CheckCircle2, XCircle, RefreshCw, LogOut, UserPlus, Fingerprint,
-  Globe, Activity, Users, Zap, Lightbulb, Loader2
+  Globe, Activity, Users, Zap, Lightbulb, Loader2,
+  Edit3, Save, X, Heart, Dumbbell, HandHelping, ChevronDown, ChevronUp, ExternalLink, Trash2, Copy
 } from "lucide-react";
 
 const statusColors: Record<VerificationStatus, string> = {
@@ -40,14 +41,12 @@ const Admin = () => {
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const [authError, setAuthError] = useState("");
   const [authMsg, setAuthMsg] = useState("");
-  const [tab, setTab] = useState<"visitors" | "security" | "events" | "scanner">("visitors");
+  const [tab, setTab] = useState<"content" | "visitors" | "security" | "events" | "scanner">("content");
   const [evtSearch, setEvtSearch] = useState("");
   const [evtFilter, setEvtFilter] = useState<"all" | VerificationStatus>("all");
-  const [imageStats, setImageStats] = useState<any>(null);
-  const [loadingImages, setLoadingImages] = useState(false);
-  const [bootstrapping, setBootstrapping] = useState(false);
   const [visitors, setVisitors] = useState<any[]>([]);
   const [loadingVisitors, setLoadingVisitors] = useState(false);
+  const [bootstrapping, setBootstrapping] = useState(false);
 
   // Scanner state
   const [scanning, setScanning] = useState(false);
@@ -57,8 +56,14 @@ const Admin = () => {
   const [scanHistory, setScanHistory] = useState<any[]>([]);
   const [scanError, setScanError] = useState("");
 
+  // Content editor state
+  const [contentTab, setContentTab] = useState<"singles" | "fitness" | "volunteer">("singles");
+  const [contentSearch, setContentSearch] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editData, setEditData] = useState<Record<string, any>>({});
+  const [copiedMsg, setCopiedMsg] = useState("");
+
   const verifiedEvents = singlesEvents.filter((e) => e.verificationStatus === "verified").length;
-  const staleEvents = singlesEvents.filter((e) => e.verificationStatus === "stale").length;
   const brokenLinks = singlesEvents.flatMap((e) => e.sources).filter((s) => s.status === "broken").length;
   const totalListings = singlesEvents.length + fitnessSpots.length + volunteerOrgs.length + cityShowcase.length;
 
@@ -71,8 +76,6 @@ const Admin = () => {
     });
   }, [evtSearch, evtFilter]);
 
-  const dateNights = singlesEvents.filter((e) => e.category === "Date Night" && e.verificationStatus === "verified");
-
   useEffect(() => {
     if (tab === "visitors" && visitors.length === 0 && isAdmin) {
       setLoadingVisitors(true);
@@ -83,7 +86,6 @@ const Admin = () => {
     }
   }, [tab, isAdmin]);
 
-  // Load scan history when scanner tab opens
   useEffect(() => {
     if (tab === "scanner" && isAdmin && scanHistory.length === 0) {
       supabase.from("scan_results").select("*").order("created_at", { ascending: false }).limit(20).then(({ data }) => {
@@ -97,13 +99,10 @@ const Admin = () => {
     setScanError("");
     setScanFindings(null);
     try {
-      const { data, error } = await supabase.functions.invoke("admin-scanner", {
-        body: { action: "scan" },
-      });
+      const { data, error } = await supabase.functions.invoke("admin-scanner", { body: { action: "scan" } });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       setScanFindings(data.findings);
-      // Refresh history
       const { data: history } = await supabase.from("scan_results").select("*").order("created_at", { ascending: false }).limit(20);
       setScanHistory(history || []);
     } catch (e: any) {
@@ -134,7 +133,6 @@ const Admin = () => {
     setAuthMsg("");
     if (!email || !password) { setAuthError("Enter email and password"); return; }
     if (password.length < 8) { setAuthError("Password must be at least 8 characters"); return; }
-
     if (authMode === "signup") {
       const { error } = await signUp(email, password);
       if (error) setAuthError(error.message);
@@ -151,6 +149,39 @@ const Admin = () => {
     if (error) setAuthError(typeof error === "string" ? error : "Failed to bootstrap admin");
     setBootstrapping(false);
   };
+
+  // Content editor helpers
+  const startEditing = (id: string, data: Record<string, any>) => {
+    setEditingId(id);
+    setEditData({ ...data });
+  };
+
+  const cancelEditing = () => {
+    setEditingId(null);
+    setEditData({});
+  };
+
+  const copyAsJson = (data: any, label: string) => {
+    navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+    setCopiedMsg(`Copied ${label} to clipboard`);
+    setTimeout(() => setCopiedMsg(""), 2000);
+  };
+
+  // Filtered content lists
+  const filteredContentSingles = useMemo(() => {
+    const q = contentSearch.toLowerCase();
+    return singlesEvents.filter((e) => !q || e.name.toLowerCase().includes(q) || e.category.toLowerCase().includes(q) || e.venue.toLowerCase().includes(q));
+  }, [contentSearch]);
+
+  const filteredContentFitness = useMemo(() => {
+    const q = contentSearch.toLowerCase();
+    return fitnessSpots.filter((s) => !q || s.name.toLowerCase().includes(q) || s.category.toLowerCase().includes(q) || s.neighborhood.toLowerCase().includes(q));
+  }, [contentSearch]);
+
+  const filteredContentVolunteer = useMemo(() => {
+    const q = contentSearch.toLowerCase();
+    return volunteerOrgs.filter((o) => !q || o.name.toLowerCase().includes(q) || o.category.toLowerCase().includes(q) || o.neighborhood.toLowerCase().includes(q));
+  }, [contentSearch]);
 
   // Loading
   if (loading) {
@@ -196,12 +227,8 @@ const Admin = () => {
               onClick={async () => {
                 setAuthError("");
                 const { lovable } = await import("@/integrations/lovable/index");
-                const result = await lovable.auth.signInWithOAuth("google", {
-                  redirect_uri: window.location.origin,
-                });
-                if (result.error) {
-                  setAuthError(result.error instanceof Error ? result.error.message : String(result.error));
-                }
+                const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
+                if (result.error) setAuthError(result.error instanceof Error ? result.error.message : String(result.error));
               }}
               className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-muted/30 border border-border/50 rounded text-sm text-foreground hover:bg-muted/50 transition-colors"
             >
@@ -242,9 +269,10 @@ const Admin = () => {
   }
 
   const tabs = [
+    { id: "content" as const, label: "Content", icon: Edit3 },
     { id: "visitors" as const, label: "Visitors", icon: Users },
     { id: "security" as const, label: "Security", icon: Shield },
-    { id: "events" as const, label: "Events", icon: Eye },
+    { id: "events" as const, label: "Audit", icon: Eye },
     { id: "scanner" as const, label: "AI Scanner", icon: Zap },
   ];
 
@@ -262,6 +290,30 @@ const Admin = () => {
           </div>
         </div>
 
+        {/* Overview stats */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+          <div className="skeuo-card-inset p-3 rounded text-center">
+            <p className="text-xl font-black text-foreground">{totalListings}</p>
+            <p className="dateline text-muted-foreground">Total Listings</p>
+          </div>
+          <div className="skeuo-card-inset p-3 rounded text-center">
+            <p className="text-xl font-black text-foreground">{singlesEvents.length}</p>
+            <p className="dateline text-muted-foreground">Events</p>
+          </div>
+          <div className="skeuo-card-inset p-3 rounded text-center">
+            <p className="text-xl font-black text-foreground">{fitnessSpots.length}</p>
+            <p className="dateline text-muted-foreground">Fitness</p>
+          </div>
+          <div className="skeuo-card-inset p-3 rounded text-center">
+            <p className="text-xl font-black text-foreground">{volunteerOrgs.length}</p>
+            <p className="dateline text-muted-foreground">Volunteer</p>
+          </div>
+          <div className="skeuo-card-inset p-3 rounded text-center">
+            <p className="text-xl font-black text-foreground">{verifiedEvents}</p>
+            <p className="dateline text-muted-foreground">Verified</p>
+          </div>
+        </div>
+
         <div className="flex gap-1 mb-6 overflow-x-auto scrollbar-hide">
           {tabs.map(({ id, label, icon: Icon }) => (
             <button
@@ -276,7 +328,124 @@ const Admin = () => {
           ))}
         </div>
 
+        {copiedMsg && (
+          <div className="fixed top-4 right-4 z-50 bg-emerald-500/90 text-white text-sm px-4 py-2 rounded shadow-lg animate-fade-in">
+            {copiedMsg}
+          </div>
+        )}
+
         <div className="skeuo-card rounded-lg p-6">
+          {/* ═══ CONTENT EDITOR TAB ═══ */}
+          {tab === "content" && (
+            <div className="space-y-4">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+                <div>
+                  <h2 className="headline text-foreground text-lg">Content Manager</h2>
+                  <p className="text-xs text-muted-foreground mt-0.5">View, inspect, and edit every listing across all directories</p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => copyAsJson(
+                      contentTab === "singles" ? singlesEvents : contentTab === "fitness" ? fitnessSpots : volunteerOrgs,
+                      contentTab
+                    )}
+                    className="skeuo-btn text-xs"
+                  >
+                    <Copy size={12} /> Export {contentTab} as JSON
+                  </button>
+                </div>
+              </div>
+
+              {/* Sub-tabs */}
+              <div className="flex gap-1">
+                {([
+                  { id: "singles" as const, label: "Events & Singles", icon: Heart, count: singlesEvents.length },
+                  { id: "fitness" as const, label: "Fitness Spots", icon: Dumbbell, count: fitnessSpots.length },
+                  { id: "volunteer" as const, label: "Volunteer Orgs", icon: HandHelping, count: volunteerOrgs.length },
+                ]).map(({ id, label, icon: Icon, count }) => (
+                  <button
+                    key={id}
+                    onClick={() => { setContentTab(id); setContentSearch(""); setEditingId(null); }}
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded text-xs font-medium transition-colors ${
+                      contentTab === id ? "bg-accent/15 text-accent border border-accent/20" : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <Icon size={12} /> {label} <span className="text-muted-foreground/60">({count})</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Search */}
+              <div className="relative">
+                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  type="text"
+                  value={contentSearch}
+                  onChange={(e) => setContentSearch(e.target.value)}
+                  placeholder={`Search ${contentTab}...`}
+                  className="w-full pl-9 pr-4 py-2 bg-muted/30 border border-border/50 rounded text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-accent"
+                />
+              </div>
+
+              {/* Singles / Events content */}
+              {contentTab === "singles" && (
+                <div className="space-y-2">
+                  <p className="dateline text-muted-foreground">{filteredContentSingles.length} listings</p>
+                  {filteredContentSingles.map((evt) => (
+                    <ContentCardSingles
+                      key={evt.id}
+                      event={evt}
+                      isEditing={editingId === evt.id}
+                      editData={editData}
+                      onEdit={() => startEditing(evt.id, { name: evt.name, venue: evt.venue, neighborhood: evt.neighborhood, description: evt.description, price: evt.price, frequency: evt.frequency, tags: evt.tags.join(", ") })}
+                      onCancel={cancelEditing}
+                      onFieldChange={(field, value) => setEditData((d) => ({ ...d, [field]: value }))}
+                      onCopy={() => copyAsJson(evt, evt.name)}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* Fitness content */}
+              {contentTab === "fitness" && (
+                <div className="space-y-2">
+                  <p className="dateline text-muted-foreground">{filteredContentFitness.length} spots</p>
+                  {filteredContentFitness.map((spot) => (
+                    <ContentCardFitness
+                      key={spot.id}
+                      spot={spot}
+                      isEditing={editingId === spot.id}
+                      editData={editData}
+                      onEdit={() => startEditing(spot.id, { name: spot.name, neighborhood: spot.neighborhood, description: spot.description, source: spot.source, tags: spot.tags.join(", ") })}
+                      onCancel={cancelEditing}
+                      onFieldChange={(field, value) => setEditData((d) => ({ ...d, [field]: value }))}
+                      onCopy={() => copyAsJson(spot, spot.name)}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* Volunteer content */}
+              {contentTab === "volunteer" && (
+                <div className="space-y-2">
+                  <p className="dateline text-muted-foreground">{filteredContentVolunteer.length} orgs</p>
+                  {filteredContentVolunteer.map((org) => (
+                    <ContentCardVolunteer
+                      key={org.id}
+                      org={org}
+                      isEditing={editingId === org.id}
+                      editData={editData}
+                      onEdit={() => startEditing(org.id, { name: org.name, neighborhood: org.neighborhood, description: org.description, source: org.source, tags: org.tags.join(", ") })}
+                      onCancel={cancelEditing}
+                      onFieldChange={(field, value) => setEditData((d) => ({ ...d, [field]: value }))}
+                      onCopy={() => copyAsJson(org, org.name)}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* VISITORS TAB */}
           {tab === "visitors" && (
             <div className="space-y-4">
@@ -287,74 +456,46 @@ const Admin = () => {
                 <StatCard icon={Activity} label="Today" value={String(visitors.filter((v: any) => new Date(v.created_at).toDateString() === new Date().toDateString()).length)} sub="Visits today" color="text-amber-500" />
               </div>
               <button onClick={() => { setVisitors([]); setLoadingVisitors(true); supabase.from("visitor_logs").select("*").order("created_at", { ascending: false }).limit(200).then(({ data }) => { setVisitors(data || []); setLoadingVisitors(false); }); }} className="skeuo-btn">
-                <RefreshCw size={12} /> Refresh Visitor Data
+                <RefreshCw size={12} /> Refresh
               </button>
               {loadingVisitors ? (
                 <div className="flex items-center justify-center py-12">
                   <RefreshCw size={20} className="animate-spin text-accent mr-2" />
-                  <span className="text-sm text-muted-foreground">Loading visitor data…</span>
+                  <span className="text-sm text-muted-foreground">Loading…</span>
                 </div>
               ) : (
-                <div className="skeuo-card-inset p-4 rounded">
-                  <h3 className="label-caps text-foreground mb-3">Recent Visitors</h3>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-xs">
-                      <thead>
-                        <tr className="border-b border-border/50">
-                          <th className="text-left py-2 pr-3 text-muted-foreground font-medium">IP Address</th>
-                          <th className="text-left py-2 pr-3 text-muted-foreground font-medium">Location</th>
-                          <th className="text-left py-2 pr-3 text-muted-foreground font-medium">Coords</th>
-                          <th className="text-left py-2 pr-3 text-muted-foreground font-medium">Page</th>
-                          <th className="text-left py-2 pr-3 text-muted-foreground font-medium">Referrer</th>
-                          <th className="text-left py-2 pr-3 text-muted-foreground font-medium">User Agent</th>
-                          <th className="text-left py-2 text-muted-foreground font-medium">Time</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {(() => {
-                          const ipCounts: Record<string, number> = {};
-                          visitors.forEach((v: any) => { ipCounts[v.ip_address] = (ipCounts[v.ip_address] || 0) + 1; });
-                          return visitors.map((v: any) => {
-                            const isRepeat = ipCounts[v.ip_address] > 2;
-                            return (
-                              <tr key={v.id} className={`border-b border-border/20 hover:bg-muted/20 ${isRepeat ? "bg-amber-500/5" : ""}`}>
-                                <td className={`py-2 pr-3 font-mono ${isRepeat ? "text-amber-500 font-bold" : "text-foreground"}`}>
-                                  {v.ip_address}
-                                  {isRepeat && <span className="text-[9px] ml-1">×{ipCounts[v.ip_address]}</span>}
-                                </td>
-                                <td className="py-2 pr-3 text-muted-foreground">
-                                  {[v.city, v.region, v.country].filter(Boolean).join(", ") || "—"}
-                                </td>
-                                <td className="py-2 pr-3">
-                                  {v.latitude && v.longitude ? (
-                                    <a href={`https://maps.google.com/?q=${v.latitude},${v.longitude}`} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline text-[10px]">
-                                      {Number(v.latitude).toFixed(4)}, {Number(v.longitude).toFixed(4)} ↗
-                                    </a>
-                                  ) : <span className="text-muted-foreground">—</span>}
-                                </td>
-                                <td className="py-2 pr-3 text-accent">{v.page_path || "—"}</td>
-                                <td className="py-2 pr-3 text-muted-foreground max-w-[150px] truncate">{v.referrer || "—"}</td>
-                                <td className="py-2 pr-3 text-muted-foreground max-w-[300px] text-[10px] break-all">{v.user_agent || "—"}</td>
-                                <td className="py-2 text-muted-foreground whitespace-nowrap">{new Date(v.created_at).toLocaleString()}</td>
-                              </tr>
-                            );
-                          });
-                        })()}
-                        {visitors.length === 0 && (
-                          <tr><td colSpan={7} className="py-8 text-center text-muted-foreground">No visitors logged yet</td></tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
+                <div className="skeuo-card-inset p-4 rounded overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="border-b border-border/50">
+                        <th className="text-left py-2 pr-3 text-muted-foreground font-medium">IP</th>
+                        <th className="text-left py-2 pr-3 text-muted-foreground font-medium">Location</th>
+                        <th className="text-left py-2 pr-3 text-muted-foreground font-medium">Page</th>
+                        <th className="text-left py-2 text-muted-foreground font-medium">Time</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(() => {
+                        const ipCounts: Record<string, number> = {};
+                        visitors.forEach((v: any) => { ipCounts[v.ip_address] = (ipCounts[v.ip_address] || 0) + 1; });
+                        return visitors.map((v: any) => {
+                          const isRepeat = ipCounts[v.ip_address] > 2;
+                          return (
+                            <tr key={v.id} className={`border-b border-border/20 hover:bg-muted/20 ${isRepeat ? "bg-amber-500/5" : ""}`}>
+                              <td className={`py-2 pr-3 font-mono ${isRepeat ? "text-amber-500 font-bold" : "text-foreground"}`}>
+                                {v.ip_address}{isRepeat && <span className="text-[9px] ml-1">×{ipCounts[v.ip_address]}</span>}
+                              </td>
+                              <td className="py-2 pr-3 text-muted-foreground">{[v.city, v.region, v.country].filter(Boolean).join(", ") || "—"}</td>
+                              <td className="py-2 pr-3 text-accent">{v.page_path || "—"}</td>
+                              <td className="py-2 text-muted-foreground whitespace-nowrap">{new Date(v.created_at).toLocaleString()}</td>
+                            </tr>
+                          );
+                        });
+                      })()}
+                    </tbody>
+                  </table>
                 </div>
               )}
-              <div className="skeuo-card-inset p-3 rounded">
-                <p className="text-[10px] text-muted-foreground">
-                  <strong className="text-foreground">🔒 Kali / Pen Testing:</strong> Visitor logs require the live deployed URL — offline/local Kali scans won't register here.
-                  Test against <span className="font-mono text-accent">inspire-okc-magic.lovable.app</span> to see results.
-                  Repeat IPs (3+) are highlighted in amber for scanning detection.
-                </p>
-              </div>
             </div>
           )}
 
@@ -375,25 +516,11 @@ const Admin = () => {
                   <CheckItem ok label="No hardcoded credentials" detail="Proper auth in place" />
                   <CheckItem ok label="RLS on all tables" detail="image_cache, profiles, user_roles, visitor_logs" />
                   <CheckItem ok label="Privilege escalation blocked" detail="Only service_role can assign roles" />
-                  <CheckItem ok label="No exposed API secrets" detail="Private keys in environment variables" />
                   <CheckItem ok={brokenLinks === 0} label={`Broken source links: ${brokenLinks}`} detail={brokenLinks > 0 ? "Some event sources return 404" : "All sources responding"} />
                 </div>
               </div>
               <div className="skeuo-card-inset p-4 rounded">
-                <h3 className="label-caps text-foreground mb-3">🛡️ Protection Layers</h3>
-                <div className="space-y-3">
-                  <ThreatRow title="SQL Injection" status="protected" detail="Parameterized queries via SDK." />
-                  <ThreatRow title="XSS" status="protected" detail="React auto-escapes. No dangerouslySetInnerHTML." />
-                  <ThreatRow title="CSRF" status="protected" detail="JWT in headers, not cookies." />
-                  <ThreatRow title="Privilege Escalation" status="protected" detail="Roles server-side only." />
-                  <ThreatRow title="Brute Force" status="protected" detail="Built-in rate limiting." />
-                  <ThreatRow title="Data Exfiltration" status="protected" detail="RLS on all tables." />
-                  <ThreatRow title="MITM" status="protected" detail="HTTPS + TLS enforced." />
-                  <ThreatRow title="Session Hijacking" status="protected" detail="Short-lived JWTs with refresh tokens." />
-                </div>
-              </div>
-              <div className="skeuo-card-inset p-4 rounded">
-                <h3 className="label-caps text-foreground mb-3">🔒 RLS Policy Matrix</h3>
+                <h3 className="label-caps text-foreground mb-3">RLS Policy Matrix</h3>
                 <div className="overflow-x-auto">
                   <table className="w-full text-xs">
                     <thead>
@@ -410,7 +537,6 @@ const Admin = () => {
                       <RLSRow table="profiles" read="Own only" write="Own only" update="Own only" delete="—" />
                       <RLSRow table="user_roles" read="Own + Admin" write="Service only" update="—" delete="Service only" />
                       <RLSRow table="visitor_logs" read="Admin only" write="Service only" update="—" delete="Service only" />
-                      <RLSRow table="scan_results" read="Admin only" write="Service only" update="Service only" delete="Service only" />
                     </tbody>
                   </table>
                 </div>
@@ -418,7 +544,7 @@ const Admin = () => {
             </div>
           )}
 
-          {/* EVENTS TAB */}
+          {/* EVENTS AUDIT TAB */}
           {tab === "events" && (
             <div className="space-y-4">
               <div className="flex flex-col md:flex-row gap-3">
@@ -444,7 +570,6 @@ const Admin = () => {
           {/* AI SCANNER TAB */}
           {tab === "scanner" && (
             <div className="space-y-6">
-              {/* Action buttons */}
               <div className="flex flex-col sm:flex-row gap-3">
                 <button onClick={runScan} disabled={scanning} className="skeuo-btn flex-1 justify-center">
                   {scanning ? <><Loader2 size={14} className="animate-spin" /> Scanning…</> : <><Zap size={14} /> Run Full Scan</>}
@@ -453,33 +578,21 @@ const Admin = () => {
                   {loadingUpgrades ? <><Loader2 size={14} className="animate-spin" /> Generating…</> : <><Lightbulb size={14} /> Get Upgrade Ideas</>}
                 </button>
               </div>
-
               {scanError && (
                 <div className="skeuo-card-inset p-3 rounded border border-red-400/30">
                   <p className="text-xs text-red-400">{scanError}</p>
                 </div>
               )}
-
-              {/* Scan Findings */}
               {scanFindings && (
                 <div className="space-y-4">
                   <h3 className="label-caps text-foreground">Scan Results</h3>
                   {Object.entries(scanFindings).map(([category, findings]: [string, any]) => (
                     <div key={category} className="skeuo-card-inset p-4 rounded">
-                      <h4 className="text-sm font-bold text-foreground capitalize mb-3 flex items-center gap-2">
-                        {category === "security" && <Shield size={14} />}
-                        {category === "content" && <Eye size={14} />}
-                        {category === "links" && <Globe size={14} />}
-                        {category === "events" && <Activity size={14} />}
-                        {category}
-                        <span className="text-[10px] text-muted-foreground font-normal">({Array.isArray(findings) ? findings.length : 0} findings)</span>
-                      </h4>
+                      <h4 className="text-sm font-bold text-foreground capitalize mb-3">{category} <span className="text-[10px] text-muted-foreground font-normal">({Array.isArray(findings) ? findings.length : 0})</span></h4>
                       <div className="space-y-2">
                         {Array.isArray(findings) && findings.map((f: any, i: number) => (
                           <div key={i} className="flex items-start gap-2 py-1.5 border-b border-border/20 last:border-0">
-                            <span className={`text-[9px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded flex-shrink-0 mt-0.5 ${severityColors[f.severity] || "text-muted-foreground bg-muted/30"}`}>
-                              {f.severity}
-                            </span>
+                            <span className={`text-[9px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded flex-shrink-0 mt-0.5 ${severityColors[f.severity] || "text-muted-foreground bg-muted/30"}`}>{f.severity}</span>
                             <div>
                               <p className="text-sm font-medium text-foreground">{f.title}</p>
                               <p className="text-xs text-muted-foreground">{f.detail}</p>
@@ -491,24 +604,17 @@ const Admin = () => {
                   ))}
                 </div>
               )}
-
-              {/* Upgrade Ideas */}
               {upgradeIdeas && Array.isArray(upgradeIdeas) && (
                 <div className="space-y-4">
                   <h3 className="label-caps text-foreground">Upgrade Ideas</h3>
                   {upgradeIdeas.map((cat: any, ci: number) => (
                     <div key={ci} className="skeuo-card-inset p-4 rounded">
-                      <h4 className="text-sm font-bold text-foreground capitalize mb-3 flex items-center gap-2">
-                        <Lightbulb size={14} className="text-amber-500" />
-                        {cat.name}
-                      </h4>
+                      <h4 className="text-sm font-bold text-foreground capitalize mb-3"><Lightbulb size={14} className="inline text-amber-500 mr-1" />{cat.name}</h4>
                       <div className="space-y-3">
                         {cat.ideas?.map((idea: any, ii: number) => (
                           <div key={ii} className="flex items-start gap-3 py-2 border-b border-border/20 last:border-0">
-                            <span className={`text-[9px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded flex-shrink-0 mt-0.5 ${difficultyColors[idea.difficulty] || "text-muted-foreground bg-muted/30"}`}>
-                              {idea.difficulty}
-                            </span>
-                            <div className="flex-1">
+                            <span className={`text-[9px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded flex-shrink-0 mt-0.5 ${difficultyColors[idea.difficulty] || "text-muted-foreground bg-muted/30"}`}>{idea.difficulty}</span>
+                            <div>
                               <p className="text-sm font-medium text-foreground">{idea.title}</p>
                               <p className="text-xs text-muted-foreground mt-0.5">{idea.description}</p>
                             </div>
@@ -519,40 +625,208 @@ const Admin = () => {
                   ))}
                 </div>
               )}
-
-              {/* Scan History */}
               {scanHistory.length > 0 && (
                 <div className="skeuo-card-inset p-4 rounded">
                   <h3 className="label-caps text-foreground mb-3">Scan History</h3>
                   <div className="space-y-2">
                     {scanHistory.map((s: any) => (
                       <div key={s.id} className="flex items-center justify-between py-2 border-b border-border/20 last:border-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground uppercase tracking-wider font-medium">{s.scan_type}</span>
-                          <span className="text-xs text-muted-foreground">
-                            {s.findings && typeof s.findings === "object" ? `${Object.values(s.findings).flat().length} findings` : ""}
-                            {s.upgrade_ideas && typeof s.upgrade_ideas === "object" && (s.upgrade_ideas as any).categories ? ` · ${((s.upgrade_ideas as any).categories || []).length} categories` : ""}
-                          </span>
-                        </div>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground uppercase tracking-wider font-medium">{s.scan_type}</span>
                         <span className="text-[10px] text-muted-foreground">{new Date(s.created_at).toLocaleString()}</span>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
-
-              {/* Background monitoring info */}
-              <div className="skeuo-card-inset p-3 rounded">
-                <p className="text-[10px] text-muted-foreground">
-                  <strong className="text-foreground">⚡ Background Monitoring:</strong> Automated scans run every 6 hours and results appear in scan history above.
-                  Manual scans run immediately with fresh AI analysis.
-                </p>
-              </div>
             </div>
           )}
         </div>
       </main>
       <Footer />
+    </div>
+  );
+};
+
+/* ── Content Editor Cards ── */
+
+interface ContentCardProps {
+  isEditing: boolean;
+  editData: Record<string, any>;
+  onEdit: () => void;
+  onCancel: () => void;
+  onFieldChange: (field: string, value: string) => void;
+  onCopy: () => void;
+}
+
+const EditableField = ({ label, field, value, editData, isEditing, onChange, multiline }: {
+  label: string; field: string; value: string; editData: Record<string, any>; isEditing: boolean; onChange: (f: string, v: string) => void; multiline?: boolean;
+}) => (
+  <div className="flex flex-col gap-0.5">
+    <label className="text-[9px] uppercase tracking-wider font-bold text-muted-foreground/60">{label}</label>
+    {isEditing ? (
+      multiline ? (
+        <textarea
+          value={editData[field] ?? value}
+          onChange={(e) => onChange(field, e.target.value)}
+          className="px-2 py-1.5 bg-muted/40 border border-accent/30 rounded text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-accent resize-y min-h-[60px]"
+        />
+      ) : (
+        <input
+          value={editData[field] ?? value}
+          onChange={(e) => onChange(field, e.target.value)}
+          className="px-2 py-1 bg-muted/40 border border-accent/30 rounded text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-accent"
+        />
+      )
+    ) : (
+      <p className="text-sm text-foreground/80 leading-relaxed">{value}</p>
+    )}
+  </div>
+);
+
+const ContentCardSingles = ({ event: evt, isEditing, editData, onEdit, onCancel, onFieldChange, onCopy }: ContentCardProps & { event: SinglesEvent }) => {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div className={`skeuo-card-inset p-4 rounded ${isEditing ? "ring-2 ring-accent/30" : ""}`}>
+      <div className="flex items-center gap-3">
+        <div className={`flex-shrink-0 ${statusColors[evt.verificationStatus]}`}>
+          {evt.verificationStatus === "verified" ? <ShieldCheck size={16} /> : <ShieldAlert size={16} />}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-semibold text-foreground truncate">{evt.name}</p>
+            <span className="text-[9px] px-1.5 py-0.5 rounded bg-accent/10 text-accent flex-shrink-0">{evt.category}</span>
+            <span className="text-[9px] text-muted-foreground font-mono">{evt.confidenceScore}%</span>
+          </div>
+          <p className="text-xs text-muted-foreground truncate">{evt.organizer} · {evt.venue} · {evt.neighborhood}</p>
+        </div>
+        <div className="flex items-center gap-1 flex-shrink-0">
+          <button onClick={onCopy} className="p-1.5 hover:bg-muted/30 rounded transition-colors" title="Copy JSON">
+            <Copy size={12} className="text-muted-foreground" />
+          </button>
+          {isEditing ? (
+            <>
+              <button onClick={onCancel} className="p-1.5 hover:bg-muted/30 rounded"><X size={12} className="text-muted-foreground" /></button>
+            </>
+          ) : (
+            <button onClick={onEdit} className="p-1.5 hover:bg-muted/30 rounded"><Edit3 size={12} className="text-accent" /></button>
+          )}
+          <button onClick={() => setExpanded(!expanded)} className="p-1.5 hover:bg-muted/30 rounded">
+            {expanded ? <ChevronUp size={12} className="text-muted-foreground" /> : <ChevronDown size={12} className="text-muted-foreground" />}
+          </button>
+        </div>
+      </div>
+      {(expanded || isEditing) && (
+        <div className="mt-3 pt-3 border-t border-border/30 grid grid-cols-1 md:grid-cols-2 gap-3">
+          <EditableField label="Name" field="name" value={evt.name} editData={editData} isEditing={isEditing} onChange={onFieldChange} />
+          <EditableField label="Venue" field="venue" value={evt.venue} editData={editData} isEditing={isEditing} onChange={onFieldChange} />
+          <EditableField label="Neighborhood" field="neighborhood" value={evt.neighborhood} editData={editData} isEditing={isEditing} onChange={onFieldChange} />
+          <EditableField label="Price" field="price" value={evt.price} editData={editData} isEditing={isEditing} onChange={onFieldChange} />
+          <EditableField label="Frequency" field="frequency" value={evt.frequency} editData={editData} isEditing={isEditing} onChange={onFieldChange} />
+          <EditableField label="Tags" field="tags" value={evt.tags.join(", ")} editData={editData} isEditing={isEditing} onChange={onFieldChange} />
+          <div className="md:col-span-2">
+            <EditableField label="Description" field="description" value={evt.description} editData={editData} isEditing={isEditing} onChange={onFieldChange} multiline />
+          </div>
+          <div className="md:col-span-2">
+            <label className="text-[9px] uppercase tracking-wider font-bold text-muted-foreground/60">Sources</label>
+            <div className="mt-1 space-y-1">
+              {evt.sources.map((src, i) => (
+                <div key={i} className="flex items-center gap-2 text-xs">
+                  <span className={statusColors[src.status]}>{src.status}</span>
+                  <a href={src.url} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline truncate">{src.title || src.url}</a>
+                  <span className="text-muted-foreground/50">{src.provider}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const ContentCardFitness = ({ spot, isEditing, editData, onEdit, onCancel, onFieldChange, onCopy }: ContentCardProps & { spot: FitnessSpot }) => {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div className={`skeuo-card-inset p-4 rounded ${isEditing ? "ring-2 ring-accent/30" : ""}`}>
+      <div className="flex items-center gap-3">
+        <Dumbbell size={16} className="text-accent flex-shrink-0" />
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-semibold text-foreground truncate">{spot.name}</p>
+            <span className="text-[9px] px-1.5 py-0.5 rounded bg-accent/10 text-accent flex-shrink-0">{spot.category}</span>
+          </div>
+          <p className="text-xs text-muted-foreground truncate">{spot.neighborhood}</p>
+        </div>
+        <div className="flex items-center gap-1 flex-shrink-0">
+          <button onClick={onCopy} className="p-1.5 hover:bg-muted/30 rounded"><Copy size={12} className="text-muted-foreground" /></button>
+          {isEditing ? (
+            <button onClick={onCancel} className="p-1.5 hover:bg-muted/30 rounded"><X size={12} className="text-muted-foreground" /></button>
+          ) : (
+            <button onClick={onEdit} className="p-1.5 hover:bg-muted/30 rounded"><Edit3 size={12} className="text-accent" /></button>
+          )}
+          <button onClick={() => setExpanded(!expanded)} className="p-1.5 hover:bg-muted/30 rounded">
+            {expanded ? <ChevronUp size={12} className="text-muted-foreground" /> : <ChevronDown size={12} className="text-muted-foreground" />}
+          </button>
+          {spot.source && (
+            <a href={spot.source} target="_blank" rel="noopener noreferrer" className="p-1.5 hover:bg-muted/30 rounded"><ExternalLink size={12} className="text-muted-foreground" /></a>
+          )}
+        </div>
+      </div>
+      {(expanded || isEditing) && (
+        <div className="mt-3 pt-3 border-t border-border/30 grid grid-cols-1 md:grid-cols-2 gap-3">
+          <EditableField label="Name" field="name" value={spot.name} editData={editData} isEditing={isEditing} onChange={onFieldChange} />
+          <EditableField label="Neighborhood" field="neighborhood" value={spot.neighborhood} editData={editData} isEditing={isEditing} onChange={onFieldChange} />
+          <EditableField label="Source URL" field="source" value={spot.source} editData={editData} isEditing={isEditing} onChange={onFieldChange} />
+          <EditableField label="Tags" field="tags" value={spot.tags.join(", ")} editData={editData} isEditing={isEditing} onChange={onFieldChange} />
+          <div className="md:col-span-2">
+            <EditableField label="Description" field="description" value={spot.description} editData={editData} isEditing={isEditing} onChange={onFieldChange} multiline />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const ContentCardVolunteer = ({ org, isEditing, editData, onEdit, onCancel, onFieldChange, onCopy }: ContentCardProps & { org: VolunteerOrg }) => {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div className={`skeuo-card-inset p-4 rounded ${isEditing ? "ring-2 ring-accent/30" : ""}`}>
+      <div className="flex items-center gap-3">
+        <HandHelping size={16} className="text-accent flex-shrink-0" />
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-semibold text-foreground truncate">{org.name}</p>
+            <span className="text-[9px] px-1.5 py-0.5 rounded bg-accent/10 text-accent flex-shrink-0">{org.category}</span>
+            {org.commitment && <span className="text-[9px] text-muted-foreground">{org.commitment}</span>}
+          </div>
+          <p className="text-xs text-muted-foreground truncate">{org.neighborhood}</p>
+        </div>
+        <div className="flex items-center gap-1 flex-shrink-0">
+          <button onClick={onCopy} className="p-1.5 hover:bg-muted/30 rounded"><Copy size={12} className="text-muted-foreground" /></button>
+          {isEditing ? (
+            <button onClick={onCancel} className="p-1.5 hover:bg-muted/30 rounded"><X size={12} className="text-muted-foreground" /></button>
+          ) : (
+            <button onClick={onEdit} className="p-1.5 hover:bg-muted/30 rounded"><Edit3 size={12} className="text-accent" /></button>
+          )}
+          <button onClick={() => setExpanded(!expanded)} className="p-1.5 hover:bg-muted/30 rounded">
+            {expanded ? <ChevronUp size={12} className="text-muted-foreground" /> : <ChevronDown size={12} className="text-muted-foreground" />}
+          </button>
+          {org.source && (
+            <a href={org.source} target="_blank" rel="noopener noreferrer" className="p-1.5 hover:bg-muted/30 rounded"><ExternalLink size={12} className="text-muted-foreground" /></a>
+          )}
+        </div>
+      </div>
+      {(expanded || isEditing) && (
+        <div className="mt-3 pt-3 border-t border-border/30 grid grid-cols-1 md:grid-cols-2 gap-3">
+          <EditableField label="Name" field="name" value={org.name} editData={editData} isEditing={isEditing} onChange={onFieldChange} />
+          <EditableField label="Neighborhood" field="neighborhood" value={org.neighborhood} editData={editData} isEditing={isEditing} onChange={onFieldChange} />
+          <EditableField label="Source URL" field="source" value={org.source} editData={editData} isEditing={isEditing} onChange={onFieldChange} />
+          <EditableField label="Tags" field="tags" value={org.tags.join(", ")} editData={editData} isEditing={isEditing} onChange={onFieldChange} />
+          <div className="md:col-span-2">
+            <EditableField label="Description" field="description" value={org.description} editData={editData} isEditing={isEditing} onChange={onFieldChange} multiline />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -574,27 +848,6 @@ const CheckItem = ({ ok, label, detail }: { ok: boolean; label: string; detail: 
     <div>
       <p className="text-sm text-foreground">{label}</p>
       <p className="text-xs text-muted-foreground">{detail}</p>
-    </div>
-  </div>
-);
-
-const ThreatRow = ({ title, status, detail }: { title: string; status: "protected" | "monitored" | "warning"; detail: string }) => (
-  <div className="flex items-start gap-3 py-2 border-b border-border/30 last:border-0">
-    <div className="flex-shrink-0 mt-0.5">
-      {status === "protected" && <ShieldCheck size={14} className="text-emerald-500" />}
-      {status === "monitored" && <Eye size={14} className="text-amber-500" />}
-      {status === "warning" && <AlertTriangle size={14} className="text-red-400" />}
-    </div>
-    <div className="flex-1">
-      <div className="flex items-center gap-2">
-        <p className="text-sm font-medium text-foreground">{title}</p>
-        <span className={`text-[9px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded ${
-          status === "protected" ? "bg-emerald-500/10 text-emerald-500" :
-          status === "monitored" ? "bg-amber-500/10 text-amber-500" :
-          "bg-red-400/10 text-red-400"
-        }`}>{status}</span>
-      </div>
-      <p className="text-xs text-muted-foreground mt-0.5">{detail}</p>
     </div>
   </div>
 );

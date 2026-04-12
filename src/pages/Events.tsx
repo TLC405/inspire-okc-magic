@@ -1,17 +1,18 @@
 import { useState, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { singlesEvents, singlesCategories, getPublishableEvents } from "@/data/singlesEvents";
 import { ListingImage } from "@/components/ListingImage";
-import { ExternalLink, Heart, Search, Clock, MapPin, Shield, ShieldAlert, Users, Sparkles, Zap } from "lucide-react";
+import { ExternalLink, Heart, Search, Clock, MapPin, Shield, ShieldAlert, Users, Sparkles } from "lucide-react";
 import { useWeather } from "@/hooks/useWeather";
 
+// Events page categories — exclude Date Night (has its own page) and Speed Dating/Mixer (those are Singles)
+const eventsCategories = ["All", "Social", "Dance", "Activity", "Faith", "Team Building"] as const;
+
 const categoryLabels: Record<string, string> = {
-  "All": "All Categories",
-  "Date Night": "Date Night",
+  "All": "All Events",
   "Team Building": "Team Building",
-  "Speed Dating": "Speed Dating",
-  "Mixer": "Mixer",
   "Social": "Social",
   "Dance": "Dance",
   "Activity": "Activity",
@@ -19,10 +20,7 @@ const categoryLabels: Record<string, string> = {
 };
 
 const editorialTaglines: Record<string, string> = {
-  "Date Night": "Curated evenings for couples and adventurers across the metro",
   "Team Building": "Group experiences designed for real connection, not corporate clichés",
-  "Speed Dating": "Structured introductions for singles on a schedule",
-  "Mixer": "Low-pressure social gatherings across Oklahoma City",
   "Social": "Community events open to everyone — no RSVP required",
   "Dance": "From ballroom to bachata, the city's best dance floors",
   "Activity": "Hands-on group experiences beyond the usual happy hour",
@@ -35,7 +33,12 @@ const Events = () => {
   const [search, setSearch] = useState("");
   const [timeFilter, setTimeFilter] = useState("All");
 
-  const publishable = useMemo(() => getPublishableEvents(singlesEvents), []);
+  // Exclude Date Night (own page at /date-nights) and Speed Dating/Mixer (own page at /singles)
+  const publishable = useMemo(() => {
+    return getPublishableEvents(singlesEvents).filter(
+      (e) => e.category !== "Date Night" && e.category !== "Speed Dating" && e.category !== "Mixer"
+    );
+  }, []);
 
   const filtered = useMemo(() => {
     return publishable.filter((evt) => {
@@ -57,9 +60,8 @@ const Events = () => {
     });
   }, [publishable, category, search, timeFilter]);
 
-  const dateNights = filtered.filter((e) => e.category === "Date Night");
   const teamBuilding = filtered.filter((e) => e.category === "Team Building");
-  const otherEvents = filtered.filter((e) => e.category !== "Date Night" && e.category !== "Team Building");
+  const otherEvents = filtered.filter((e) => e.category !== "Team Building");
 
   return (
     <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0 animate-fade-in">
@@ -71,19 +73,28 @@ const Events = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
           <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
             <div className="flex items-center gap-2 mb-2">
-              <Heart size={28} className="text-accent" />
-              <Sparkles size={20} className="text-accent/60" />
+              <Sparkles size={28} className="text-accent" />
             </div>
             <h1 className="masthead text-foreground text-center text-3xl md:text-5xl font-black">
-              Events &amp; Date Nights
+              Community Events
             </h1>
             <p className="text-sm md:text-base text-muted-foreground mt-2 text-center max-w-lg">
-              Oklahoma City's curated guide to experiences for couples, groups, and solo adventurers
+              Social gatherings, dance nights, team building, and community activities across Oklahoma City
             </p>
             <p className="dateline text-muted-foreground/60 mt-1">
               Staff Report · Community Desk
               {weather && <span className="ml-2">{weather.icon} {weather.temperature}°F · {weather.description}</span>}
             </p>
+          </div>
+        </div>
+
+        {/* Cross-links to related pages */}
+        <div className="container py-3">
+          <div className="flex items-center justify-center gap-3 text-xs">
+            <span className="text-muted-foreground">Looking for:</span>
+            <Link to="/singles" className="text-accent hover:underline font-semibold">Speed Dating & Mixers →</Link>
+            <span className="text-foreground/20">|</span>
+            <Link to="/date-nights" className="text-accent hover:underline font-semibold">Date Nights →</Link>
           </div>
         </div>
 
@@ -94,14 +105,14 @@ const Events = () => {
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="text"
-                placeholder="Search events, venues, vibes..."
+                placeholder="Search events, venues, neighborhoods..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full pl-9 pr-4 py-2.5 bg-muted/30 border border-border/50 rounded text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-accent"
               />
             </div>
             <div className="flex flex-wrap gap-1.5">
-              {singlesCategories.map((cat) => (
+              {eventsCategories.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setCategory(cat)}
@@ -140,26 +151,6 @@ const Events = () => {
           </div>
         )}
 
-        {/* Date Nights Featured */}
-        {(category === "All" || category === "Date Night") && dateNights.length > 0 && (
-          <div className="container pb-6">
-            <div className="flex items-center gap-2 mb-1">
-              <h2 className="section-head text-foreground flex items-center gap-2">
-                <Heart size={18} className="text-accent" /> Date Nights
-              </h2>
-              <span className="text-xs text-muted-foreground italic ml-2 hidden md:inline">
-                — Curated evenings for two
-              </span>
-            </div>
-            <p className="dateline text-muted-foreground mb-4">{dateNights.length} curated date experiences</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {dateNights.map((evt) => (
-                <EventCard key={evt.id} event={evt} accent="rose" />
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Team Building Featured */}
         {(category === "All" || category === "Team Building") && teamBuilding.length > 0 && (
           <div className="container pb-6">
@@ -174,14 +165,14 @@ const Events = () => {
             <p className="dateline text-muted-foreground mb-4">{teamBuilding.length} group experiences across the metro</p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {teamBuilding.map((evt) => (
-                <EventCard key={evt.id} event={evt} accent="blue" />
+                <EventCard key={evt.id} event={evt} />
               ))}
             </div>
           </div>
         )}
 
         {/* Other Events */}
-        {otherEvents.length > 0 && category !== "Date Night" && category !== "Team Building" && (
+        {otherEvents.length > 0 && category !== "Team Building" && (
           <div className="container pb-8">
             <h2 className="section-head text-foreground mb-1">
               {category === "All" ? "All Events" : category}
@@ -191,7 +182,7 @@ const Events = () => {
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {otherEvents.map((evt) => (
-                <EventCard key={evt.id} event={evt} accent="accent" />
+                <EventCard key={evt.id} event={evt} />
               ))}
             </div>
           </div>
@@ -207,7 +198,7 @@ const Events = () => {
           </div>
         )}
 
-        {/* Fun footer note */}
+        {/* Footer note */}
         <div className="container pb-8">
           <div className="skeuo-card-inset p-4 rounded-lg text-center">
             <p className="text-xs text-muted-foreground">
@@ -223,12 +214,9 @@ const Events = () => {
   );
 };
 
-const EventCard = ({ event: evt, accent }: { event: typeof singlesEvents[0]; accent: "rose" | "blue" | "accent" }) => {
-  const borderColor = accent === "rose" ? "border-accent/10" : accent === "blue" ? "border-accent/10" : "border-border/50";
-  const badgeBg = "bg-accent/20 text-accent-foreground";
-
+const EventCard = ({ event: evt }: { event: typeof singlesEvents[0] }) => {
   return (
-    <div className={`skeuo-card rounded-lg overflow-hidden border ${borderColor} transition-all hover:translate-y-[-2px]`}>
+    <div className="skeuo-card rounded-lg overflow-hidden border border-border/50 transition-all hover:translate-y-[-2px]">
       <div className="h-40 relative">
         <ListingImage
           listingType="singles"
@@ -240,7 +228,7 @@ const EventCard = ({ event: evt, accent }: { event: typeof singlesEvents[0]; acc
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         <div className="absolute bottom-2 left-3 right-3 flex items-end justify-between">
-          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full ${badgeBg} text-[10px] font-semibold backdrop-blur-sm`}>
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-accent/20 text-accent-foreground text-[10px] font-semibold backdrop-blur-sm">
             {evt.category}
           </span>
           <span className="text-white/70 text-[10px] font-mono">{evt.price}</span>

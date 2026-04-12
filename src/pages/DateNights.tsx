@@ -37,7 +37,7 @@ const DateNights = () => {
   }, [dateNights, search, sub]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0 animate-fade-in">
       <Navbar />
       <main className="flex-1">
         {/* Romantic Hero */}
