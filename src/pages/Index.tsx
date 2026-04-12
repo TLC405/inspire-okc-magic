@@ -388,6 +388,82 @@ const Index = () => {
           </div>
 
           <div className="rule-heavy mt-6" />
+          </div>
+
+          {/* Mobile: stacked single-column cards */}
+          <div className="md:hidden space-y-4">
+            {/* Singles */}
+            <div className="skeuo-card rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Heart size={16} className="text-accent" />
+                <h3 className="section-head text-foreground text-base">Singles Events</h3>
+                <span className="dateline text-muted-foreground ml-auto">{singlesEvents.length} events</span>
+              </div>
+              {singlesTeaser.slice(0, 2).map((evt) => (
+                <div key={evt.id} className="flex items-center gap-3 py-2 border-b border-foreground/[0.06] last:border-0">
+                  <div className="w-10 h-10 rounded flex-shrink-0 overflow-hidden">
+                    <ListingImage listingType="singles" listingId={evt.id} name={evt.name} category={evt.category} websiteUrl={evt.sources[0]?.url} className="w-full h-full" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-foreground truncate">{evt.name}</p>
+                    <p className="text-xs text-muted-foreground truncate">{evt.venue}</p>
+                  </div>
+                  <span className="skeuo-badge-accent text-[9px] flex-shrink-0">{evt.category}</span>
+                </div>
+              ))}
+              <Link to="/singles" className="inline-flex items-center gap-1 mt-2 text-xs text-accent font-semibold">
+                See all <ArrowRight size={10} />
+              </Link>
+            </div>
+
+            {/* Fitness */}
+            <div className="skeuo-card rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Dumbbell size={16} className="text-accent" />
+                <h3 className="section-head text-foreground text-base">Fitness Spots</h3>
+                <span className="dateline text-muted-foreground ml-auto">{fitnessSpots.length} spots</span>
+              </div>
+              {fitnessTeaser.slice(0, 2).map((spot) => (
+                <div key={spot.id} className="flex items-center gap-3 py-2 border-b border-foreground/[0.06] last:border-0">
+                  <div className="w-10 h-10 rounded flex-shrink-0 overflow-hidden">
+                    <ListingImage listingType="fitness" listingId={spot.id} name={spot.name} category={spot.category} websiteUrl={spot.source} className="w-full h-full" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-foreground truncate">{spot.name}</p>
+                    <p className="text-xs text-muted-foreground truncate">{spot.neighborhood}</p>
+                  </div>
+                  <span className="skeuo-badge-accent text-[9px] flex-shrink-0">{spot.category}</span>
+                </div>
+              ))}
+              <Link to="/fitness" className="inline-flex items-center gap-1 mt-2 text-xs text-accent font-semibold">
+                See all <ArrowRight size={10} />
+              </Link>
+            </div>
+
+            {/* Volunteering */}
+            <div className="skeuo-card rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <HandHelping size={16} className="text-accent" />
+                <h3 className="section-head text-foreground text-base">Volunteering</h3>
+                <span className="dateline text-muted-foreground ml-auto">{volunteerOrgs.length} orgs</span>
+              </div>
+              {volunteerOrgs.slice(0, 2).map((org) => (
+                <div key={org.id} className="flex items-center gap-3 py-2 border-b border-foreground/[0.06] last:border-0">
+                  <div className="w-10 h-10 rounded flex-shrink-0 overflow-hidden">
+                    <ListingImage listingType="volunteer" listingId={org.id} name={org.name} category={org.category} websiteUrl={org.source} className="w-full h-full" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-foreground truncate">{org.name}</p>
+                    <p className="text-xs text-muted-foreground truncate">{org.neighborhood}</p>
+                  </div>
+                  <span className="skeuo-badge-accent text-[9px] flex-shrink-0">{org.category}</span>
+                </div>
+              ))}
+              <Link to="/volunteering" className="inline-flex items-center gap-1 mt-2 text-xs text-accent font-semibold">
+                See all <ArrowRight size={10} />
+              </Link>
+            </div>
+          </div>
         </div>
 
         <FolioLine page="Page A3" note="Lifestyle" />
