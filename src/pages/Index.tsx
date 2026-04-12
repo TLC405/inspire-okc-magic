@@ -343,6 +343,11 @@ const Index = () => {
           </div>
         </div>
 
+        {/* ═══ Tonight in OKC ═══ */}
+        <div className="container py-4 md:py-6">
+          <TonightBlock />
+        </div>
+
         <FolioLine page="Page A2" note="Broadsheet" />
 
         {/* ═══ Broadsheet Columns ═══ */}
