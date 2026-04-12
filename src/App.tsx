@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { useVisitorLog } from "@/hooks/useVisitorLog";
+import { MobileTabBar } from "@/components/MobileTabBar";
 import Index from "./pages/Index";
 import Singles from "./pages/Singles";
 import Events from "./pages/Events";
@@ -20,18 +21,21 @@ const queryClient = new QueryClient();
 const AppInner = () => {
   useVisitorLog();
   return (
-    <Routes>
-      <Route path="/" element={<Index />} />
-      <Route path="/singles" element={<Singles />} />
-      <Route path="/events" element={<Events />} />
-      <Route path="/date-nights" element={<DateNights />} />
-      <Route path="/fitness" element={<Workouts />} />
-      <Route path="/volunteering" element={<Volunteering />} />
-      <Route path="/discover" element={<Discover />} />
-      <Route path="/admin" element={<Admin />} />
-      <Route path="/workouts" element={<Navigate to="/fitness" replace />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/singles" element={<Singles />} />
+        <Route path="/events" element={<Events />} />
+        <Route path="/date-nights" element={<DateNights />} />
+        <Route path="/fitness" element={<Workouts />} />
+        <Route path="/volunteering" element={<Volunteering />} />
+        <Route path="/discover" element={<Discover />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/workouts" element={<Navigate to="/fitness" replace />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+      <MobileTabBar />
+    </>
   );
 };
 
