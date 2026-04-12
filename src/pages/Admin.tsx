@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { useAuth } from "@/hooks/useAuth";
@@ -7,11 +7,13 @@ import { fitnessSpots, type FitnessSpot } from "@/data/fitnessSpots";
 import { volunteerOrgs, type VolunteerOrg } from "@/data/volunteerOrgs";
 import { cityShowcase } from "@/data/cityShowcase";
 import { supabase } from "@/integrations/supabase/client";
+import ReactMarkdown from "react-markdown";
 import {
   Shield, ShieldCheck, ShieldAlert, AlertTriangle, Search, MapPin, Eye, Database, Key,
-  CheckCircle2, XCircle, RefreshCw, LogOut, UserPlus, Fingerprint,
+  CheckCircle2, XCircle, RefreshCw, LogOut, Fingerprint,
   Globe, Activity, Users, Zap, Lightbulb, Loader2,
-  Edit3, Save, X, Heart, Dumbbell, HandHelping, ChevronDown, ChevronUp, ExternalLink, Trash2, Copy
+  Edit3, Save, X, Heart, Dumbbell, HandHelping, ChevronDown, ChevronUp, ExternalLink, Trash2, Copy,
+  MessageSquare, Send, Settings, Sparkles, Brain
 } from "lucide-react";
 
 const statusColors: Record<VerificationStatus, string> = {
@@ -34,19 +36,22 @@ const difficultyColors: Record<string, string> = {
   hard: "text-red-500 bg-red-500/10",
 };
 
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-chat`;
+
+type ChatMsg = { role: "user" | "assistant"; content: string };
+
 const Admin = () => {
-  const { user, loading, isAdmin, signIn, signUp, signOut, bootstrapAdmin } = useAuth();
+  const { user, loading, isAdmin, signIn, signUp, signOut } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const [authError, setAuthError] = useState("");
   const [authMsg, setAuthMsg] = useState("");
-  const [tab, setTab] = useState<"content" | "visitors" | "security" | "events" | "scanner">("content");
+  const [tab, setTab] = useState<"content" | "visitors" | "security" | "events" | "scanner" | "ai">("content");
   const [evtSearch, setEvtSearch] = useState("");
   const [evtFilter, setEvtFilter] = useState<"all" | VerificationStatus>("all");
   const [visitors, setVisitors] = useState<any[]>([]);
   const [loadingVisitors, setLoadingVisitors] = useState(false);
-  const [bootstrapping, setBootstrapping] = useState(false);
 
   // Scanner state
   const [scanning, setScanning] = useState(false);
@@ -62,6 +67,15 @@ const Admin = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editData, setEditData] = useState<Record<string, any>>({});
   const [copiedMsg, setCopiedMsg] = useState("");
+
+  // AI Chat state
+  const [chatMessages, setChatMessages] = useState<ChatMsg[]>([]);
+  const [chatInput, setChatInput] = useState("");
+  const [chatLoading, setChatLoading] = useState(false);
+  const [customInstructions, setCustomInstructions] = useState("");
+  const [instructionsSaved, setInstructionsSaved] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
   const verifiedEvents = singlesEvents.filter((e) => e.verificationStatus === "verified").length;
   const brokenLinks = singlesEvents.flatMap((e) => e.sources).filter((s) => s.status === "broken").length;
@@ -93,6 +107,130 @@ const Admin = () => {
       });
     }
   }, [tab, isAdmin]);
+
+  // Load chat history and custom instructions
+  useEffect(() => {
+    if (tab === "ai" && isAdmin && user) {
+      supabase.from("admin_chat_messages").select("*").eq("user_id", user.id).order("created_at", { ascending: true }).limit(100).then(({ data }) => {
+        if (data && data.length > 0) {
+          setChatMessages(data.map((m: any) => ({ role: m.role as "user" | "assistant", content: m.content })));
+        }
+      });
+      supabase.from("admin_settings").select("*").eq("user_id", user.id).eq("setting_key", "custom_instructions").single().then(({ data }) => {
+        if (data) setCustomInstructions(data.setting_value);
+      });
+    }
+  }, [tab, isAdmin, user]);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chatMessages]);
+
+  const saveCustomInstructions = async () => {
+    if (!user) return;
+    await supabase.from("admin_settings").upsert({
+      user_id: user.id,
+      setting_key: "custom_instructions",
+      setting_value: customInstructions,
+    }, { onConflict: "user_id,setting_key" });
+    setInstructionsSaved(true);
+    setTimeout(() => setInstructionsSaved(false), 2000);
+  };
+
+  const sendChat = useCallback(async (input?: string) => {
+    const text = input || chatInput.trim();
+    if (!text || chatLoading) return;
+    setChatInput("");
+
+    const userMsg: ChatMsg = { role: "user", content: text };
+    setChatMessages(prev => [...prev, userMsg]);
+    setChatLoading(true);
+
+    // Persist user message
+    if (user) {
+      supabase.from("admin_chat_messages").insert({ user_id: user.id, role: "user", content: text }).then(() => {});
+    }
+
+    let assistantSoFar = "";
+    try {
+      const session = await supabase.auth.getSession();
+      const token = session.data.session?.access_token;
+
+      const resp = await fetch(CHAT_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        },
+        body: JSON.stringify({
+          messages: [...chatMessages, userMsg].map(m => ({ role: m.role, content: m.content })),
+          customInstructions,
+        }),
+      });
+
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({ error: "Stream failed" }));
+        throw new Error(err.error || `Error ${resp.status}`);
+      }
+
+      const reader = resp.body!.getReader();
+      const decoder = new TextDecoder();
+      let textBuffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        textBuffer += decoder.decode(value, { stream: true });
+
+        let newlineIndex: number;
+        while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
+          let line = textBuffer.slice(0, newlineIndex);
+          textBuffer = textBuffer.slice(newlineIndex + 1);
+          if (line.endsWith("\r")) line = line.slice(0, -1);
+          if (line.startsWith(":") || line.trim() === "") continue;
+          if (!line.startsWith("data: ")) continue;
+
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === "[DONE]") break;
+
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+            if (content) {
+              assistantSoFar += content;
+              setChatMessages(prev => {
+                const last = prev[prev.length - 1];
+                if (last?.role === "assistant") {
+                  return prev.map((m, i) => i === prev.length - 1 ? { ...m, content: assistantSoFar } : m);
+                }
+                return [...prev, { role: "assistant", content: assistantSoFar }];
+              });
+            }
+          } catch {
+            textBuffer = line + "\n" + textBuffer;
+            break;
+          }
+        }
+      }
+
+      // Persist assistant message
+      if (user && assistantSoFar) {
+        supabase.from("admin_chat_messages").insert({ user_id: user.id, role: "assistant", content: assistantSoFar }).then(() => {});
+      }
+    } catch (e: any) {
+      setChatMessages(prev => [...prev, { role: "assistant", content: `Error: ${e.message}` }]);
+    }
+
+    setChatLoading(false);
+  }, [chatInput, chatMessages, chatLoading, user, customInstructions]);
+
+  const clearChat = async () => {
+    setChatMessages([]);
+    if (user) {
+      await supabase.from("admin_chat_messages").delete().eq("user_id", user.id);
+    }
+  };
 
   const runScan = async () => {
     setScanning(true);
@@ -141,13 +279,6 @@ const Admin = () => {
       const { error } = await signIn(email, password);
       if (error) setAuthError(error.message);
     }
-  };
-
-  const handleBootstrap = async () => {
-    setBootstrapping(true);
-    const { error } = await bootstrapAdmin();
-    if (error) setAuthError(typeof error === "string" ? error : "Failed to bootstrap admin");
-    setBootstrapping(false);
   };
 
   // Content editor helpers
@@ -254,9 +385,7 @@ const Admin = () => {
             <p className="text-xs text-muted-foreground mb-4">
               Signed in as <span className="text-foreground font-medium">{user.email}</span>
             </p>
-            <button onClick={handleBootstrap} disabled={bootstrapping} className="skeuo-btn w-full justify-center mb-3">
-              <UserPlus size={13} /> {bootstrapping ? "Granting…" : "Bootstrap Admin (First User Only)"}
-            </button>
+            <p className="text-xs text-muted-foreground mb-4">Contact the site administrator for access.</p>
             <button onClick={signOut} className="text-xs text-muted-foreground hover:text-foreground">
               <LogOut size={12} className="inline mr-1" /> Sign Out
             </button>
@@ -274,6 +403,14 @@ const Admin = () => {
     { id: "security" as const, label: "Security", icon: Shield },
     { id: "events" as const, label: "Audit", icon: Eye },
     { id: "scanner" as const, label: "AI Scanner", icon: Zap },
+    { id: "ai" as const, label: "AI / Settings", icon: Brain },
+  ];
+
+  const quickActions = [
+    { label: "Audit homepage", prompt: "Run a detailed audit of the homepage. What's working, what's not, and what should change?" },
+    { label: "Suggest upgrades", prompt: "Give me 5 creative, non-obvious upgrades I should make to the app. Focus on things competitors aren't doing." },
+    { label: "Write Singles copy", prompt: "Write compelling editorial copy for the Singles events page hero section. Match the broadsheet journalism voice." },
+    { label: "Analyze traffic", prompt: "Based on the platform architecture, what strategies would maximize organic traffic and user engagement?" },
   ];
 
   return (
@@ -335,6 +472,131 @@ const Admin = () => {
         )}
 
         <div className="skeuo-card rounded-lg p-6">
+          {/* ═══ AI / SETTINGS TAB ═══ */}
+          {tab === "ai" && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Sparkles size={20} className="text-accent" />
+                  <div>
+                    <h2 className="headline text-foreground text-lg">INSPIRE Intelligence</h2>
+                    <p className="text-xs text-muted-foreground">Your editorial AI — contextualized with the full platform</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button onClick={() => setShowSettings(!showSettings)} className={`skeuo-btn text-xs ${showSettings ? "bg-accent/20" : ""}`}>
+                    <Settings size={12} /> {showSettings ? "Chat" : "Settings"}
+                  </button>
+                  <button onClick={clearChat} className="skeuo-btn text-xs">
+                    <Trash2 size={12} /> Clear
+                  </button>
+                </div>
+              </div>
+
+              {showSettings ? (
+                <div className="space-y-4">
+                  <div className="skeuo-card-inset p-4 rounded">
+                    <h3 className="label-caps text-foreground mb-2">Custom Instructions</h3>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      These instructions are prepended to every AI conversation. Use them to set preferences, brand rules, or focus areas.
+                    </p>
+                    <textarea
+                      value={customInstructions}
+                      onChange={(e) => setCustomInstructions(e.target.value)}
+                      placeholder="e.g., Always suggest mobile-first designs. Focus on conversion optimization. Reference Bricktown and Midtown neighborhoods..."
+                      className="w-full px-3 py-2 bg-muted/30 border border-border/50 rounded text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-accent min-h-[120px] resize-y"
+                    />
+                    <div className="flex items-center gap-2 mt-2">
+                      <button onClick={saveCustomInstructions} className="skeuo-btn text-xs">
+                        <Save size={12} /> Save Instructions
+                      </button>
+                      {instructionsSaved && <span className="text-xs text-emerald-500">Saved</span>}
+                    </div>
+                  </div>
+                  <div className="skeuo-card-inset p-4 rounded">
+                    <h3 className="label-caps text-foreground mb-2">System Context</h3>
+                    <p className="text-xs text-muted-foreground mb-2">The AI has built-in knowledge of:</p>
+                    <ul className="text-xs text-muted-foreground space-y-1">
+                      <li>• Full platform architecture (React + Vite + Tailwind + Supabase)</li>
+                      <li>• All 6 directories with data structure details</li>
+                      <li>• Brand voice guidelines (broadsheet journalism)</li>
+                      <li>• Theme system (Signal, Editorial, Raw)</li>
+                      <li>• Edge functions and database schema</li>
+                      <li>• Triple-verification system and confidence scoring</li>
+                    </ul>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {/* Quick Actions */}
+                  {chatMessages.length === 0 && (
+                    <div className="grid grid-cols-2 gap-2">
+                      {quickActions.map((action) => (
+                        <button
+                          key={action.label}
+                          onClick={() => sendChat(action.prompt)}
+                          className="skeuo-card-inset p-3 rounded text-left hover:bg-muted/30 transition-colors"
+                        >
+                          <p className="text-xs font-semibold text-foreground">{action.label}</p>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Chat Messages */}
+                  <div className="skeuo-card-inset rounded p-4 max-h-[500px] overflow-y-auto space-y-4">
+                    {chatMessages.length === 0 && (
+                      <div className="text-center py-8">
+                        <Brain size={32} className="mx-auto mb-3 text-muted-foreground/30" />
+                        <p className="text-sm text-muted-foreground">Ask anything about your platform, content, or strategy</p>
+                      </div>
+                    )}
+                    {chatMessages.map((msg, i) => (
+                      <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                        <div className={`max-w-[85%] rounded-lg px-4 py-3 ${
+                          msg.role === "user"
+                            ? "bg-accent/15 text-foreground"
+                            : "bg-muted/30 text-foreground"
+                        }`}>
+                          {msg.role === "assistant" ? (
+                            <div className="prose prose-sm dark:prose-invert max-w-none text-sm [&_p]:mb-2 [&_ul]:mb-2 [&_li]:mb-0.5 [&_h1]:text-base [&_h2]:text-sm [&_h3]:text-sm [&_code]:text-xs [&_pre]:text-xs">
+                              <ReactMarkdown>{msg.content}</ReactMarkdown>
+                            </div>
+                          ) : (
+                            <p className="text-sm">{msg.content}</p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                    {chatLoading && (
+                      <div className="flex justify-start">
+                        <div className="bg-muted/30 rounded-lg px-4 py-3">
+                          <Loader2 size={14} className="animate-spin text-accent" />
+                        </div>
+                      </div>
+                    )}
+                    <div ref={chatEndRef} />
+                  </div>
+
+                  {/* Chat Input */}
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={chatInput}
+                      onChange={(e) => setChatInput(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendChat()}
+                      placeholder="Ask INSPIRE Intelligence..."
+                      className="flex-1 px-4 py-2.5 bg-muted/30 border border-border/50 rounded text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-accent"
+                    />
+                    <button onClick={() => sendChat()} disabled={chatLoading || !chatInput.trim()} className="skeuo-btn">
+                      <Send size={14} />
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
           {/* ═══ CONTENT EDITOR TAB ═══ */}
           {tab === "content" && (
             <div className="space-y-4">
@@ -387,7 +649,6 @@ const Admin = () => {
                 />
               </div>
 
-              {/* Singles / Events content */}
               {contentTab === "singles" && (
                 <div className="space-y-2">
                   <p className="dateline text-muted-foreground">{filteredContentSingles.length} listings</p>
@@ -406,7 +667,6 @@ const Admin = () => {
                 </div>
               )}
 
-              {/* Fitness content */}
               {contentTab === "fitness" && (
                 <div className="space-y-2">
                   <p className="dateline text-muted-foreground">{filteredContentFitness.length} spots</p>
@@ -425,7 +685,6 @@ const Admin = () => {
                 </div>
               )}
 
-              {/* Volunteer content */}
               {contentTab === "volunteer" && (
                 <div className="space-y-2">
                   <p className="dateline text-muted-foreground">{filteredContentVolunteer.length} orgs</p>
@@ -513,8 +772,8 @@ const Admin = () => {
                 <div className="space-y-2">
                   <CheckItem ok label="Authentication required for admin" detail="Auth with email verification" />
                   <CheckItem ok label="Role-based access control (RBAC)" detail="Admin role checked server-side" />
-                  <CheckItem ok label="No hardcoded credentials" detail="Proper auth in place" />
-                  <CheckItem ok label="RLS on all tables" detail="image_cache, profiles, user_roles, visitor_logs" />
+                  <CheckItem ok label="Master admin hardcoded" detail="inspirelawton@gmail.com — auto-granted on login" />
+                  <CheckItem ok label="RLS on all tables" detail="image_cache, profiles, user_roles, visitor_logs, admin_*" />
                   <CheckItem ok label="Privilege escalation blocked" detail="Only service_role can assign roles" />
                   <CheckItem ok={brokenLinks === 0} label={`Broken source links: ${brokenLinks}`} detail={brokenLinks > 0 ? "Some event sources return 404" : "All sources responding"} />
                 </div>
@@ -537,6 +796,8 @@ const Admin = () => {
                       <RLSRow table="profiles" read="Own only" write="Own only" update="Own only" delete="—" />
                       <RLSRow table="user_roles" read="Own + Admin" write="Service only" update="—" delete="Service only" />
                       <RLSRow table="visitor_logs" read="Admin only" write="Service only" update="—" delete="Service only" />
+                      <RLSRow table="admin_chat_messages" read="Own (Admin)" write="Own (Admin)" update="—" delete="Own (Admin)" />
+                      <RLSRow table="admin_settings" read="Own (Admin)" write="Own (Admin)" update="Own (Admin)" delete="Own (Admin)" />
                     </tbody>
                   </table>
                 </div>
@@ -704,9 +965,7 @@ const ContentCardSingles = ({ event: evt, isEditing, editData, onEdit, onCancel,
             <Copy size={12} className="text-muted-foreground" />
           </button>
           {isEditing ? (
-            <>
-              <button onClick={onCancel} className="p-1.5 hover:bg-muted/30 rounded"><X size={12} className="text-muted-foreground" /></button>
-            </>
+            <button onClick={onCancel} className="p-1.5 hover:bg-muted/30 rounded"><X size={12} className="text-muted-foreground" /></button>
           ) : (
             <button onClick={onEdit} className="p-1.5 hover:bg-muted/30 rounded"><Edit3 size={12} className="text-accent" /></button>
           )}
