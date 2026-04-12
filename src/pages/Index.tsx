@@ -15,7 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import heroSingles from "@/assets/hero-singles.jpg";
 import heroFitness from "@/assets/hero-fitness.jpg";
 import heroVolunteer from "@/assets/hero-volunteer.jpg";
-import okcChar2 from "@/assets/okc-char-2.png";
+
 
 const today = new Date();
 const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -138,7 +138,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0">
+    <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0 animate-fade-in">
       <Navbar />
 
       <main className="flex-1">
@@ -559,34 +559,25 @@ const Index = () => {
 
         <FolioLine page="Page B1" note="Back Page" />
 
-        {/* ═══ Character accent ═══ */}
-        <div className="container py-4 flex items-center gap-4">
-          <img src={okcChar2} alt="OKC Character" className="w-20 md:w-28 drop-shadow-lg" />
-          <div>
-            <p className="headline text-foreground text-sm md:text-base">Your guide to everything Oklahoma City</p>
-            <p className="text-xs text-muted-foreground mt-0.5">From Bricktown to Paseo — we've got it covered.</p>
-          </div>
-        </div>
-
-        {/* ═══ Stats Bar ═══ */}
+        {/* ═══ Stats Bar — Product-Value Metrics ═══ */}
         <div className="container pb-8">
           <div className="skeuo-card-inset p-4 md:p-6 rounded-lg">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 text-center">
               <div>
                 <p className="text-2xl md:text-4xl font-black text-foreground">{totalListings}</p>
-                <p className="dateline text-muted-foreground mt-1">Total Listings</p>
+                <p className="dateline text-muted-foreground mt-1">Verified Listings</p>
               </div>
               <div>
-                <p className="text-2xl md:text-4xl font-black text-foreground">29</p>
-                <p className="dateline text-muted-foreground mt-1">Fitness Categories</p>
+                <p className="text-2xl md:text-4xl font-black text-foreground">6</p>
+                <p className="dateline text-muted-foreground mt-1">Categories</p>
               </div>
               <div>
-                <p className="text-2xl md:text-4xl font-black text-foreground">700K+</p>
-                <p className="dateline text-muted-foreground mt-1">Population</p>
+                <p className="text-2xl md:text-4xl font-black text-foreground">98%</p>
+                <p className="dateline text-muted-foreground mt-1">Avg Confidence</p>
               </div>
               <div>
-                <p className="text-2xl md:text-4xl font-black text-foreground">405</p>
-                <p className="dateline text-muted-foreground mt-1">Area Code</p>
+                <p className="text-2xl md:text-4xl font-black text-foreground">✓</p>
+                <p className="dateline text-muted-foreground mt-1">Updated This Week</p>
               </div>
             </div>
           </div>

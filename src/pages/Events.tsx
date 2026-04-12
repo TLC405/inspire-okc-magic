@@ -4,6 +4,7 @@ import { Footer } from "@/components/Footer";
 import { singlesEvents, singlesCategories, getPublishableEvents } from "@/data/singlesEvents";
 import { ListingImage } from "@/components/ListingImage";
 import { ExternalLink, Heart, Search, Clock, MapPin, Shield, ShieldAlert, Users, Sparkles, Zap } from "lucide-react";
+import { useWeather } from "@/hooks/useWeather";
 
 const categoryLabels: Record<string, string> = {
   "All": "All Categories",
@@ -29,6 +30,7 @@ const editorialTaglines: Record<string, string> = {
 };
 
 const Events = () => {
+  const weather = useWeather();
   const [category, setCategory] = useState("All");
   const [search, setSearch] = useState("");
   const [timeFilter, setTimeFilter] = useState("All");
@@ -60,7 +62,7 @@ const Events = () => {
   const otherEvents = filtered.filter((e) => e.category !== "Date Night" && e.category !== "Team Building");
 
   return (
-    <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0">
+    <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0 animate-fade-in">
       <Navbar />
       <main className="flex-1">
         {/* Hero */}
@@ -80,6 +82,7 @@ const Events = () => {
             </p>
             <p className="dateline text-muted-foreground/60 mt-1">
               Staff Report · Community Desk
+              {weather && <span className="ml-2">{weather.icon} {weather.temperature}°F · {weather.description}</span>}
             </p>
           </div>
         </div>
@@ -196,9 +199,8 @@ const Events = () => {
 
         {filtered.length === 0 && (
           <div className="container py-16 text-center">
-            <p className="text-4xl mb-3">🦗</p>
-            <p className="headline text-foreground mb-1">Nothing here but tumbleweeds</p>
-            <p className="text-sm text-muted-foreground mb-4">Try different filters or search for something else!</p>
+            <p className="headline text-foreground mb-1">No events match your current filters</p>
+            <p className="text-sm text-muted-foreground mb-4">Try adjusting your search or clearing some filters to see what's happening.</p>
             <button onClick={() => { setSearch(""); setCategory("All"); setTimeFilter("All"); }} className="skeuo-btn">
               Clear all filters
             </button>
