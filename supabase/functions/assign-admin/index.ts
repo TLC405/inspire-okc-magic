@@ -5,6 +5,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const MASTER_ADMIN_EMAIL = "inspirelawton@gmail.com";
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -19,13 +21,11 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Create service role client
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Verify the calling user
     const supabaseUser = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_ANON_KEY")!,
@@ -42,6 +42,18 @@ Deno.serve(async (req) => {
 
     const { target_user_id, role, action } = await req.json();
 
+    // Auto-grant: if calling user is master admin and requesting their own admin role
+    if (user.email === MASTER_ADMIN_EMAIL && target_user_id === user.id && role === "admin" && action === "grant") {
+      const { error } = await supabaseAdmin.from("user_roles").upsert({
+        user_id: user.id,
+        role: "admin",
+      }, { onConflict: "user_id,role" });
+      if (error) throw error;
+      return new Response(JSON.stringify({ success: true, message: "Master admin granted" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (!target_user_id || !role || !action) {
       return new Response(JSON.stringify({ error: "Missing target_user_id, role, or action" }), {
         status: 400,
@@ -56,11 +68,9 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Check if calling user is admin (or if this is the first user — bootstrap)
-    const { count } = await supabaseAdmin.from("user_roles").select("*", { count: "exact", head: true });
-    const isBootstrap = count === 0;
-
-    if (!isBootstrap) {
+    // Check if calling user is admin or master admin
+    const isMaster = user.email === MASTER_ADMIN_EMAIL;
+    if (!isMaster) {
       const { data: callerRoles } = await supabaseAdmin
         .from("user_roles")
         .select("role")
@@ -80,7 +90,6 @@ Deno.serve(async (req) => {
         user_id: target_user_id,
         role,
       }, { onConflict: "user_id,role" });
-
       if (error) throw error;
       return new Response(JSON.stringify({ success: true, message: `Granted ${role} to user` }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -93,7 +102,6 @@ Deno.serve(async (req) => {
         .delete()
         .eq("user_id", target_user_id)
         .eq("role", role);
-
       if (error) throw error;
       return new Response(JSON.stringify({ success: true, message: `Revoked ${role} from user` }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
