@@ -239,7 +239,7 @@ const EventCard = ({ event: evt, accent }: { event: typeof singlesEvents[0]; acc
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         <div className="absolute bottom-2 left-3 right-3 flex items-end justify-between">
           <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full ${badgeBg} text-[10px] font-semibold backdrop-blur-sm`}>
-            {emoji} {evt.category}
+            {evt.category}
           </span>
           <span className="text-white/70 text-[10px] font-mono">{evt.price}</span>
         </div>
