@@ -5,8 +5,6 @@ import { Settings, Clock, MapPin } from "lucide-react";
 import { useRef, useEffect, useState } from "react";
 import { useWeather } from "@/hooks/useWeather";
 import { useLiveClock } from "@/hooks/useLiveClock";
-import { useWeather } from "@/hooks/useWeather";
-import { useLiveClock } from "@/hooks/useLiveClock";
 
 const navLinks = [
   { label: "Singles", href: "/singles", numeral: "I", desk: "Social" },
