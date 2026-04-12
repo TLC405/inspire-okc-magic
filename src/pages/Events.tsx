@@ -5,27 +5,27 @@ import { singlesEvents, singlesCategories, getPublishableEvents } from "@/data/s
 import { ListingImage } from "@/components/ListingImage";
 import { ExternalLink, Heart, Search, Clock, MapPin, Shield, ShieldAlert, Users, Sparkles, Zap } from "lucide-react";
 
-const categoryEmojis: Record<string, string> = {
-  "All": "✨",
-  "Date Night": "❤️",
-  "Team Building": "🤝",
-  "Speed Dating": "⚡",
-  "Mixer": "🍸",
-  "Social": "🎉",
-  "Dance": "💃",
-  "Activity": "🎯",
-  "Faith": "🙏",
+const categoryLabels: Record<string, string> = {
+  "All": "All Categories",
+  "Date Night": "Date Night",
+  "Team Building": "Team Building",
+  "Speed Dating": "Speed Dating",
+  "Mixer": "Mixer",
+  "Social": "Social",
+  "Dance": "Dance",
+  "Activity": "Activity",
+  "Faith": "Faith",
 };
 
-const funTaglines: Record<string, string> = {
-  "Date Night": "Because Netflix & Chill gets old 🍿",
-  "Team Building": "Bond with humans IRL (scary, we know) 😅",
-  "Speed Dating": "3 minutes to make an impression. No pressure.",
-  "Mixer": "Mingle like your extroverted alter ego",
-  "Social": "Show up. Say hi. That's literally it.",
-  "Dance": "Two left feet? Perfect, you'll fit right in 🕺",
-  "Activity": "Do stuff together. It's called friendship.",
-  "Faith": "Community with a higher purpose 🙌",
+const editorialTaglines: Record<string, string> = {
+  "Date Night": "Curated evenings for couples and adventurers across the metro",
+  "Team Building": "Group experiences designed for real connection, not corporate clichés",
+  "Speed Dating": "Structured introductions for singles on a schedule",
+  "Mixer": "Low-pressure social gatherings across Oklahoma City",
+  "Social": "Community events open to everyone — no RSVP required",
+  "Dance": "From ballroom to bachata, the city's best dance floors",
+  "Activity": "Hands-on group experiences beyond the usual happy hour",
+  "Faith": "Community gatherings rooted in shared values and purpose",
 };
 
 const Events = () => {
@@ -60,26 +60,26 @@ const Events = () => {
   const otherEvents = filtered.filter((e) => e.category !== "Date Night" && e.category !== "Team Building");
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0">
       <Navbar />
       <main className="flex-1">
         {/* Hero */}
         <div className="relative h-[220px] md:h-[300px] overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-rose-500/20 via-accent/10 to-background" />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-accent/10 to-background" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
           <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
             <div className="flex items-center gap-2 mb-2">
-              <Heart size={28} className="text-rose-400 animate-pulse" />
-              <Sparkles size={20} className="text-amber-400" />
+              <Heart size={28} className="text-accent" />
+              <Sparkles size={20} className="text-accent/60" />
             </div>
             <h1 className="masthead text-foreground text-center text-3xl md:text-5xl font-black">
-              Events & Date Nights
+              Events &amp; Date Nights
             </h1>
             <p className="text-sm md:text-base text-muted-foreground mt-2 text-center max-w-lg">
-              OKC's best experiences for couples, friend groups, work squads & solo adventurers 🌟
+              Oklahoma City's curated guide to experiences for couples, groups, and solo adventurers
             </p>
-            <p className="text-xs text-muted-foreground/60 mt-1 italic">
-              (Yes, that includes you, person scrolling alone at 2am. We see you. 👀)
+            <p className="dateline text-muted-foreground/60 mt-1">
+              Staff Report · Community Desk
             </p>
           </div>
         </div>
@@ -104,15 +104,11 @@ const Events = () => {
                   onClick={() => setCategory(cat)}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                     category === cat
-                      ? cat === "Date Night"
-                        ? "bg-rose-500/20 text-rose-400 border border-rose-400/30 shadow-sm"
-                        : cat === "Team Building"
-                        ? "bg-blue-500/20 text-blue-400 border border-blue-400/30 shadow-sm"
-                        : "bg-accent/20 text-accent border border-accent/30 shadow-sm"
+                      ? "bg-accent/20 text-accent border border-accent/30 shadow-sm"
                       : "bg-muted/30 text-muted-foreground border border-transparent hover:bg-muted/50"
                   }`}
                 >
-                  {categoryEmojis[cat] || "📌"} {cat}
+                  {categoryLabels[cat] || cat}
                 </button>
               ))}
             </div>
@@ -133,10 +129,10 @@ const Events = () => {
         </div>
 
         {/* Category tagline */}
-        {category !== "All" && funTaglines[category] && (
+        {category !== "All" && editorialTaglines[category] && (
           <div className="container pb-2">
             <p className="text-center text-sm text-muted-foreground italic">
-              {funTaglines[category]}
+              {editorialTaglines[category]}
             </p>
           </div>
         )}
@@ -146,10 +142,10 @@ const Events = () => {
           <div className="container pb-6">
             <div className="flex items-center gap-2 mb-1">
               <h2 className="section-head text-foreground flex items-center gap-2">
-                <Heart size={18} className="text-rose-400" /> Date Nights
+                <Heart size={18} className="text-accent" /> Date Nights
               </h2>
               <span className="text-xs text-muted-foreground italic ml-2 hidden md:inline">
-                — swipe right on these experiences 💕
+                — Curated evenings for two
               </span>
             </div>
             <p className="dateline text-muted-foreground mb-4">{dateNights.length} curated date experiences</p>
@@ -166,13 +162,13 @@ const Events = () => {
           <div className="container pb-6">
             <div className="flex items-center gap-2 mb-1">
               <h2 className="section-head text-foreground flex items-center gap-2">
-                <Users size={18} className="text-blue-400" /> Team Building
+                <Users size={18} className="text-accent" /> Team Building
               </h2>
               <span className="text-xs text-muted-foreground italic ml-2 hidden md:inline">
-                — because trust falls are so 2005 🙃
+                — Group experiences that foster genuine connection
               </span>
             </div>
-            <p className="dateline text-muted-foreground mb-4">{teamBuilding.length} group experiences that don't suck</p>
+            <p className="dateline text-muted-foreground mb-4">{teamBuilding.length} group experiences across the metro</p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {teamBuilding.map((evt) => (
                 <EventCard key={evt.id} event={evt} accent="blue" />
@@ -213,9 +209,9 @@ const Events = () => {
         <div className="container pb-8">
           <div className="skeuo-card-inset p-4 rounded-lg text-center">
             <p className="text-xs text-muted-foreground">
-              🎪 All events are verified by our team of overworked AI agents who definitely don't need a vacation.
+              All events are verified by our editorial team.
               <br />
-              <span className="italic">Have an event to add? We're working on submissions — stay tuned!</span>
+              <span className="italic">Have an event to submit? We're building a submissions portal — stay tuned.</span>
             </p>
           </div>
         </div>
@@ -226,9 +222,8 @@ const Events = () => {
 };
 
 const EventCard = ({ event: evt, accent }: { event: typeof singlesEvents[0]; accent: "rose" | "blue" | "accent" }) => {
-  const borderColor = accent === "rose" ? "border-rose-400/10" : accent === "blue" ? "border-blue-400/10" : "border-border/50";
-  const badgeBg = accent === "rose" ? "bg-rose-500/30 text-rose-200" : accent === "blue" ? "bg-blue-500/30 text-blue-200" : "bg-accent/30 text-accent-foreground";
-  const emoji = categoryEmojis[evt.category] || "📌";
+  const borderColor = accent === "rose" ? "border-accent/10" : accent === "blue" ? "border-accent/10" : "border-border/50";
+  const badgeBg = "bg-accent/20 text-accent-foreground";
 
   return (
     <div className={`skeuo-card rounded-lg overflow-hidden border ${borderColor} transition-all hover:translate-y-[-2px]`}>
@@ -244,7 +239,7 @@ const EventCard = ({ event: evt, accent }: { event: typeof singlesEvents[0]; acc
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         <div className="absolute bottom-2 left-3 right-3 flex items-end justify-between">
           <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full ${badgeBg} text-[10px] font-semibold backdrop-blur-sm`}>
-            {emoji} {evt.category}
+            {evt.category}
           </span>
           <span className="text-white/70 text-[10px] font-mono">{evt.price}</span>
         </div>

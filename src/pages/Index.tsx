@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -7,8 +8,10 @@ import { ListingImage } from "@/components/ListingImage";
 import { fitnessSpots } from "@/data/fitnessSpots";
 import { volunteerOrgs } from "@/data/volunteerOrgs";
 import { cityShowcase } from "@/data/cityShowcase";
-import { ArrowRight, Building2, Scale, Leaf, Palette, TrendingUp, Heart, Dumbbell, HandHelping } from "lucide-react";
+import { ArrowRight, Building2, Scale, Leaf, Palette, TrendingUp, Heart, Dumbbell, HandHelping, Mail } from "lucide-react";
 import { HeroCarousel } from "@/components/HeroCarousel";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import heroSingles from "@/assets/hero-singles.jpg";
 import heroFitness from "@/assets/hero-fitness.jpg";
 import heroVolunteer from "@/assets/hero-volunteer.jpg";
@@ -108,9 +111,34 @@ function FolioLine({ page, note }: { page: string; note?: string }) {
 
 const Index = () => {
   const singlesTeaser = getDiverseSinglesTeaser(4);
+  const fitnessTeaser = getDiverseFitnessTeaser(4);
+  const [email, setEmail] = useState("");
+  const [subscribed, setSubscribed] = useState(false);
+  const { toast } = useToast();
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = email.trim();
+    if (!trimmed) return;
+    try {
+      const { error } = await supabase.from("newsletter_subscribers").insert({ email: trimmed });
+      if (error) {
+        if (error.code === "23505") {
+          toast({ title: "Already subscribed", description: "You're on the list." });
+        } else {
+          throw error;
+        }
+      } else {
+        setSubscribed(true);
+        toast({ title: "Subscribed", description: "You'll get the Weekly Brief." });
+      }
+    } catch {
+      toast({ title: "Error", description: "Something went wrong. Try again.", variant: "destructive" });
+    }
+  };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0">
       <Navbar />
 
       <main className="flex-1">
@@ -201,10 +229,38 @@ const Index = () => {
           </div>
         </div>
 
+        {/* ═══ Newsletter CTA ═══ */}
+        <div className="container py-4 md:py-6">
+          <div className="skeuo-card p-4 md:p-6 rounded-lg max-w-2xl mx-auto text-center">
+            <Mail size={20} className="mx-auto mb-2 text-accent" />
+            <h3 className="headline text-foreground text-base md:text-lg">Get the Weekly Brief</h3>
+            <p className="dateline text-muted-foreground mt-1 mb-3">Oklahoma City's best events, fitness, and community — delivered every Monday.</p>
+            {subscribed ? (
+              <p className="text-sm text-accent font-semibold">You're on the list.</p>
+            ) : (
+              <form onSubmit={handleSubscribe} className="flex gap-2 max-w-sm mx-auto">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  required
+                  className="flex-1 px-3 py-2 bg-muted/30 border border-border/50 rounded text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-accent"
+                />
+                <button type="submit" className="skeuo-btn rounded px-4 py-2 text-sm font-semibold">
+                  Subscribe
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+
         <FolioLine page="Page A2" note="Broadsheet" />
 
         {/* ═══ Broadsheet Columns ═══ */}
-        <div className="container py-4 md:py-10 hidden md:block">
+        <div className="container py-4 md:py-10">
+          {/* Desktop: 3-column broadsheet */}
+          <div className="hidden md:block">
           <div className="rule-heavy mb-1" />
           <div className="flex items-center justify-center gap-3 mb-4">
             <span className="font-mono text-[8px] tracking-[0.3em] uppercase text-muted-foreground">❧ Community Desk ❧</span>
@@ -332,12 +388,88 @@ const Index = () => {
           </div>
 
           <div className="rule-heavy mt-6" />
+          </div>
+
+          {/* Mobile: stacked single-column cards */}
+          <div className="md:hidden space-y-4">
+            {/* Singles */}
+            <div className="skeuo-card rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Heart size={16} className="text-accent" />
+                <h3 className="section-head text-foreground text-base">Singles Events</h3>
+                <span className="dateline text-muted-foreground ml-auto">{singlesEvents.length} events</span>
+              </div>
+              {singlesTeaser.slice(0, 2).map((evt) => (
+                <div key={evt.id} className="flex items-center gap-3 py-2 border-b border-foreground/[0.06] last:border-0">
+                  <div className="w-10 h-10 rounded flex-shrink-0 overflow-hidden">
+                    <ListingImage listingType="singles" listingId={evt.id} name={evt.name} category={evt.category} websiteUrl={evt.sources[0]?.url} className="w-full h-full" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-foreground truncate">{evt.name}</p>
+                    <p className="text-xs text-muted-foreground truncate">{evt.venue}</p>
+                  </div>
+                  <span className="skeuo-badge-accent text-[9px] flex-shrink-0">{evt.category}</span>
+                </div>
+              ))}
+              <Link to="/singles" className="inline-flex items-center gap-1 mt-2 text-xs text-accent font-semibold">
+                See all <ArrowRight size={10} />
+              </Link>
+            </div>
+
+            {/* Fitness */}
+            <div className="skeuo-card rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Dumbbell size={16} className="text-accent" />
+                <h3 className="section-head text-foreground text-base">Fitness Spots</h3>
+                <span className="dateline text-muted-foreground ml-auto">{fitnessSpots.length} spots</span>
+              </div>
+              {fitnessTeaser.slice(0, 2).map((spot) => (
+                <div key={spot.id} className="flex items-center gap-3 py-2 border-b border-foreground/[0.06] last:border-0">
+                  <div className="w-10 h-10 rounded flex-shrink-0 overflow-hidden">
+                    <ListingImage listingType="fitness" listingId={spot.id} name={spot.name} category={spot.category} websiteUrl={spot.source} className="w-full h-full" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-foreground truncate">{spot.name}</p>
+                    <p className="text-xs text-muted-foreground truncate">{spot.neighborhood}</p>
+                  </div>
+                  <span className="skeuo-badge-accent text-[9px] flex-shrink-0">{spot.category}</span>
+                </div>
+              ))}
+              <Link to="/fitness" className="inline-flex items-center gap-1 mt-2 text-xs text-accent font-semibold">
+                See all <ArrowRight size={10} />
+              </Link>
+            </div>
+
+            {/* Volunteering */}
+            <div className="skeuo-card rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <HandHelping size={16} className="text-accent" />
+                <h3 className="section-head text-foreground text-base">Volunteering</h3>
+                <span className="dateline text-muted-foreground ml-auto">{volunteerOrgs.length} orgs</span>
+              </div>
+              {volunteerOrgs.slice(0, 2).map((org) => (
+                <div key={org.id} className="flex items-center gap-3 py-2 border-b border-foreground/[0.06] last:border-0">
+                  <div className="w-10 h-10 rounded flex-shrink-0 overflow-hidden">
+                    <ListingImage listingType="volunteer" listingId={org.id} name={org.name} category={org.category} websiteUrl={org.source} className="w-full h-full" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-foreground truncate">{org.name}</p>
+                    <p className="text-xs text-muted-foreground truncate">{org.neighborhood}</p>
+                  </div>
+                  <span className="skeuo-badge-accent text-[9px] flex-shrink-0">{org.category}</span>
+                </div>
+              ))}
+              <Link to="/volunteering" className="inline-flex items-center gap-1 mt-2 text-xs text-accent font-semibold">
+                See all <ArrowRight size={10} />
+              </Link>
+            </div>
+          </div>
         </div>
 
         <FolioLine page="Page A3" note="Lifestyle" />
 
         {/* ═══ Pull Quote ═══ */}
-        <div className="container py-4 md:py-6 hidden md:block">
+        <div className="container py-4 md:py-6">
           <div className="max-w-xl mx-auto text-center py-6">
             <span className="text-5xl text-foreground/15 leading-none" style={{ fontFamily: "'Playfair Display', serif" }}>"</span>
             <p
@@ -437,23 +569,23 @@ const Index = () => {
         </div>
 
         {/* ═══ Stats Bar ═══ */}
-        <div className="container pb-8 hidden md:block">
-          <div className="skeuo-card-inset p-6 rounded-lg">
-            <div className="grid grid-cols-4 gap-6 text-center">
+        <div className="container pb-8">
+          <div className="skeuo-card-inset p-4 md:p-6 rounded-lg">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 text-center">
               <div>
-                <p className="text-4xl font-black text-foreground">{totalListings}</p>
+                <p className="text-2xl md:text-4xl font-black text-foreground">{totalListings}</p>
                 <p className="dateline text-muted-foreground mt-1">Total Listings</p>
               </div>
               <div>
-                <p className="text-4xl font-black text-foreground">29</p>
+                <p className="text-2xl md:text-4xl font-black text-foreground">29</p>
                 <p className="dateline text-muted-foreground mt-1">Fitness Categories</p>
               </div>
               <div>
-                <p className="text-4xl font-black text-foreground">700K+</p>
+                <p className="text-2xl md:text-4xl font-black text-foreground">700K+</p>
                 <p className="dateline text-muted-foreground mt-1">Population</p>
               </div>
               <div>
-                <p className="text-4xl font-black text-foreground">405</p>
+                <p className="text-2xl md:text-4xl font-black text-foreground">405</p>
                 <p className="dateline text-muted-foreground mt-1">Area Code</p>
               </div>
             </div>
