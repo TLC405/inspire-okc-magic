@@ -142,10 +142,10 @@ const Events = () => {
           <div className="container pb-6">
             <div className="flex items-center gap-2 mb-1">
               <h2 className="section-head text-foreground flex items-center gap-2">
-                <Heart size={18} className="text-rose-400" /> Date Nights
+                <Heart size={18} className="text-accent" /> Date Nights
               </h2>
               <span className="text-xs text-muted-foreground italic ml-2 hidden md:inline">
-                — swipe right on these experiences 💕
+                — Curated evenings for two
               </span>
             </div>
             <p className="dateline text-muted-foreground mb-4">{dateNights.length} curated date experiences</p>
@@ -162,13 +162,13 @@ const Events = () => {
           <div className="container pb-6">
             <div className="flex items-center gap-2 mb-1">
               <h2 className="section-head text-foreground flex items-center gap-2">
-                <Users size={18} className="text-blue-400" /> Team Building
+                <Users size={18} className="text-accent" /> Team Building
               </h2>
               <span className="text-xs text-muted-foreground italic ml-2 hidden md:inline">
-                — because trust falls are so 2005 🙃
+                — Group experiences that foster genuine connection
               </span>
             </div>
-            <p className="dateline text-muted-foreground mb-4">{teamBuilding.length} group experiences that don't suck</p>
+            <p className="dateline text-muted-foreground mb-4">{teamBuilding.length} group experiences across the metro</p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {teamBuilding.map((evt) => (
                 <EventCard key={evt.id} event={evt} accent="blue" />
@@ -209,9 +209,9 @@ const Events = () => {
         <div className="container pb-8">
           <div className="skeuo-card-inset p-4 rounded-lg text-center">
             <p className="text-xs text-muted-foreground">
-              🎪 All events are verified by our team of overworked AI agents who definitely don't need a vacation.
+              All events are verified by our editorial team.
               <br />
-              <span className="italic">Have an event to add? We're working on submissions — stay tuned!</span>
+              <span className="italic">Have an event to submit? We're building a submissions portal — stay tuned.</span>
             </p>
           </div>
         </div>
@@ -222,9 +222,8 @@ const Events = () => {
 };
 
 const EventCard = ({ event: evt, accent }: { event: typeof singlesEvents[0]; accent: "rose" | "blue" | "accent" }) => {
-  const borderColor = accent === "rose" ? "border-rose-400/10" : accent === "blue" ? "border-blue-400/10" : "border-border/50";
-  const badgeBg = accent === "rose" ? "bg-rose-500/30 text-rose-200" : accent === "blue" ? "bg-blue-500/30 text-blue-200" : "bg-accent/30 text-accent-foreground";
-  const emoji = categoryEmojis[evt.category] || "📌";
+  const borderColor = accent === "rose" ? "border-accent/10" : accent === "blue" ? "border-accent/10" : "border-border/50";
+  const badgeBg = "bg-accent/20 text-accent-foreground";
 
   return (
     <div className={`skeuo-card rounded-lg overflow-hidden border ${borderColor} transition-all hover:translate-y-[-2px]`}>
