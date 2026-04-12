@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -8,7 +8,7 @@ import { ListingImage } from "@/components/ListingImage";
 import { fitnessSpots } from "@/data/fitnessSpots";
 import { volunteerOrgs } from "@/data/volunteerOrgs";
 import { cityShowcase } from "@/data/cityShowcase";
-import { ArrowRight, Building2, Scale, Leaf, Palette, TrendingUp, Heart, Dumbbell, HandHelping, Mail } from "lucide-react";
+import { ArrowRight, Building2, Scale, Leaf, Palette, TrendingUp, Heart, Dumbbell, HandHelping, Mail, Clock, Sun, Moon, Sunrise } from "lucide-react";
 import { HeroCarousel } from "@/components/HeroCarousel";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -109,12 +109,100 @@ function FolioLine({ page, note }: { page: string; note?: string }) {
   );
 }
 
+/** "Tonight in OKC" — time-aware recommendations */
+function TonightBlock() {
+  const now = new Date();
+  const hour = now.getHours();
+  const day = now.getDay(); // 0=Sun
+  const isWeekend = day === 0 || day === 5 || day === 6;
+  const isMorning = hour < 12;
+  const isAfternoon = hour >= 12 && hour < 17;
+
+  const TimeIcon = isMorning ? Sunrise : isAfternoon ? Sun : Moon;
+  const editionName = isMorning ? "Morning Edition" : isAfternoon ? "Afternoon Edition" : "Evening Edition";
+
+  // Different recommendations based on time/day
+  let headline: string;
+  let recommendations: { label: string; to: string; desc: string }[];
+
+  if (!isMorning && isWeekend) {
+    headline = "Friday and Saturday nights belong to the city";
+    recommendations = [
+      { label: "Date Nights", to: "/date-nights", desc: "Curated romantic experiences" },
+      { label: "Singles Mixers", to: "/singles", desc: "Speed dating and social events" },
+      { label: "Community Events", to: "/events", desc: "Live music, dance, social" },
+    ];
+  } else if (isMorning && (day === 6 || day === 0)) {
+    headline = "Saturday mornings are for moving and giving back";
+    recommendations = [
+      { label: "Fitness Spots", to: "/fitness", desc: "Yoga, HIIT, outdoor runs" },
+      { label: "Volunteering", to: "/volunteering", desc: "Weekend service opportunities" },
+      { label: "Discover OKC", to: "/discover", desc: "Explore the city's hidden gems" },
+    ];
+  } else if (isMorning) {
+    headline = "Start your day with purpose";
+    recommendations = [
+      { label: "Fitness", to: "/fitness", desc: "Morning classes across the metro" },
+      { label: "Volunteering", to: "/volunteering", desc: "Make an impact before noon" },
+      { label: "Discover", to: "/discover", desc: "100 facts about your city" },
+    ];
+  } else {
+    headline = "The city is waiting — what moves you tonight?";
+    recommendations = [
+      { label: "Events", to: "/events", desc: "Social, dance, activities" },
+      { label: "Date Nights", to: "/date-nights", desc: "Creative couple experiences" },
+      { label: "Singles", to: "/singles", desc: "Speed dating and mixers" },
+    ];
+  }
+
+  return (
+    <div className="skeuo-card p-4 md:p-6 rounded-lg">
+      <div className="flex items-center gap-2 mb-2">
+        <TimeIcon size={16} className="text-accent" />
+        <span className="dateline text-accent font-bold">{editionName} Recommends</span>
+        <Clock size={12} className="text-muted-foreground/40 ml-auto" />
+      </div>
+      <p className="text-foreground font-semibold text-sm md:text-base italic mb-3" style={{ fontFamily: "'Playfair Display', serif" }}>
+        "{headline}"
+      </p>
+      <div className="grid grid-cols-3 gap-2">
+        {recommendations.map((rec) => (
+          <Link
+            key={rec.to}
+            to={rec.to}
+            className="skeuo-card-inset p-3 rounded text-center hover:bg-muted/30 transition-colors"
+          >
+            <p className="text-xs font-bold text-foreground">{rec.label}</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">{rec.desc}</p>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 const Index = () => {
   const singlesTeaser = getDiverseSinglesTeaser(4);
   const fitnessTeaser = getDiverseFitnessTeaser(4);
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
   const { toast } = useToast();
+  const pullQuoteRef = useRef<HTMLDivElement>(null);
+  const [parallaxOffset, setParallaxOffset] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (pullQuoteRef.current) {
+        const rect = pullQuoteRef.current.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        if (rect.top < viewportHeight && rect.bottom > 0) {
+          setParallaxOffset((viewportHeight - rect.top) * 0.15);
+        }
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
