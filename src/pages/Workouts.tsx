@@ -98,7 +98,7 @@ const Workouts = () => {
   );
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-background animate-fade-in">
       <Navbar />
       <main className="flex-1">
         {/* Hero Banner */}

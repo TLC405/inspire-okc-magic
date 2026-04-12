@@ -24,7 +24,6 @@ const fullDateStr = `${dayNames[today.getDay()]}, ${fullMonths[today.getMonth()]
 const dayName = dayNames[today.getDay()];
 const issueNo = Math.floor((today.getTime() - new Date("2026-01-01").getTime()) / 86400000) + 1;
 
-// Rotating headlines for the ticker
 const tickerHeadlines = [
   "YOUR GUIDE TO OKLAHOMA CITY",
   "COMMUNITY · CULTURE · CONNECTION",
@@ -39,6 +38,14 @@ export function Navbar() {
   const weather = useWeather();
   const { timeStr, edition } = useLiveClock();
   const [tickerIdx, setTickerIdx] = useState(0);
+  const [scrolled, setScrolled] = useState(false);
+
+  // Scroll-collapse
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   // Ticker rotation
   useEffect(() => {
@@ -65,7 +72,6 @@ export function Navbar() {
       <div className="container">
         {/* ═══ UPPER UTILITY BAR ═══ */}
         <div className="flex items-center justify-between py-1 border-b border-foreground/15">
-          {/* Left: Category / Section tag */}
           <div className="flex items-center gap-2">
             <span className="font-mono text-[8px] md:text-[9px] tracking-[0.15em] uppercase text-foreground font-bold bg-foreground/5 px-1.5 py-0.5 border border-foreground/10">
               City Guide
@@ -75,8 +81,6 @@ export function Navbar() {
               Community & Culture
             </span>
           </div>
-
-          {/* Center: Vol / Issue */}
           <div className="hidden md:flex items-center gap-2">
             <span className="font-mono text-[8px] tracking-[0.15em] uppercase text-muted-foreground">
               Vol. I, No. {issueNo}
@@ -86,10 +90,7 @@ export function Navbar() {
               Printed in Oklahoma
             </span>
           </div>
-
-          {/* Right: Live info cluster */}
           <div className="flex items-center gap-2 md:gap-3">
-            {/* Weather */}
             {weather && (
               <span className="flex items-center gap-1 font-mono text-[8px] md:text-[9px] tracking-[0.1em] uppercase text-muted-foreground">
                 <span className="text-[10px]">{weather.icon}</span>
@@ -98,19 +99,16 @@ export function Navbar() {
               </span>
             )}
             <span className="text-foreground/15 text-[6px]">|</span>
-            {/* Time */}
             <span className="flex items-center gap-1 font-mono text-[8px] md:text-[9px] tracking-[0.1em] text-muted-foreground">
               <Clock size={8} className="text-muted-foreground/50" />
               <span className="font-semibold text-foreground/80">{timeStr}</span>
             </span>
             <span className="text-foreground/15 text-[6px] hidden sm:inline">|</span>
-            {/* Location */}
             <span className="hidden sm:flex items-center gap-0.5 font-mono text-[8px] tracking-[0.1em] uppercase text-muted-foreground">
               <MapPin size={7} className="text-muted-foreground/50" />
               OKC
             </span>
             <span className="text-foreground/15 text-[6px] hidden md:inline">|</span>
-            {/* Theme + Admin */}
             <ThemeToggle className="text-muted-foreground hover:text-foreground" />
             <Link to="/admin" className="text-muted-foreground hover:text-foreground transition-colors">
               <Settings size={10} />
@@ -118,55 +116,53 @@ export function Navbar() {
           </div>
         </div>
 
-        {/* ═══ DOUBLE RULE ABOVE NAMEPLATE ═══ */}
-        <div className="h-[3px] bg-foreground mt-1" />
-        <div className="h-[1px] bg-foreground/20 mt-[2px]" />
+        {/* ═══ NAMEPLATE (collapses on scroll) ═══ */}
+        <div
+          className={cn(
+            "overflow-hidden transition-all duration-300 ease-in-out",
+            scrolled ? "max-h-0 opacity-0" : "max-h-40 opacity-100"
+          )}
+        >
+          <div className="h-[3px] bg-foreground mt-1" />
+          <div className="h-[1px] bg-foreground/20 mt-[2px]" />
 
-        {/* ═══ NAMEPLATE ═══ */}
-        <div className="py-2 md:py-4 text-center">
-          <Link to="/" className="inline-block group">
-            {/* Ornamental flourish */}
-            <div className="flex items-center justify-center gap-3 mb-0.5">
-              <span className="block w-8 md:w-16 h-[1px] bg-foreground/30 group-hover:bg-foreground/50 transition-colors" />
-              <span className="font-mono text-[6px] md:text-[8px] tracking-[0.35em] uppercase text-muted-foreground">
-                ❧ Est. 2026 ❧
-              </span>
-              <span className="block w-8 md:w-16 h-[1px] bg-foreground/30 group-hover:bg-foreground/50 transition-colors" />
-            </div>
-
-            {/* Main title — INSPIRE */}
-            <h1
-              className="font-black tracking-[-0.03em] leading-[0.82] text-foreground group-hover:tracking-[-0.02em] transition-all duration-300"
-              style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(2rem, 7vw, 4.5rem)" }}
-            >
-              INSPIRE
-            </h1>
-
-            {/* Subtitle — Oklahoma City */}
-            <div className="flex items-center justify-center gap-2 mt-0.5">
-              <span className="block w-5 md:w-12 h-[1px] bg-foreground/25" />
-              <p
-                className="tracking-[0.25em] uppercase text-foreground/60 font-semibold leading-none"
-                style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(0.45rem, 1.5vw, 0.75rem)" }}
+          <div className="py-2 md:py-4 text-center">
+            <Link to="/" className="inline-block group">
+              <div className="flex items-center justify-center gap-3 mb-0.5">
+                <span className="block w-8 md:w-16 h-[1px] bg-foreground/30 group-hover:bg-foreground/50 transition-colors" />
+                <span className="font-mono text-[6px] md:text-[8px] tracking-[0.35em] uppercase text-muted-foreground">
+                  ❧ Est. 2026 ❧
+                </span>
+                <span className="block w-8 md:w-16 h-[1px] bg-foreground/30 group-hover:bg-foreground/50 transition-colors" />
+              </div>
+              <h1
+                className="font-black tracking-[-0.03em] leading-[0.82] text-foreground group-hover:tracking-[-0.02em] transition-all duration-300"
+                style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(2rem, 7vw, 4.5rem)" }}
               >
-                Oklahoma City
+                INSPIRE
+              </h1>
+              <div className="flex items-center justify-center gap-2 mt-0.5">
+                <span className="block w-5 md:w-12 h-[1px] bg-foreground/25" />
+                <p
+                  className="tracking-[0.25em] uppercase text-foreground/60 font-semibold leading-none"
+                  style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(0.45rem, 1.5vw, 0.75rem)" }}
+                >
+                  Oklahoma City
+                </p>
+                <span className="block w-5 md:w-12 h-[1px] bg-foreground/25" />
+              </div>
+              <p
+                className="mt-0.5 text-muted-foreground/50 italic"
+                style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(0.45rem, 1.1vw, 0.6rem)", letterSpacing: "0.05em" }}
+              >
+                "All the City's News That Inspires"
               </p>
-              <span className="block w-5 md:w-12 h-[1px] bg-foreground/25" />
-            </div>
+            </Link>
+          </div>
 
-            {/* Motto */}
-            <p
-              className="mt-0.5 text-muted-foreground/50 italic"
-              style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(0.45rem, 1.1vw, 0.6rem)", letterSpacing: "0.05em" }}
-            >
-              "All the City's News That Inspires"
-            </p>
-          </Link>
+          <div className="h-[3px] bg-foreground" />
+          <div className="h-[1px] bg-foreground/20 mt-[2px]" />
         </div>
-
-        {/* ═══ DOUBLE RULE BELOW NAMEPLATE ═══ */}
-        <div className="h-[3px] bg-foreground" />
-        <div className="h-[1px] bg-foreground/20 mt-[2px]" />
 
         {/* ═══ DATE + EDITION BAR ═══ */}
         <div className="flex items-center justify-between py-1 border-b border-foreground/10">
@@ -174,7 +170,6 @@ export function Navbar() {
             <span className="hidden md:inline">{fullDateStr}</span>
             <span className="md:hidden">{dayName} · {dateStr}</span>
           </span>
-          {/* Ticker */}
           <span
             className="font-mono text-[7px] md:text-[8px] tracking-[0.2em] uppercase text-foreground/50 font-semibold transition-opacity duration-700"
             key={tickerIdx}
@@ -187,9 +182,7 @@ export function Navbar() {
           </span>
         </div>
 
-        {/* ═══ NAVIGATION — Desktop: full row, Mobile: carousel card ═══ */}
-
-        {/* Desktop nav */}
+        {/* ═══ Desktop nav ═══ */}
         <div
           ref={navScrollRef}
           className="hidden md:flex items-center justify-center py-2"
@@ -219,14 +212,12 @@ export function Navbar() {
             ))}
           </nav>
         </div>
-
       </div>
 
       {/* Bottom thick + thin rule */}
       <div className="h-[3px] bg-foreground" />
       <div className="h-[1px] bg-foreground/15 mt-[1px]" />
 
-      {/* Inline animation keyframes */}
       <style>{`
         @keyframes fadeInUp {
           from { opacity: 0; transform: translateY(4px); }
