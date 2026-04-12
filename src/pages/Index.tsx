@@ -469,7 +469,7 @@ const Index = () => {
         <FolioLine page="Page A3" note="Lifestyle" />
 
         {/* ═══ Pull Quote ═══ */}
-        <div className="container py-4 md:py-6 hidden md:block">
+        <div className="container py-4 md:py-6">
           <div className="max-w-xl mx-auto text-center py-6">
             <span className="text-5xl text-foreground/15 leading-none" style={{ fontFamily: "'Playfair Display', serif" }}>"</span>
             <p
@@ -569,23 +569,23 @@ const Index = () => {
         </div>
 
         {/* ═══ Stats Bar ═══ */}
-        <div className="container pb-8 hidden md:block">
-          <div className="skeuo-card-inset p-6 rounded-lg">
-            <div className="grid grid-cols-4 gap-6 text-center">
+        <div className="container pb-8">
+          <div className="skeuo-card-inset p-4 md:p-6 rounded-lg">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 text-center">
               <div>
-                <p className="text-4xl font-black text-foreground">{totalListings}</p>
+                <p className="text-2xl md:text-4xl font-black text-foreground">{totalListings}</p>
                 <p className="dateline text-muted-foreground mt-1">Total Listings</p>
               </div>
               <div>
-                <p className="text-4xl font-black text-foreground">29</p>
+                <p className="text-2xl md:text-4xl font-black text-foreground">29</p>
                 <p className="dateline text-muted-foreground mt-1">Fitness Categories</p>
               </div>
               <div>
-                <p className="text-4xl font-black text-foreground">700K+</p>
+                <p className="text-2xl md:text-4xl font-black text-foreground">700K+</p>
                 <p className="dateline text-muted-foreground mt-1">Population</p>
               </div>
               <div>
-                <p className="text-4xl font-black text-foreground">405</p>
+                <p className="text-2xl md:text-4xl font-black text-foreground">405</p>
                 <p className="dateline text-muted-foreground mt-1">Area Code</p>
               </div>
             </div>
