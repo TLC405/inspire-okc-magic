@@ -561,9 +561,12 @@ const Index = () => {
 
         <FolioLine page="Page A3" note="Lifestyle" />
 
-        {/* ═══ Pull Quote ═══ */}
-        <div className="container py-4 md:py-6">
-          <div className="max-w-xl mx-auto text-center py-6">
+        {/* ═══ Pull Quote with Parallax ═══ */}
+        <div className="container py-4 md:py-6 overflow-hidden" ref={pullQuoteRef}>
+          <div
+            className="max-w-xl mx-auto text-center py-6 transition-transform duration-100"
+            style={{ transform: `translateY(${-parallaxOffset * 0.3}px)` }}
+          >
             <span className="text-5xl text-foreground/15 leading-none" style={{ fontFamily: "'Playfair Display', serif" }}>"</span>
             <p
               className="text-foreground/70 italic leading-relaxed -mt-4"
