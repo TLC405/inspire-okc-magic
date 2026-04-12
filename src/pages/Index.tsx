@@ -15,7 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import heroSingles from "@/assets/hero-singles.jpg";
 import heroFitness from "@/assets/hero-fitness.jpg";
 import heroVolunteer from "@/assets/hero-volunteer.jpg";
-import okcChar2 from "@/assets/okc-char-2.png";
+
 
 const today = new Date();
 const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];

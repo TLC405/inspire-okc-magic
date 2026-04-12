@@ -4,6 +4,7 @@ import { Footer } from "@/components/Footer";
 import { singlesEvents, singlesCategories, getPublishableEvents } from "@/data/singlesEvents";
 import { ListingImage } from "@/components/ListingImage";
 import { ExternalLink, Heart, Search, Clock, MapPin, Shield, ShieldAlert, Users, Sparkles, Zap } from "lucide-react";
+import { useWeather } from "@/hooks/useWeather";
 
 const categoryLabels: Record<string, string> = {
   "All": "All Categories",
@@ -29,6 +30,7 @@ const editorialTaglines: Record<string, string> = {
 };
 
 const Events = () => {
+  const weather = useWeather();
   const [category, setCategory] = useState("All");
   const [search, setSearch] = useState("");
   const [timeFilter, setTimeFilter] = useState("All");
@@ -80,6 +82,7 @@ const Events = () => {
             </p>
             <p className="dateline text-muted-foreground/60 mt-1">
               Staff Report · Community Desk
+              {weather && <span className="ml-2">{weather.icon} {weather.temperature}°F · {weather.description}</span>}
             </p>
           </div>
         </div>
