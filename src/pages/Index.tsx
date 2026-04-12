@@ -229,10 +229,38 @@ const Index = () => {
           </div>
         </div>
 
+        {/* ═══ Newsletter CTA ═══ */}
+        <div className="container py-4 md:py-6">
+          <div className="skeuo-card p-4 md:p-6 rounded-lg max-w-2xl mx-auto text-center">
+            <Mail size={20} className="mx-auto mb-2 text-accent" />
+            <h3 className="headline text-foreground text-base md:text-lg">Get the Weekly Brief</h3>
+            <p className="dateline text-muted-foreground mt-1 mb-3">Oklahoma City's best events, fitness, and community — delivered every Monday.</p>
+            {subscribed ? (
+              <p className="text-sm text-accent font-semibold">You're on the list.</p>
+            ) : (
+              <form onSubmit={handleSubscribe} className="flex gap-2 max-w-sm mx-auto">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  required
+                  className="flex-1 px-3 py-2 bg-muted/30 border border-border/50 rounded text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-accent"
+                />
+                <button type="submit" className="skeuo-btn rounded px-4 py-2 text-sm font-semibold">
+                  Subscribe
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+
         <FolioLine page="Page A2" note="Broadsheet" />
 
         {/* ═══ Broadsheet Columns ═══ */}
-        <div className="container py-4 md:py-10 hidden md:block">
+        <div className="container py-4 md:py-10">
+          {/* Desktop: 3-column broadsheet */}
+          <div className="hidden md:block">
           <div className="rule-heavy mb-1" />
           <div className="flex items-center justify-center gap-3 mb-4">
             <span className="font-mono text-[8px] tracking-[0.3em] uppercase text-muted-foreground">❧ Community Desk ❧</span>
