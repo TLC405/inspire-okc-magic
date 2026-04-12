@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -7,8 +8,14 @@ import { ListingImage } from "@/components/ListingImage";
 import { fitnessSpots } from "@/data/fitnessSpots";
 import { volunteerOrgs } from "@/data/volunteerOrgs";
 import { cityShowcase } from "@/data/cityShowcase";
-import { ArrowRight, Building2, Scale, Leaf, Palette, TrendingUp, Heart, Dumbbell, HandHelping } from "lucide-react";
+import { ArrowRight, Building2, Scale, Leaf, Palette, TrendingUp, Heart, Dumbbell, HandHelping, Mail } from "lucide-react";
 import { HeroCarousel } from "@/components/HeroCarousel";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import heroSingles from "@/assets/hero-singles.jpg";
+import heroFitness from "@/assets/hero-fitness.jpg";
+import heroVolunteer from "@/assets/hero-volunteer.jpg";
+import okcChar2 from "@/assets/okc-char-2.png";
 import heroSingles from "@/assets/hero-singles.jpg";
 import heroFitness from "@/assets/hero-fitness.jpg";
 import heroVolunteer from "@/assets/hero-volunteer.jpg";
@@ -108,9 +115,34 @@ function FolioLine({ page, note }: { page: string; note?: string }) {
 
 const Index = () => {
   const singlesTeaser = getDiverseSinglesTeaser(4);
+  const fitnessTeaser = getDiverseFitnessTeaser(4);
+  const [email, setEmail] = useState("");
+  const [subscribed, setSubscribed] = useState(false);
+  const { toast } = useToast();
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = email.trim();
+    if (!trimmed) return;
+    try {
+      const { error } = await supabase.from("newsletter_subscribers").insert({ email: trimmed });
+      if (error) {
+        if (error.code === "23505") {
+          toast({ title: "Already subscribed", description: "You're on the list." });
+        } else {
+          throw error;
+        }
+      } else {
+        setSubscribed(true);
+        toast({ title: "Subscribed", description: "You'll get the Weekly Brief." });
+      }
+    } catch {
+      toast({ title: "Error", description: "Something went wrong. Try again.", variant: "destructive" });
+    }
+  };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0">
       <Navbar />
 
       <main className="flex-1">
