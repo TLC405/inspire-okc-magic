@@ -60,26 +60,26 @@ const Events = () => {
   const otherEvents = filtered.filter((e) => e.category !== "Date Night" && e.category !== "Team Building");
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0">
       <Navbar />
       <main className="flex-1">
         {/* Hero */}
         <div className="relative h-[220px] md:h-[300px] overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-rose-500/20 via-accent/10 to-background" />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-accent/10 to-background" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
           <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
             <div className="flex items-center gap-2 mb-2">
-              <Heart size={28} className="text-rose-400 animate-pulse" />
-              <Sparkles size={20} className="text-amber-400" />
+              <Heart size={28} className="text-accent" />
+              <Sparkles size={20} className="text-accent/60" />
             </div>
             <h1 className="masthead text-foreground text-center text-3xl md:text-5xl font-black">
-              Events & Date Nights
+              Events &amp; Date Nights
             </h1>
             <p className="text-sm md:text-base text-muted-foreground mt-2 text-center max-w-lg">
-              OKC's best experiences for couples, friend groups, work squads & solo adventurers 🌟
+              Oklahoma City's curated guide to experiences for couples, groups, and solo adventurers
             </p>
-            <p className="text-xs text-muted-foreground/60 mt-1 italic">
-              (Yes, that includes you, person scrolling alone at 2am. We see you. 👀)
+            <p className="dateline text-muted-foreground/60 mt-1">
+              Staff Report · Community Desk
             </p>
           </div>
         </div>
@@ -104,15 +104,11 @@ const Events = () => {
                   onClick={() => setCategory(cat)}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                     category === cat
-                      ? cat === "Date Night"
-                        ? "bg-rose-500/20 text-rose-400 border border-rose-400/30 shadow-sm"
-                        : cat === "Team Building"
-                        ? "bg-blue-500/20 text-blue-400 border border-blue-400/30 shadow-sm"
-                        : "bg-accent/20 text-accent border border-accent/30 shadow-sm"
+                      ? "bg-accent/20 text-accent border border-accent/30 shadow-sm"
                       : "bg-muted/30 text-muted-foreground border border-transparent hover:bg-muted/50"
                   }`}
                 >
-                  {categoryEmojis[cat] || "📌"} {cat}
+                  {categoryLabels[cat] || cat}
                 </button>
               ))}
             </div>
@@ -133,10 +129,10 @@ const Events = () => {
         </div>
 
         {/* Category tagline */}
-        {category !== "All" && funTaglines[category] && (
+        {category !== "All" && editorialTaglines[category] && (
           <div className="container pb-2">
             <p className="text-center text-sm text-muted-foreground italic">
-              {funTaglines[category]}
+              {editorialTaglines[category]}
             </p>
           </div>
         )}
