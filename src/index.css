@@ -10,42 +10,31 @@
 @tailwind utilities;
 
 @layer base {
-  /* ══ Light — warm broadsheet ══ */
+  /* ══ Light — elegant broadsheet ══ */
   .light {
     --background: 42 25% 94%;
     --foreground: 0 0% 8%;
-
     --card: 42 22% 98%;
     --card-foreground: 0 0% 8%;
-
     --popover: 42 22% 98%;
     --popover-foreground: 0 0% 8%;
-
     --primary: 0 0% 8%;
     --primary-foreground: 42 25% 94%;
-
     --secondary: 42 15% 88%;
     --secondary-foreground: 0 0% 20%;
-
     --muted: 40 10% 84%;
     --muted-foreground: 30 8% 45%;
-
     --accent: 210 85% 30%;
     --accent-foreground: 0 0% 100%;
-
     --signal-secondary: 8 87% 48%;
     --signal-highlight: 42 98% 50%;
     --signal-positive: 157 55% 36%;
-
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
-
     --border: 40 12% 78%;
     --input: 40 12% 78%;
     --ring: 0 0% 8%;
-
     --radius: 0.375rem;
-
     --sidebar-background: 38 20% 90%;
     --sidebar-foreground: 0 0% 8%;
     --sidebar-primary: 205 100% 35%;
@@ -54,52 +43,41 @@
     --sidebar-accent-foreground: 0 0% 8%;
     --sidebar-border: 40 8% 72%;
     --sidebar-ring: 205 100% 35%;
-
     --rule: 0 0% 8%;
-
     --skeuo-shadow: 0 0 0 1px hsl(0 0% 0% / 0.06), 0 1px 3px hsl(0 0% 0% / 0.06), 0 4px 12px hsl(0 0% 0% / 0.08);
     --skeuo-shadow-hover: 0 0 0 1px hsl(0 0% 0% / 0.08), 0 2px 8px hsl(0 0% 0% / 0.1), 0 8px 24px hsl(0 0% 0% / 0.1);
     --skeuo-inset: inset 0 2px 4px hsl(0 0% 0% / 0.08), inset 0 1px 2px hsl(0 0% 0% / 0.06);
     --skeuo-highlight: inset 0 1px 0 hsl(0 0% 100% / 0.7);
     --paper-grain: hsl(40 18% 95%);
+    --font-heading: 'Cormorant Garamond', serif;
+    --font-heading-weight: 600;
   }
 
-  /* ══ Dark — enhanced contrast (DEFAULT) ══ */
+  /* ══ Dark — enhanced contrast ══ */
   :root {
     --background: 220 15% 5%;
     --foreground: 40 20% 92%;
-
     --card: 220 12% 7%;
     --card-foreground: 40 20% 92%;
-
     --popover: 220 12% 7%;
     --popover-foreground: 40 20% 92%;
-
     --primary: 40 20% 92%;
     --primary-foreground: 220 15% 5%;
-
     --secondary: 220 8% 12%;
     --secondary-foreground: 40 15% 75%;
-
     --muted: 220 6% 15%;
     --muted-foreground: 220 5% 50%;
-
     --accent: 205 100% 42%;
     --accent-foreground: 0 0% 100%;
-
     --signal-secondary: 8 87% 54%;
     --signal-highlight: 42 98% 59%;
     --signal-positive: 157 55% 46%;
-
     --destructive: 8 87% 54%;
     --destructive-foreground: 0 0% 98%;
-
     --border: 220 6% 18%;
     --input: 220 6% 18%;
     --ring: 205 100% 42%;
-
     --radius: 0.375rem;
-
     --sidebar-background: 220 15% 4%;
     --sidebar-foreground: 40 20% 92%;
     --sidebar-primary: 205 100% 42%;
@@ -108,52 +86,41 @@
     --sidebar-accent-foreground: 40 20% 92%;
     --sidebar-border: 220 6% 18%;
     --sidebar-ring: 205 100% 42%;
-
     --rule: 40 20% 92%;
-
     --skeuo-shadow: 0 0 0 1px hsl(40 20% 90% / 0.06), 0 2px 8px hsl(0 0% 0% / 0.3), 0 8px 24px hsl(0 0% 0% / 0.2);
     --skeuo-shadow-hover: 0 0 0 1px hsl(40 20% 90% / 0.1), 0 4px 16px hsl(0 0% 0% / 0.4), 0 12px 32px hsl(0 0% 0% / 0.25);
     --skeuo-inset: inset 0 2px 6px hsl(0 0% 0% / 0.4), inset 0 1px 2px hsl(0 0% 0% / 0.3);
     --skeuo-highlight: inset 0 1px 0 hsl(40 20% 90% / 0.06);
     --paper-grain: hsl(220 10% 8%);
+    --font-heading: 'Playfair Display', serif;
+    --font-heading-weight: 900;
   }
 
-  /* ══ Thunder — OKC Thunder branding ══ */
+  /* ══ Thunder — NBA athletic bold ══ */
   .thunder {
     --background: 214 100% 12%;
     --foreground: 210 20% 95%;
-
     --card: 214 80% 15%;
     --card-foreground: 210 20% 95%;
-
     --popover: 214 80% 15%;
     --popover-foreground: 210 20% 95%;
-
     --primary: 200 100% 45%;
     --primary-foreground: 0 0% 100%;
-
     --secondary: 214 60% 20%;
     --secondary-foreground: 200 60% 80%;
-
     --muted: 214 40% 22%;
     --muted-foreground: 210 15% 55%;
-
     --accent: 8 87% 54%;
     --accent-foreground: 0 0% 100%;
-
     --signal-secondary: 42 98% 59%;
     --signal-highlight: 200 100% 45%;
     --signal-positive: 157 55% 46%;
-
     --destructive: 8 87% 54%;
     --destructive-foreground: 0 0% 98%;
-
     --border: 214 40% 25%;
     --input: 214 40% 25%;
     --ring: 200 100% 45%;
-
     --radius: 0.375rem;
-
     --sidebar-background: 214 100% 10%;
     --sidebar-foreground: 210 20% 95%;
     --sidebar-primary: 200 100% 45%;
@@ -162,70 +129,146 @@
     --sidebar-accent-foreground: 210 20% 95%;
     --sidebar-border: 214 40% 25%;
     --sidebar-ring: 200 100% 45%;
-
     --rule: 210 20% 95%;
-
     --skeuo-shadow: 0 0 0 1px hsl(200 100% 45% / 0.1), 0 2px 8px hsl(214 100% 5% / 0.4), 0 8px 24px hsl(214 100% 5% / 0.3);
     --skeuo-shadow-hover: 0 0 0 1px hsl(200 100% 45% / 0.2), 0 4px 16px hsl(214 100% 5% / 0.5), 0 12px 32px hsl(214 100% 5% / 0.35);
     --skeuo-inset: inset 0 2px 6px hsl(214 100% 5% / 0.5), inset 0 1px 2px hsl(214 100% 5% / 0.4);
     --skeuo-highlight: inset 0 1px 0 hsl(200 100% 45% / 0.08);
     --paper-grain: hsl(214 80% 14%);
+    --font-heading: 'Oswald', sans-serif;
+    --font-heading-weight: 700;
   }
 
-  /* ══ Comets — OKC Comets NWSL branding ══ */
+  /* ══ Comets — OKC Comets red/blue/white ══ */
   .comets {
-    --background: 270 60% 8%;
-    --foreground: 270 20% 92%;
-
-    --card: 270 45% 11%;
-    --card-foreground: 270 20% 92%;
-
-    --popover: 270 45% 11%;
-    --popover-foreground: 270 20% 92%;
-
-    --primary: 270 55% 55%;
+    --background: 220 50% 8%;
+    --foreground: 210 15% 93%;
+    --card: 218 45% 11%;
+    --card-foreground: 210 15% 93%;
+    --popover: 218 45% 11%;
+    --popover-foreground: 210 15% 93%;
+    --primary: 353 85% 43%;
     --primary-foreground: 0 0% 100%;
-
-    --secondary: 270 30% 16%;
-    --secondary-foreground: 270 30% 75%;
-
-    --muted: 270 20% 18%;
-    --muted-foreground: 270 10% 50%;
-
-    --accent: 168 100% 39%;
+    --secondary: 218 35% 16%;
+    --secondary-foreground: 210 20% 75%;
+    --muted: 218 25% 18%;
+    --muted-foreground: 215 10% 52%;
+    --accent: 218 100% 40%;
     --accent-foreground: 0 0% 100%;
-
-    --signal-secondary: 48 100% 50%;
-    --signal-highlight: 270 55% 55%;
-    --signal-positive: 168 100% 39%;
-
-    --destructive: 0 72% 51%;
+    --signal-secondary: 353 85% 50%;
+    --signal-highlight: 218 100% 50%;
+    --signal-positive: 157 55% 46%;
+    --destructive: 353 85% 50%;
     --destructive-foreground: 0 0% 98%;
-
-    --border: 270 20% 22%;
-    --input: 270 20% 22%;
-    --ring: 168 100% 39%;
-
+    --border: 218 25% 22%;
+    --input: 218 25% 22%;
+    --ring: 353 85% 43%;
     --radius: 0.375rem;
-
-    --sidebar-background: 270 60% 6%;
-    --sidebar-foreground: 270 20% 92%;
-    --sidebar-primary: 168 100% 39%;
+    --sidebar-background: 220 50% 6%;
+    --sidebar-foreground: 210 15% 93%;
+    --sidebar-primary: 353 85% 43%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 270 30% 16%;
-    --sidebar-accent-foreground: 270 20% 92%;
-    --sidebar-border: 270 20% 22%;
-    --sidebar-ring: 168 100% 39%;
-
-    --rule: 270 20% 92%;
-
-    --skeuo-shadow: 0 0 0 1px hsl(270 55% 55% / 0.1), 0 2px 8px hsl(270 60% 4% / 0.4), 0 8px 24px hsl(270 60% 4% / 0.3);
-    --skeuo-shadow-hover: 0 0 0 1px hsl(270 55% 55% / 0.2), 0 4px 16px hsl(270 60% 4% / 0.5), 0 12px 32px hsl(270 60% 4% / 0.35);
-    --skeuo-inset: inset 0 2px 6px hsl(270 60% 4% / 0.5), inset 0 1px 2px hsl(270 60% 4% / 0.4);
-    --skeuo-highlight: inset 0 1px 0 hsl(270 55% 55% / 0.08);
-    --paper-grain: hsl(270 45% 10%);
+    --sidebar-accent: 218 35% 16%;
+    --sidebar-accent-foreground: 210 15% 93%;
+    --sidebar-border: 218 25% 22%;
+    --sidebar-ring: 353 85% 43%;
+    --rule: 210 15% 93%;
+    --skeuo-shadow: 0 0 0 1px hsl(353 85% 43% / 0.1), 0 2px 8px hsl(220 50% 4% / 0.4), 0 8px 24px hsl(220 50% 4% / 0.3);
+    --skeuo-shadow-hover: 0 0 0 1px hsl(353 85% 43% / 0.2), 0 4px 16px hsl(220 50% 4% / 0.5), 0 12px 32px hsl(220 50% 4% / 0.35);
+    --skeuo-inset: inset 0 2px 6px hsl(220 50% 4% / 0.5), inset 0 1px 2px hsl(220 50% 4% / 0.4);
+    --skeuo-highlight: inset 0 1px 0 hsl(353 85% 43% / 0.08);
+    --paper-grain: hsl(218 40% 10%);
+    --font-heading: 'Bitter', serif;
+    --font-heading-weight: 800;
   }
 
+  /* ══ Bricktown — warm urban brick & iron ══ */
+  .bricktown {
+    --background: 15 25% 10%;
+    --foreground: 30 25% 90%;
+    --card: 15 20% 13%;
+    --card-foreground: 30 25% 90%;
+    --popover: 15 20% 13%;
+    --popover-foreground: 30 25% 90%;
+    --primary: 24 85% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 15 15% 18%;
+    --secondary-foreground: 30 15% 70%;
+    --muted: 15 12% 20%;
+    --muted-foreground: 20 8% 50%;
+    --accent: 24 85% 55%;
+    --accent-foreground: 0 0% 100%;
+    --signal-secondary: 0 70% 50%;
+    --signal-highlight: 45 90% 55%;
+    --signal-positive: 150 50% 42%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 15 12% 24%;
+    --input: 15 12% 24%;
+    --ring: 24 85% 55%;
+    --radius: 0.375rem;
+    --sidebar-background: 15 25% 8%;
+    --sidebar-foreground: 30 25% 90%;
+    --sidebar-primary: 24 85% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 15 15% 18%;
+    --sidebar-accent-foreground: 30 25% 90%;
+    --sidebar-border: 15 12% 24%;
+    --sidebar-ring: 24 85% 55%;
+    --rule: 30 25% 90%;
+    --skeuo-shadow: 0 0 0 1px hsl(24 85% 55% / 0.08), 0 2px 8px hsl(15 25% 4% / 0.4), 0 8px 24px hsl(15 25% 4% / 0.3);
+    --skeuo-shadow-hover: 0 0 0 1px hsl(24 85% 55% / 0.15), 0 4px 16px hsl(15 25% 4% / 0.5), 0 12px 32px hsl(15 25% 4% / 0.35);
+    --skeuo-inset: inset 0 2px 6px hsl(15 25% 4% / 0.5), inset 0 1px 2px hsl(15 25% 4% / 0.4);
+    --skeuo-highlight: inset 0 1px 0 hsl(24 85% 55% / 0.06);
+    --paper-grain: hsl(15 18% 12%);
+    --font-heading: 'Bitter', serif;
+    --font-heading-weight: 700;
+  }
+
+  /* ══ TLC — tender, contemplative, warm ══ */
+  .tlc {
+    --background: 340 15% 95%;
+    --foreground: 340 20% 15%;
+    --card: 340 12% 98%;
+    --card-foreground: 340 20% 15%;
+    --popover: 340 12% 98%;
+    --popover-foreground: 340 20% 15%;
+    --primary: 340 45% 45%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 340 10% 88%;
+    --secondary-foreground: 340 15% 30%;
+    --muted: 340 8% 85%;
+    --muted-foreground: 340 8% 42%;
+    --accent: 340 45% 45%;
+    --accent-foreground: 0 0% 100%;
+    --signal-secondary: 20 75% 52%;
+    --signal-highlight: 35 80% 55%;
+    --signal-positive: 160 40% 40%;
+    --destructive: 0 60% 48%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 340 8% 78%;
+    --input: 340 8% 78%;
+    --ring: 340 45% 45%;
+    --radius: 0.5rem;
+    --sidebar-background: 340 12% 92%;
+    --sidebar-foreground: 340 20% 15%;
+    --sidebar-primary: 340 45% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 340 8% 88%;
+    --sidebar-accent-foreground: 340 20% 15%;
+    --sidebar-border: 340 6% 75%;
+    --sidebar-ring: 340 45% 45%;
+    --rule: 340 20% 15%;
+    --skeuo-shadow: 0 0 0 1px hsl(340 15% 0% / 0.04), 0 1px 3px hsl(340 15% 0% / 0.06), 0 4px 12px hsl(340 15% 0% / 0.06);
+    --skeuo-shadow-hover: 0 0 0 1px hsl(340 15% 0% / 0.06), 0 2px 8px hsl(340 15% 0% / 0.08), 0 8px 24px hsl(340 15% 0% / 0.08);
+    --skeuo-inset: inset 0 2px 4px hsl(340 15% 0% / 0.06), inset 0 1px 2px hsl(340 15% 0% / 0.04);
+    --skeuo-highlight: inset 0 1px 0 hsl(0 0% 100% / 0.6);
+    --paper-grain: hsl(340 10% 93%);
+    --font-heading: 'Quicksand', sans-serif;
+    --font-heading-weight: 600;
+  }
+
+  /* ── Vignette + grain per theme ── */
   :root {
     --paper-grain-opacity: 0.08;
     --bg-vignette: radial-gradient(ellipse at 50% 30%, hsl(220 15% 8%) 0%, hsl(220 18% 4%) 100%);
@@ -240,7 +283,15 @@
   }
   .comets {
     --paper-grain-opacity: 0.05;
-    --bg-vignette: radial-gradient(ellipse at 50% 20%, hsl(270 45% 12%) 0%, hsl(270 60% 5%) 100%);
+    --bg-vignette: radial-gradient(ellipse at 50% 20%, hsl(218 40% 12%) 0%, hsl(220 50% 5%) 100%);
+  }
+  .bricktown {
+    --paper-grain-opacity: 0.1;
+    --bg-vignette: radial-gradient(ellipse at 50% 30%, hsl(15 20% 14%) 0%, hsl(15 25% 7%) 100%);
+  }
+  .tlc {
+    --paper-grain-opacity: 0.06;
+    --bg-vignette: radial-gradient(ellipse at 50% 30%, hsl(340 15% 97%) 0%, hsl(340 12% 92%) 100%);
   }
 
   body {
