@@ -749,6 +749,7 @@ const Index = () => {
       </main>
 
       <Footer />
+      <CityConcierge />
     </div>
   );
 };
