@@ -1,111 +1,65 @@
 
 
-# World-Class Theme Enhancement + Admin Simplification
+# Masthead Enhancement + Static Images + Every-Page Layout
 
-## Overview
-Three parallel workstreams: (1) elevate each theme with refined colors, unique typography feel, and per-theme accent behaviors; (2) atomic text sweep to eliminate inconsistencies; (3) radically simplify the admin panel from 13 tabs to 5 grouped sections.
+## What Gets Built
 
----
+### 1. Enhanced Masthead — Richer, More Interactive, on Every Page
 
-## 1. Theme Upgrades — Each Gets a Distinct World-Class Identity
+The current Navbar already has City Guide, Vol/Issue, weather, time, and edition — but it needs to be denser, more interactive, and appear consistently across all pages.
 
-### Light (Broadsheet)
-- Font: Cormorant Garamond (already set) — refine with lighter weight body, crisper contrast
-- Warmer parchment background, subtle sepia tint on cards
-- Accent: deep navy `210 85% 28%` — more authoritative
-- Paper grain opacity up to 0.14 for tactile feel
+**Enhancements:**
+- Add the section label to the utility bar that changes per page (e.g., "Section B: The Singles Beat" on `/singles`, "Section C: The Lifestyle Report" on `/fitness`)
+- Add a live reader count or entity count from the knowledge graph inline
+- Add a "Today's Focus" micro-headline that rotates based on time of day (morning/afternoon/evening recommendations)
+- Make the weather ornament clickable — expands to show a 3-day mini-forecast (still using open-meteo, no API key)
+- Add a subtle animated separator between utility bar items using CSS `::after` pseudo-elements
+- Ensure the `Navbar` component receives the current page context via `useLocation` to display the correct section label
 
-### Dark (Night Desk)
-- Font: Playfair Display (already set) — tighten tracking, add subtle glow on headings
-- True OLED-friendly black: `220 20% 3%` background
-- Brighter accent blue `205 100% 50%` for better contrast
-- Sharper card borders, subtle blue rim light on hover
+### 2. Static Images Embedded in App — Zero Loading
 
-### Thunder (Game Day)
-- Font: Oswald (already set) — increase weight to 800, all-caps forced on headings via CSS
-- True OKC Thunder palette: `--background: 214 100% 8%`, `--accent: 16 100% 50%` (Sunset Orange), `--primary: 200 100% 50%` (Thunder Blue)
-- Add `text-transform: uppercase` and `letter-spacing: 0.05em` to `.section-head` and `.headline` in Thunder
-- Electric glow effect on accent elements: `box-shadow: 0 0 12px hsl(16 100% 50% / 0.3)`
-- Scoreboard-style stat counters with tabular-nums
+Replace the dynamic `useListingImage` hook and edge function approach with a static image map embedded directly in the codebase. This eliminates all loading states, network requests, and CORS failures.
 
-### Comets (Red/White/Blue)
-- Font: Bitter (keep) — add condensed feel
-- Correct OKC Comets colors: Primary red `0 85% 45%`, Blue `220 100% 35%`, White accents
-- Star accent decorations on section dividers via CSS `::before` content
-- Athletic slab-serif energy with bold rule-doubles
+**Approach:**
+- Create `src/data/listingImages.ts` — a static map of `listingId → imageUrl` using free, open-licensed image URLs from Unsplash (via their static CDN — no API key, just direct URLs like `https://images.unsplash.com/photo-xxx?w=400&q=80`)
+- Curate ~50 category-specific images: CrossFit boxes, yoga studios, food banks, dance halls, parks, etc.
+- For organizations without a specific match, use a curated category fallback (e.g., all "CrossFit" listings share a CrossFit gym photo, all "Food" volunteer orgs share a food bank photo)
+- Update `ListingImage.tsx` to check the static map first — if found, render immediately with no loading state; only fall back to the edge function if no static match exists
+- This means cards render instantly with real photos, zero shimmer/skeleton states
 
-### Bricktown (Urban Warmth)
-- Font: Change to `'Bitter'` for headings but add a new Google Font — `Archivo` for body to feel more industrial/warehouse
-- Import `Archivo` font
-- Warm brick orange `18 75% 48%`, iron grey accents `20 5% 35%`
-- Exposed-brick texture grain (increase opacity to 0.15)
-- Warmer card backgrounds `15 18% 15%`, rust-colored borders
-- Industrial divider style: thicker rule-heavy with rust tint
+### 3. Creative Unique Layout in Masthead — Per-Page Personality
 
-### TLC (Love & Peace)
-- Font: Quicksand (keep) — lighter weight 500 for body, softer roundness
-- Palette: soft rose `345 25% 94%` bg, dusty mauve `340 35% 40%` primary, sage green `160 25% 45%` positive signal
-- Rounded corners increased: `--radius: 0.625rem`
-- Softer shadows with warm tint
-- Gentle transitions (0.3s ease instead of 0.2s)
-- No harsh blacks — darkest foreground is `340 20% 18%`
+Each page gets a unique masthead treatment below the main Navbar:
+- **Homepage**: Full hero carousel (already exists) + broadsheet headline block
+- **Singles**: Inline "The Singles Beat" dateline banner with a mini-stat bar (verified count, event count)
+- **Fitness**: "The Lifestyle Report" with district count and category breakdown inline
+- **Volunteering**: "The Civic Report" with org count and commitment breakdown
+- **Events**: "The Events Desk" with tonight's count
+- **Date Nights**: "The Social Scene" with curated picks count
+- **Discover**: "The Metro" with neighborhood count
 
-### Per-Theme CSS Overrides (new block in index.css)
-Add theme-specific overrides for:
-- `.thunder .section-head, .thunder .headline` → uppercase, wider tracking
-- `.thunder .skeuo-card:hover` → electric glow shadow
-- `.tlc .skeuo-card` → softer shadow, warmer border
-- `.bricktown .rule-heavy` → rust-colored
-- `.comets .rule-double` → red/blue alternating borders
+These are small, dense, section-header-style blocks (not full hero images) that reinforce the newspaper section identity.
 
----
+## Files Created/Modified
 
-## 2. Atomic Text Sweep
-
-Scan all components for inconsistencies and standardize:
-- **Font size classes**: Normalize all `text-[9px]`, `text-[10px]`, `text-[11px]` to use 3 atomic sizes: `text-[10px]`, `text-xs` (12px), `text-sm` (14px)
-- **Tracking**: Standardize `tracking-[0.12em]`, `tracking-[0.15em]` etc to 2 values: `tracking-wider` and `tracking-widest`
-- **Uppercase labels**: Ensure all use `.label-caps` or `.dateline` instead of inline combinations
-- **ThemePanel descriptions**: Update to match each theme's new identity
-- **ThemeToggle colors**: Match the swatch colors to actual CSS variable values
-
----
-
-## 3. Admin Panel Simplification — 13 Tabs → 5
-
-Current tabs: Briefing, Site Editor, Media, Feeds, Content, Visitors, Security, Audit, Graph, Newsroom, Moderation, AI Scanner, AI/Settings
-
-### New Structure:
-
-| Group | Contains | Icon |
-|---|---|---|
-| **Editorial** | Briefing + Newsroom + Feeds | Newspaper |
-| **Site** | Site Editor + Media + Content | Settings |
-| **Intelligence** | Graph + AI Scanner + Moderation | Brain |
-| **Operations** | Visitors + Security + Audit | Shield |
-| **AI Assistant** | AI Chat + Settings + Theme | Sparkles |
-
-Each group renders as a single tab. Within each tab, the sub-sections stack vertically with collapsible `<details>` elements (using the `Collapsible` shadcn component), so everything is accessible but not overwhelming.
-
-### Admin Header Cleanup
-- Remove the 5-stat overview bar (redundant with individual sections)
-- Replace with a single-line status: "142 listings · 38 entities · 12 feed items · Last scan 2h ago"
-- Cleaner tab bar with just 5 items — no horizontal scroll needed
-
----
-
-## Files Modified
-
-| File | Change |
+| File | Action |
 |---|---|
-| `src/index.css` | Theme variable refinements for all 6 themes, per-theme override classes, add Archivo font import |
-| `src/components/admin/ThemePanel.tsx` | Updated descriptions and swatch colors |
-| `src/components/ThemeToggle.tsx` | No changes needed |
-| `src/pages/Admin.tsx` | Restructure from 13 tabs to 5 grouped sections with collapsible sub-panels |
+| `src/data/listingImages.ts` | New — static image URL map for all listings by category |
+| `src/components/ListingImage.tsx` | Modified — check static map first, instant render |
+| `src/components/Navbar.tsx` | Modified — add per-page section labels, interactive weather, denser utility bar |
+| `src/components/SectionHeader.tsx` | New — reusable per-page section masthead with stats |
+| `src/hooks/useWeather.ts` | Modified — add 3-day forecast data from open-meteo |
+| `src/pages/Singles.tsx` | Modified — add SectionHeader |
+| `src/pages/Workouts.tsx` | Modified — add SectionHeader |
+| `src/pages/Volunteering.tsx` | Modified — add SectionHeader |
+| `src/pages/Events.tsx` | Modified — add SectionHeader |
+| `src/pages/DateNights.tsx` | Modified — add SectionHeader |
+| `src/pages/Discover.tsx` | Modified — add SectionHeader |
 
 ## Technical Notes
-- All changes are CSS/component-level — no database or edge function changes
-- Font imports use Google Fonts CDN (already established pattern)
-- Per-theme CSS overrides use the existing `.thunder`, `.comets` etc class selectors
-- Admin restructure preserves all existing sub-components (GraphEditor, NewsroomPanel, etc.) — only the tab navigation and layout wrapper changes
+- Unsplash static URLs (`images.unsplash.com/photo-xxx?w=400&q=80`) are free, no API key needed, and served from a global CDN
+- Category-based fallback images mean even new listings added later get a relevant photo instantly
+- The static map can be overridden by the existing `media_overrides` table for admin-curated images
+- No database or edge function changes needed
+- Weather forecast uses the same open-meteo API, just adds `&daily=temperature_2m_max,temperature_2m_min,weather_code&forecast_days=3`
 
