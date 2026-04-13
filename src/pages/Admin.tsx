@@ -110,7 +110,7 @@ const Admin = () => {
     }
   }, [tab, isAdmin]);
 
-  // Load chat history and custom instructions
+  // Load chat history, custom instructions, and feedback count
   useEffect(() => {
     if (tab === "ai" && isAdmin && user) {
       supabase.from("admin_chat_messages").select("*").eq("user_id", user.id).order("created_at", { ascending: true }).limit(100).then(({ data }) => {
@@ -120,6 +120,9 @@ const Admin = () => {
       });
       supabase.from("admin_settings").select("*").eq("user_id", user.id).eq("setting_key", "custom_instructions").single().then(({ data }) => {
         if (data) setCustomInstructions(data.setting_value);
+      });
+      supabase.from("admin_prompt_history").select("id", { count: "exact", head: true }).eq("user_id", user.id).then(({ count }) => {
+        setFeedbackCount(count || 0);
       });
     }
   }, [tab, isAdmin, user]);
