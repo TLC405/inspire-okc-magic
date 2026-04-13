@@ -13,8 +13,9 @@ import {
   CheckCircle2, XCircle, RefreshCw, LogOut, Fingerprint,
   Globe, Activity, Users, Zap, Lightbulb, Loader2,
   Edit3, Save, X, Heart, Dumbbell, HandHelping, ChevronDown, ChevronUp, ExternalLink, Trash2, Copy,
-  MessageSquare, Send, Settings, Sparkles, Brain
+  MessageSquare, Send, Settings, Sparkles, Brain, ThumbsUp, ThumbsDown, TrendingUp
 } from "lucide-react";
+import { knowledgeGraph } from "@/lib/knowledgeGraph";
 
 const statusColors: Record<VerificationStatus, string> = {
   verified: "text-emerald-500",
