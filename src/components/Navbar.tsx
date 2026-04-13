@@ -1,11 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
 import { ThemeToggle } from "./ThemeToggle";
 import { cn } from "@/lib/utils";
-import { Settings, Clock, MapPin } from "lucide-react";
+import { Settings, Clock, MapPin, Zap, Star } from "lucide-react";
 import { WireTicker } from "./WireTicker";
 import { useRef, useEffect, useState } from "react";
 import { useWeather } from "@/hooks/useWeather";
 import { useLiveClock } from "@/hooks/useLiveClock";
+import { useTheme } from "next-themes";
 
 const navLinks = [
   { label: "Singles", href: "/singles", numeral: "I", desk: "Social" },
@@ -39,6 +40,8 @@ export function Navbar() {
   const weather = useWeather();
   const { timeStr, edition } = useLiveClock();
   const [tickerIdx, setTickerIdx] = useState(0);
+  const { theme } = useTheme();
+  const isTeamTheme = theme === "thunder" || theme === "comets";
   const [scrolled, setScrolled] = useState(false);
 
   // Scroll-collapse with RAF debounce
@@ -73,9 +76,19 @@ export function Navbar() {
 
   return (
     <header className="bg-background sticky top-0 z-50">
-      {/* Top thick rule */}
-      <div className="h-[4px] bg-foreground" />
-      <div className="h-[1px] bg-foreground/30 mt-[2px]" />
+      {/* Top thick rule — team-colored for Thunder/Comets */}
+      <div className={cn(
+        "h-[4px]",
+        theme === "thunder" ? "bg-[hsl(200,100%,45%)]" :
+        theme === "comets" ? "bg-[hsl(270,55%,55%)]" :
+        "bg-foreground"
+      )} />
+      <div className={cn(
+        "h-[1px] mt-[2px]",
+        theme === "thunder" ? "bg-[hsl(8,87%,54%,0.5)]" :
+        theme === "comets" ? "bg-[hsl(168,100%,39%,0.5)]" :
+        "bg-foreground/30"
+      )} />
 
       <div className="container">
         {/* ═══ UPPER UTILITY BAR ═══ */}
