@@ -512,7 +512,14 @@ const Admin = () => {
                   <Sparkles size={20} className="text-accent" />
                   <div>
                     <h2 className="headline text-foreground text-lg">INSPIRE Intelligence</h2>
-                    <p className="text-xs text-muted-foreground">Your editorial AI — contextualized with the full platform</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-xs text-muted-foreground">Your editorial AI — contextualized with the full platform</p>
+                      {feedbackCount > 0 && (
+                        <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded bg-accent/10 text-accent font-mono">
+                          <TrendingUp size={9} /> {feedbackCount} signals
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
