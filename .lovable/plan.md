@@ -1,31 +1,41 @@
 
-# Fix Masthead Scroll-Collapse Glitch
+
+# Momento Mori Showcase Page + Header Flicker Fix
 
 ## Problem
-The nameplate section uses `max-height` transition from `max-h-60` to `max-h-0` with `opacity`. This causes:
-1. **Layout jump** — `max-height: 0` collapses the element but the transition is imprecise (max-h-60 = 240px but actual content is ~120px, so the animation starts with dead time)
-2. **Composite layer thrash** — `will-change` on both `max-height` and `opacity` forces repaints
+1. **Momento Mori**: User wants the app from `github.com/TLC405/momentomori` accessible as a page within Inspire OKC -- clicking a link opens the full app as a showcase, kept separate from the main Inspire codebase.
+2. **Header flicker**: The sticky header's nameplate collapse (`grid-rows-[0fr]` + `opacity-0`) causes visual flickering during scroll. The `opacity` transition on the grid wrapper creates a flash as the layout shift and fade fight each other. Additionally, `transition-all` on the h1's letter-spacing causes reflow during the grid animation.
 
-## Fix (single file: `Navbar.tsx`)
-Replace the `max-height` hack with a proper `grid` row collapse pattern — this is the modern, glitch-free way to animate height to/from 0:
+## Plan
 
-```tsx
-// Replace the nameplate wrapper (lines 208-212)
-<div
-  className={cn(
-    "grid transition-[grid-template-rows,opacity] duration-300 ease-in-out",
-    scrolled ? "grid-rows-[0fr] opacity-0" : "grid-rows-[1fr] opacity-100"
-  )}
->
-  <div className="overflow-hidden">
-    {/* ...existing nameplate content unchanged... */}
-  </div>
-</div>
-```
+### 1. Fix Header Flicker (`src/components/Navbar.tsx`)
+- Remove `opacity-0`/`opacity-100` from the grid-rows collapse wrapper -- the `grid-rows-[0fr]` + `overflow-hidden` already hides content cleanly without needing opacity.
+- Remove `transition-[grid-template-rows,opacity]` and replace with just `transition-[grid-template-rows]` to avoid the opacity causing a visible flash.
+- Remove `transition-all` from the h1 hover tracking change (the letter-spacing reflow during collapse causes jank). Use a transform-based hover effect instead or remove it.
+- Add `will-change: grid-template-rows` to hint the browser for smoother compositing.
 
-This uses CSS `grid-rows-[0fr]` → `grid-rows-[1fr]` which smoothly animates the actual content height with no jump, no guessing max-height values, and no layout thrash. The inner `overflow-hidden` div clips content during collapse.
+### 2. Create Momento Mori Showcase Page (`src/pages/MomentoMori.tsx`)
+- New page component that renders the Navbar, then a full-viewport iframe embedding the deployed Momento Mori app.
+- The iframe URL will be the published Lovable URL for that project. Since the README doesn't show a custom domain, we'll need the user to confirm the URL -- but the standard Lovable pattern is `https://<slug>.lovable.app`. I'll use a placeholder and ask.
+- The page includes a small top bar with "Back to Inspire" link and "Momento Mori" title, then the iframe fills remaining space.
+- No Inspire footer/nav overlapping the iframe -- minimal chrome so the showcase app feels standalone.
 
-## Files Modified
+### 3. Add Route (`src/App.tsx`)
+- Add `/momento-mori` route pointing to the new page.
+
+### 4. Add Nav Link (`src/components/Navbar.tsx`)
+- Add a GitHub-style link or "Momento Mori" link in the upper utility bar, linking to `/momento-mori` internally (not to GitHub).
+
+### 5. Add to Mobile Tab Bar (`src/components/MobileTabBar.tsx`)
+- Add "Momento Mori" to the "More" dropdown menu.
+
+## Question needed
+I need to confirm the deployed URL for the Momento Mori app to embed it. It's likely something like `https://momento-mori-xxx.lovable.app` or a custom domain.
+
 | File | Change |
 |---|---|
-| `src/components/Navbar.tsx` | Replace `max-h` collapse with `grid-rows` collapse pattern (~3 lines changed) |
+| `src/components/Navbar.tsx` | Remove opacity from collapse transition; add showcase link |
+| `src/pages/MomentoMori.tsx` | New iframe showcase page |
+| `src/App.tsx` | Add `/momento-mori` route |
+| `src/components/MobileTabBar.tsx` | Add to More menu |
+
