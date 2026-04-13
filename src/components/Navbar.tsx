@@ -251,6 +251,7 @@ export function Navbar() {
 
           <div className="h-[3px] bg-foreground" />
           <div className="h-[1px] bg-foreground/20 mt-[2px]" />
+          </div>
         </div>
 
         {/* ═══ DATE + EDITION + TODAY'S FOCUS BAR ═══ */}
