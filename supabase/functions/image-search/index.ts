@@ -55,7 +55,6 @@ serve(async (req) => {
 
         if (scrapeRes.ok) {
           const scrapeData = await scrapeRes.json();
-          // Look for image links from the page
           const links: string[] = scrapeData.data?.links || scrapeData.links || [];
           const imgLinks = links.filter((l: string) =>
             /\.(jpg|jpeg|png|webp)/i.test(l) && !/logo|icon|favicon|sprite|banner-ad/i.test(l)
@@ -84,7 +83,6 @@ serve(async (req) => {
         if (searchRes.ok) {
           const searchData = await searchRes.json();
           const results = searchData.data || [];
-          // Find a result with image content
           for (const r of results) {
             if (r.markdown) {
               const imgMatch = r.markdown.match(/!\[.*?\]\((https?:\/\/[^\s)]+\.(jpg|jpeg|png|webp)[^\s)]*)\)/i);
@@ -101,16 +99,16 @@ serve(async (req) => {
       }
     }
 
-    // Final fallback: Use Lovable AI to suggest a known image URL
+    // Final fallback: Use Groq AI to suggest a known image URL
     if (!imageUrl) {
-      const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-      if (LOVABLE_API_KEY) {
+      const GROQ_API_KEY = Deno.env.get("GROQ_API_KEY");
+      if (GROQ_API_KEY) {
         try {
-          const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          const aiRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
             method: "POST",
-            headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+            headers: { Authorization: `Bearer ${GROQ_API_KEY}`, "Content-Type": "application/json" },
             body: JSON.stringify({
-              model: "google/gemini-3.1-pro-preview",
+              model: "meta-llama/llama-4-scout-17b-16e-instruct",
               messages: [
                 { role: "system", content: "You find real, publicly accessible image URLs for businesses and places. Return ONLY a direct image URL (jpg/png/webp) that is publicly accessible. If you cannot find one with high confidence, return NONE." },
                 { role: "user", content: `Find a real photo URL for: ${name} in ${location || "Oklahoma City, OK"}. Category: ${category || "business"}. ${websiteUrl ? `Website: ${websiteUrl}` : ""}` },
