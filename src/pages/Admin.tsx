@@ -506,6 +506,9 @@ const Admin = () => {
         )}
 
         <div className="skeuo-card rounded-lg p-6">
+          {/* ═══ BRIEFING TAB ═══ */}
+          {tab === "briefing" && <AdminBriefing />}
+
           {/* ═══ AI / SETTINGS TAB ═══ */}
           {tab === "ai" && (
             <div className="space-y-4">
