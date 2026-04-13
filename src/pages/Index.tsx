@@ -642,6 +642,8 @@ const Index = () => {
 
             {/* Civic Panels Sidebar */}
             <div className="lg:col-span-4 space-y-6">
+              <ThunderPlayoffBracket />
+              <CometsSchedule />
               <AtAGlance />
               <MayorsDesk />
               <SportsSidebar />

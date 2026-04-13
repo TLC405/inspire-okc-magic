@@ -150,6 +150,13 @@ export function Navbar() {
                 </span>
               </>
             )}
+            {/* Thunder playoff teaser */}
+            {theme === "thunder" && (
+              <>
+                <span className="hidden sm:inline text-foreground/15 text-[6px]">|</span>
+                <ThunderPlayoffTeaser />
+              </>
+            )}
           </div>
           <div className="hidden md:flex items-center gap-2">
             <span className="font-mono text-[8px] tracking-widest uppercase text-muted-foreground">
