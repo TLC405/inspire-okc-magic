@@ -620,6 +620,58 @@
   }
 }
 
+/* ═══ Per-Theme Behavioral Overrides ═══ */
+
+/* Thunder — uppercase headings, electric glow */
+.thunder .section-head,
+.thunder .headline {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.thunder .skeuo-card:hover {
+  box-shadow: 0 0 0 1px hsl(16 100% 50% / 0.2), 0 0 12px hsl(16 100% 50% / 0.15), 0 4px 16px hsl(214 100% 3% / 0.5);
+}
+.thunder .skeuo-badge-accent,
+.thunder .news-badge-accent {
+  box-shadow: 0 0 8px hsl(16 100% 50% / 0.2);
+}
+.thunder .mono-data,
+.thunder .dateline {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Comets — star decorations, bold slab energy */
+.comets .rule-double {
+  border-top-color: hsl(0 85% 45%);
+  border-bottom-color: hsl(220 100% 35%);
+}
+.comets .section-head::after {
+  content: ' \u2605';
+  color: hsl(0 85% 45% / 0.4);
+  font-size: 0.6em;
+}
+
+/* Bricktown — industrial rust, warehouse feel */
+.bricktown .rule-heavy {
+  background: hsl(18 75% 48% / 0.6);
+}
+.bricktown .ink-rule-thick {
+  background: linear-gradient(90deg, transparent 0%, hsl(18 75% 48% / 0.4) 5%, hsl(18 75% 48% / 0.4) 95%, transparent 100%);
+}
+
+/* TLC — gentle transitions, softer everything */
+.tlc .skeuo-card {
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  border-color: hsl(340 10% 76% / 0.6);
+}
+.tlc .skeuo-card:hover {
+  box-shadow: 0 0 0 1px hsl(340 15% 0% / 0.05), 0 4px 16px hsl(340 20% 30% / 0.1);
+}
+.tlc .skeuo-btn,
+.tlc .skeuo-chip {
+  border-radius: 0.625rem;
+}
+
 @keyframes signal-pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
