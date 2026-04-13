@@ -328,21 +328,26 @@
 @layer components {
   /* ── Newspaper Typography ── */
   .masthead {
-    font-family: 'Playfair Display', serif;
-    @apply text-[clamp(2.5rem,10vw,7rem)] font-black tracking-[-0.04em] leading-[0.85];
+    font-family: var(--font-heading);
+    @apply text-[clamp(2.5rem,10vw,7rem)] tracking-[-0.04em] leading-[0.85];
+    font-weight: var(--font-heading-weight);
   }
 
   .masthead-sub {
-    font-family: 'Playfair Display', serif;
+    font-family: var(--font-heading);
     @apply text-[clamp(1rem,3vw,1.5rem)] font-normal tracking-[0.08em] uppercase;
   }
 
   .section-head {
-    @apply text-[clamp(1.5rem,4vw,3rem)] font-black tracking-[-0.03em] leading-[0.9] uppercase;
+    font-family: var(--font-heading);
+    @apply text-[clamp(1.5rem,4vw,3rem)] tracking-[-0.03em] leading-[0.9] uppercase;
+    font-weight: var(--font-heading-weight);
   }
 
   .headline {
-    @apply text-lg md:text-xl font-bold tracking-tight leading-snug;
+    font-family: var(--font-heading);
+    @apply text-lg md:text-xl tracking-tight leading-snug;
+    font-weight: var(--font-heading-weight);
   }
 
   .subheadline {

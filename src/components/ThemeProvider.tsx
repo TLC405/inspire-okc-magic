@@ -5,7 +5,7 @@ export function ThemeProvider({ children, ...props }: { children: React.ReactNod
     <NextThemesProvider
       attribute="class"
       defaultTheme="light"
-      themes={["light", "dark", "thunder", "comets"]}
+      themes={["light", "dark", "thunder", "comets", "bricktown", "tlc"]}
       enableSystem={false}
       disableTransitionOnChange
       {...props}

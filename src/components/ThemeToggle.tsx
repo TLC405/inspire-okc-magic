@@ -1,5 +1,5 @@
 import { useTheme } from "next-themes";
-import { Sun, Moon, Zap, Star } from "lucide-react";
+import { Sun, Moon, Zap, Star, Building2, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const modes = [
@@ -7,6 +7,8 @@ const modes = [
   { key: "dark", label: "Dark", icon: Moon },
   { key: "thunder", label: "Thunder", icon: Zap },
   { key: "comets", label: "Comets", icon: Star },
+  { key: "bricktown", label: "Bricktown", icon: Building2 },
+  { key: "tlc", label: "TLC", icon: Heart },
 ] as const;
 
 export function ThemeToggle({ className }: { className?: string }) {
@@ -18,7 +20,7 @@ export function ThemeToggle({ className }: { className?: string }) {
     setTheme(next.key);
   };
 
-  const current = modes.find((m) => m.key === theme) || modes[1];
+  const current = modes.find((m) => m.key === theme) || modes[0];
   const Icon = current.icon;
 
   return (
