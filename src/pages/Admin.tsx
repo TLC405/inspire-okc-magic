@@ -9,6 +9,7 @@ import { cityShowcase } from "@/data/cityShowcase";
 import { supabase } from "@/integrations/supabase/client";
 import ReactMarkdown from "react-markdown";
 import { AdminBriefing } from "@/components/AdminBriefing";
+import { BriefingEditor } from "@/components/BriefingEditor";
 import {
   Shield, ShieldCheck, ShieldAlert, AlertTriangle, Search, MapPin, Eye, Database, Key,
   CheckCircle2, XCircle, RefreshCw, LogOut, Fingerprint,
@@ -507,7 +508,13 @@ const Admin = () => {
 
         <div className="skeuo-card rounded-lg p-6">
           {/* ═══ BRIEFING TAB ═══ */}
-          {tab === "briefing" && <AdminBriefing />}
+          {tab === "briefing" && (
+            <div className="space-y-8">
+              <BriefingEditor />
+              <div className="rule-thin" />
+              <AdminBriefing />
+            </div>
+          )}
 
           {/* ═══ AI / SETTINGS TAB ═══ */}
           {tab === "ai" && (
