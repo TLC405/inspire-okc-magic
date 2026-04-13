@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import heroSkyline from "@/assets/hero-okc-skyline.jpg";
 import heroBg from "@/assets/hero-bg.jpg";
 import heroDiscover from "@/assets/hero-discover.jpg";
@@ -8,7 +9,7 @@ import heroFitness from "@/assets/hero-fitness.jpg";
 import heroSingles from "@/assets/hero-singles.jpg";
 import heroVolunteer from "@/assets/hero-volunteer.jpg";
 
-const photos = [
+const defaultPhotos = [
   { src: heroSkyline, alt: "Oklahoma City skyline at golden hour", headline: "Your City. Tonight.", sub: "Oklahoma City's most curated community guide", href: "/" },
   { src: heroSingles, alt: "Singles events in Oklahoma City", headline: "Meet Someone Real", sub: "Verified singles events — zero ghost profiles", href: "/singles" },
   { src: heroFitness, alt: "Fitness in Oklahoma City", headline: "Sweat Together", sub: "Every gym, trail, and studio across every district", href: "/fitness" },
@@ -17,15 +18,39 @@ const photos = [
   { src: heroDiscover, alt: "Discover Oklahoma City", headline: "Discover the Metro", sub: "Architecture, culture, and hidden gems", href: "/discover" },
 ];
 
+type SlideData = { src: string; alt: string; headline: string; sub: string; href: string };
+
 export function HeroCarousel() {
   const [current, setCurrent] = useState(0);
+  const [photos, setPhotos] = useState<SlideData[]>(defaultPhotos);
+
+  useEffect(() => {
+    supabase
+      .from("hero_slides")
+      .select("title, subtitle, cta_text, cta_link, image_url")
+      .eq("active", true)
+      .order("sort_order", { ascending: true })
+      .then(({ data }) => {
+        if (data && data.length > 0) {
+          setPhotos(
+            (data as any[]).map((d) => ({
+              src: d.image_url,
+              alt: d.title,
+              headline: d.title,
+              sub: d.subtitle,
+              href: d.cta_link,
+            }))
+          );
+        }
+      });
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrent((prev) => (prev + 1) % photos.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [photos.length]);
 
   return (
     <div className="relative w-full h-[380px] md:h-[560px] overflow-hidden">
@@ -42,7 +67,6 @@ export function HeroCarousel() {
       ))}
       <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-background" />
 
-      {/* Per-slide content overlay */}
       <div className="absolute inset-0 flex flex-col items-center justify-end pb-16 md:pb-20 px-4 text-center">
         {photos.map((photo, i) => (
           <div
@@ -71,7 +95,6 @@ export function HeroCarousel() {
         ))}
       </div>
 
-      {/* Photo indicator dots */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10">
         {photos.map((_, i) => (
           <button
