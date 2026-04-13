@@ -61,7 +61,8 @@ const Admin = () => {
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const [authError, setAuthError] = useState("");
   const [authMsg, setAuthMsg] = useState("");
-  const [tab, setTab] = useState<"content" | "visitors" | "security" | "events" | "scanner" | "ai" | "briefing" | "site" | "media" | "feeds" | "graph" | "newsroom" | "moderation">("briefing");
+  const [tab, setTab] = useState<"editorial" | "site" | "intelligence" | "operations" | "assistant">("editorial");
+  const [openSections, setOpenSections] = useState<Set<string>>(new Set(["briefing", "settings", "graph", "visitors", "site-editor"]));
   const [evtSearch, setEvtSearch] = useState("");
   const [evtFilter, setEvtFilter] = useState<"all" | VerificationStatus>("all");
   const [visitors, setVisitors] = useState<any[]>([]);
@@ -106,7 +107,7 @@ const Admin = () => {
   }, [evtSearch, evtFilter]);
 
   useEffect(() => {
-    if (tab === "visitors" && visitors.length === 0 && isAdmin) {
+    if (tab === "operations" && visitors.length === 0 && isAdmin) {
       setLoadingVisitors(true);
       supabase.from("visitor_logs").select("*").order("created_at", { ascending: false }).limit(200).then(({ data }) => {
         setVisitors(data || []);
@@ -116,7 +117,7 @@ const Admin = () => {
   }, [tab, isAdmin]);
 
   useEffect(() => {
-    if (tab === "scanner" && isAdmin && scanHistory.length === 0) {
+    if (tab === "intelligence" && isAdmin && scanHistory.length === 0) {
       supabase.from("scan_results").select("*").order("created_at", { ascending: false }).limit(20).then(({ data }) => {
         setScanHistory(data || []);
       });
@@ -125,7 +126,7 @@ const Admin = () => {
 
   // Load chat history, custom instructions, and feedback count
   useEffect(() => {
-    if (tab === "ai" && isAdmin && user) {
+    if (tab === "assistant" && isAdmin && user) {
       supabase.from("admin_chat_messages").select("*").eq("user_id", user.id).order("created_at", { ascending: true }).limit(100).then(({ data }) => {
         if (data && data.length > 0) {
           setChatMessages(data.map((m: any) => ({ role: m.role as "user" | "assistant", content: m.content })));
@@ -443,19 +444,11 @@ const Admin = () => {
   }
 
   const tabs = [
-    { id: "briefing" as const, label: "Briefing", icon: TrendingUp },
-    { id: "site" as const, label: "Site Editor", icon: Settings },
-    { id: "media" as const, label: "Media", icon: Eye },
-    { id: "feeds" as const, label: "Feeds", icon: Activity },
-    { id: "content" as const, label: "Content", icon: Edit3 },
-    { id: "visitors" as const, label: "Visitors", icon: Users },
-    { id: "security" as const, label: "Security", icon: Shield },
-    { id: "events" as const, label: "Audit", icon: Eye },
-    { id: "graph" as const, label: "Graph", icon: Network },
-    { id: "newsroom" as const, label: "Newsroom", icon: Newspaper },
-    { id: "moderation" as const, label: "Moderation", icon: ShieldMod },
-    { id: "scanner" as const, label: "AI Scanner", icon: Zap },
-    { id: "ai" as const, label: "AI / Settings", icon: Brain },
+    { id: "editorial" as const, label: "Editorial", icon: Newspaper },
+    { id: "site" as const, label: "Site", icon: Settings },
+    { id: "intelligence" as const, label: "Intelligence", icon: Brain },
+    { id: "operations" as const, label: "Operations", icon: Shield },
+    { id: "assistant" as const, label: "AI Assistant", icon: Sparkles },
   ];
 
   const quickActions = [
@@ -465,11 +458,32 @@ const Admin = () => {
     { label: "Analyze traffic", prompt: "Based on the platform architecture, what strategies would maximize organic traffic and user engagement?" },
   ];
 
+  const toggleSection = (key: string) => {
+    setOpenSections(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      return next;
+    });
+  };
+
+  const SectionCollapsible = ({ id, title, icon: Icon, children }: { id: string; title: string; icon: typeof Shield; children: React.ReactNode }) => (
+    <div className="border-b border-border/20 last:border-0">
+      <button onClick={() => toggleSection(id)} className="w-full flex items-center justify-between py-3 px-1 hover:bg-muted/10 transition-colors">
+        <div className="flex items-center gap-2">
+          <Icon size={14} className="text-accent" />
+          <span className="text-sm font-semibold text-foreground">{title}</span>
+        </div>
+        {openSections.has(id) ? <ChevronUp size={14} className="text-muted-foreground" /> : <ChevronDown size={14} className="text-muted-foreground" />}
+      </button>
+      {openSections.has(id) && <div className="pb-4 pt-1">{children}</div>}
+    </div>
+  );
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       <main className="flex-1 container py-6">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-4">
           <h1 className="section-head text-foreground text-2xl">Admin Dashboard</h1>
           <div className="flex items-center gap-3">
             <span className="text-xs text-muted-foreground">{user.email}</span>
@@ -479,31 +493,12 @@ const Admin = () => {
           </div>
         </div>
 
-        {/* Overview stats */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
-          <div className="skeuo-card-inset p-3 rounded text-center">
-            <p className="text-xl font-black text-foreground">{totalListings}</p>
-            <p className="dateline text-muted-foreground">Total Listings</p>
-          </div>
-          <div className="skeuo-card-inset p-3 rounded text-center">
-            <p className="text-xl font-black text-foreground">{singlesEvents.length}</p>
-            <p className="dateline text-muted-foreground">Events</p>
-          </div>
-          <div className="skeuo-card-inset p-3 rounded text-center">
-            <p className="text-xl font-black text-foreground">{fitnessSpots.length}</p>
-            <p className="dateline text-muted-foreground">Fitness</p>
-          </div>
-          <div className="skeuo-card-inset p-3 rounded text-center">
-            <p className="text-xl font-black text-foreground">{volunteerOrgs.length}</p>
-            <p className="dateline text-muted-foreground">Volunteer</p>
-          </div>
-          <div className="skeuo-card-inset p-3 rounded text-center">
-            <p className="text-xl font-black text-foreground">{verifiedEvents}</p>
-            <p className="dateline text-muted-foreground">Verified</p>
-          </div>
-        </div>
+        {/* Compact status line */}
+        <p className="text-xs text-muted-foreground mb-5 font-mono tracking-wider">
+          {totalListings} listings · {graphStats.nodeCount} entities · {singlesEvents.length} events · {verifiedEvents} verified
+        </p>
 
-        <div className="flex gap-1 mb-6 overflow-x-auto scrollbar-hide">
+        <div className="flex gap-1 mb-6">
           {tabs.map(({ id, label, icon: Icon }) => (
             <button
               key={id}
@@ -518,53 +513,338 @@ const Admin = () => {
         </div>
 
         {copiedMsg && (
-          <div className="fixed top-4 right-4 z-50 bg-emerald-500/90 text-white text-sm px-4 py-2 rounded shadow-lg animate-fade-in">
+          <div className="fixed top-4 right-4 z-50 bg-accent/90 text-accent-foreground text-sm px-4 py-2 rounded shadow-lg animate-fade-in">
             {copiedMsg}
           </div>
         )}
 
         <div className="skeuo-card rounded-lg p-6">
-          {/* ═══ BRIEFING TAB ═══ */}
-          {tab === "briefing" && (
-            <div className="space-y-8">
-              <BriefingEditor />
-              <div className="rule-thin" />
-              <AdminBriefing />
+          {/* ═══ EDITORIAL TAB ═══ */}
+          {tab === "editorial" && (
+            <div>
+              <SectionCollapsible id="briefing" title="Briefings" icon={TrendingUp}>
+                <div className="space-y-6">
+                  <BriefingEditor />
+                  <div className="rule-thin" />
+                  <AdminBriefing />
+                </div>
+              </SectionCollapsible>
+              <SectionCollapsible id="newsroom" title="Newsroom" icon={Newspaper}>
+                <NewsroomPanel />
+              </SectionCollapsible>
+              <SectionCollapsible id="feeds" title="Feeds" icon={Activity}>
+                <FeedManager />
+              </SectionCollapsible>
             </div>
           )}
 
-          {/* ═══ SITE EDITOR TAB ═══ */}
+          {/* ═══ SITE TAB ═══ */}
           {tab === "site" && (
-            <div className="space-y-8">
-              <SiteModulesEditor />
-              <div className="rule-thin" />
-              <SiteCopyEditor />
-              <div className="rule-thin" />
-              <HeroSlideEditor />
-              <div className="rule-thin" />
-              <TickerEditor />
-              <div className="rule-thin" />
-              <PullQuoteEditor />
+            <div>
+              <SectionCollapsible id="site-editor" title="Site Editor" icon={Settings}>
+                <div className="space-y-6">
+                  <SiteModulesEditor />
+                  <div className="rule-thin" />
+                  <SiteCopyEditor />
+                  <div className="rule-thin" />
+                  <HeroSlideEditor />
+                  <div className="rule-thin" />
+                  <TickerEditor />
+                  <div className="rule-thin" />
+                  <PullQuoteEditor />
+                </div>
+              </SectionCollapsible>
+              <SectionCollapsible id="media" title="Media Audit" icon={Eye}>
+                <MediaAuditPanel />
+              </SectionCollapsible>
+              <SectionCollapsible id="content" title="Content Manager" icon={Edit3}>
+                <div className="space-y-4">
+                  <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+                    <div>
+                      <h2 className="headline text-foreground text-lg">Content Manager</h2>
+                      <p className="text-xs text-muted-foreground mt-0.5">View, inspect, and edit every listing</p>
+                    </div>
+                    <button
+                      onClick={() => copyAsJson(
+                        contentTab === "singles" ? singlesEvents : contentTab === "fitness" ? fitnessSpots : volunteerOrgs,
+                        contentTab
+                      )}
+                      className="skeuo-btn text-xs"
+                    >
+                      <Copy size={12} /> Export {contentTab} as JSON
+                    </button>
+                  </div>
+                  <div className="flex gap-1">
+                    {([
+                      { id: "singles" as const, label: "Events & Singles", icon: Heart, count: singlesEvents.length },
+                      { id: "fitness" as const, label: "Fitness Spots", icon: Dumbbell, count: fitnessSpots.length },
+                      { id: "volunteer" as const, label: "Volunteer Orgs", icon: HandHelping, count: volunteerOrgs.length },
+                    ]).map(({ id, label, icon: Icon, count }) => (
+                      <button
+                        key={id}
+                        onClick={() => { setContentTab(id); setContentSearch(""); setEditingId(null); }}
+                        className={`flex items-center gap-1.5 px-3 py-2 rounded text-xs font-medium transition-colors ${
+                          contentTab === id ? "bg-accent/15 text-accent border border-accent/20" : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        <Icon size={12} /> {label} <span className="text-muted-foreground/60">({count})</span>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="relative">
+                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <input
+                      type="text"
+                      value={contentSearch}
+                      onChange={(e) => setContentSearch(e.target.value)}
+                      placeholder={`Search ${contentTab}...`}
+                      className="w-full pl-9 pr-4 py-2 bg-muted/30 border border-border/50 rounded text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-accent"
+                    />
+                  </div>
+                  {contentTab === "singles" && (
+                    <div className="space-y-2">
+                      <p className="dateline text-muted-foreground">{filteredContentSingles.length} listings</p>
+                      {filteredContentSingles.map((evt) => (
+                        <ContentCardSingles key={evt.id} event={evt} isEditing={editingId === evt.id} editData={editData}
+                          onEdit={() => startEditing(evt.id, { name: evt.name, venue: evt.venue, neighborhood: evt.neighborhood, description: evt.description, price: evt.price, frequency: evt.frequency, tags: evt.tags.join(", ") })}
+                          onCancel={cancelEditing} onFieldChange={(field, value) => setEditData((d) => ({ ...d, [field]: value }))} onCopy={() => copyAsJson(evt, evt.name)} />
+                      ))}
+                    </div>
+                  )}
+                  {contentTab === "fitness" && (
+                    <div className="space-y-2">
+                      <p className="dateline text-muted-foreground">{filteredContentFitness.length} spots</p>
+                      {filteredContentFitness.map((spot) => (
+                        <ContentCardFitness key={spot.id} spot={spot} isEditing={editingId === spot.id} editData={editData}
+                          onEdit={() => startEditing(spot.id, { name: spot.name, neighborhood: spot.neighborhood, description: spot.description, source: spot.source, tags: spot.tags.join(", ") })}
+                          onCancel={cancelEditing} onFieldChange={(field, value) => setEditData((d) => ({ ...d, [field]: value }))} onCopy={() => copyAsJson(spot, spot.name)} />
+                      ))}
+                    </div>
+                  )}
+                  {contentTab === "volunteer" && (
+                    <div className="space-y-2">
+                      <p className="dateline text-muted-foreground">{filteredContentVolunteer.length} orgs</p>
+                      {filteredContentVolunteer.map((org) => (
+                        <ContentCardVolunteer key={org.id} org={org} isEditing={editingId === org.id} editData={editData}
+                          onEdit={() => startEditing(org.id, { name: org.name, neighborhood: org.neighborhood, description: org.description, source: org.source, tags: org.tags.join(", ") })}
+                          onCancel={cancelEditing} onFieldChange={(field, value) => setEditData((d) => ({ ...d, [field]: value }))} onCopy={() => copyAsJson(org, org.name)} />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </SectionCollapsible>
             </div>
           )}
 
-          {/* ═══ MEDIA TAB ═══ */}
-          {tab === "media" && <MediaAuditPanel />}
+          {/* ═══ INTELLIGENCE TAB ═══ */}
+          {tab === "intelligence" && (
+            <div>
+              <SectionCollapsible id="graph" title="Knowledge Graph" icon={Network}>
+                <GraphEditor />
+              </SectionCollapsible>
+              <SectionCollapsible id="scanner" title="AI Scanner" icon={Zap}>
+                <div className="space-y-6">
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <button onClick={runScan} disabled={scanning} className="skeuo-btn flex-1 justify-center">
+                      {scanning ? <><Loader2 size={14} className="animate-spin" /> Scanning…</> : <><Zap size={14} /> Run Full Scan</>}
+                    </button>
+                    <button onClick={getUpgrades} disabled={loadingUpgrades} className="skeuo-btn flex-1 justify-center">
+                      {loadingUpgrades ? <><Loader2 size={14} className="animate-spin" /> Generating…</> : <><Lightbulb size={14} /> Get Upgrade Ideas</>}
+                    </button>
+                  </div>
+                  {scanError && (
+                    <div className="skeuo-card-inset p-3 rounded border border-destructive/30">
+                      <p className="text-xs text-destructive">{scanError}</p>
+                    </div>
+                  )}
+                  {scanFindings && (
+                    <div className="space-y-4">
+                      <h3 className="label-caps text-foreground">Scan Results</h3>
+                      {Object.entries(scanFindings).map(([category, findings]: [string, any]) => (
+                        <div key={category} className="skeuo-card-inset p-4 rounded">
+                          <h4 className="text-sm font-bold text-foreground capitalize mb-3">{category} <span className="text-[10px] text-muted-foreground font-normal">({Array.isArray(findings) ? findings.length : 0})</span></h4>
+                          <div className="space-y-2">
+                            {Array.isArray(findings) && findings.map((f: any, i: number) => (
+                              <div key={i} className="flex items-start gap-2 py-1.5 border-b border-border/20 last:border-0">
+                                <span className={`text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded flex-shrink-0 mt-0.5 ${severityColors[f.severity] || "text-muted-foreground bg-muted/30"}`}>{f.severity}</span>
+                                <div>
+                                  <p className="text-sm font-medium text-foreground">{f.title}</p>
+                                  <p className="text-xs text-muted-foreground">{f.detail}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {upgradeIdeas && Array.isArray(upgradeIdeas) && (
+                    <div className="space-y-4">
+                      <h3 className="label-caps text-foreground">Upgrade Ideas</h3>
+                      {upgradeIdeas.map((cat: any, ci: number) => (
+                        <div key={ci} className="skeuo-card-inset p-4 rounded">
+                          <h4 className="text-sm font-bold text-foreground capitalize mb-3"><Lightbulb size={14} className="inline text-signal-highlight mr-1" />{cat.name}</h4>
+                          <div className="space-y-3">
+                            {cat.ideas?.map((idea: any, ii: number) => (
+                              <div key={ii} className="flex items-start gap-3 py-2 border-b border-border/20 last:border-0">
+                                <span className={`text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded flex-shrink-0 mt-0.5 ${difficultyColors[idea.difficulty] || "text-muted-foreground bg-muted/30"}`}>{idea.difficulty}</span>
+                                <div>
+                                  <p className="text-sm font-medium text-foreground">{idea.title}</p>
+                                  <p className="text-xs text-muted-foreground mt-0.5">{idea.description}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {scanHistory.length > 0 && (
+                    <div className="skeuo-card-inset p-4 rounded">
+                      <h3 className="label-caps text-foreground mb-3">Scan History</h3>
+                      <div className="space-y-2">
+                        {scanHistory.map((s: any) => (
+                          <div key={s.id} className="flex items-center justify-between py-2 border-b border-border/20 last:border-0">
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground uppercase tracking-wider font-medium">{s.scan_type}</span>
+                            <span className="text-[10px] text-muted-foreground">{new Date(s.created_at).toLocaleString()}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </SectionCollapsible>
+              <SectionCollapsible id="moderation" title="Moderation" icon={ShieldMod}>
+                <ModerationPanel />
+              </SectionCollapsible>
+            </div>
+          )}
 
-          {/* ═══ FEEDS TAB ═══ */}
-          {tab === "feeds" && <FeedManager />}
+          {/* ═══ OPERATIONS TAB ═══ */}
+          {tab === "operations" && (
+            <div>
+              <SectionCollapsible id="visitors" title="Visitors" icon={Users}>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <StatCard icon={Users} label="Total Visits" value={String(visitors.length)} sub="Last 200 logged" color="text-accent" />
+                    <StatCard icon={Globe} label="Unique IPs" value={String(new Set(visitors.map((v: any) => v.ip_address)).size)} sub="Distinct addresses" color="text-signal-positive" />
+                    <StatCard icon={MapPin} label="Cities" value={String(new Set(visitors.filter((v: any) => v.city).map((v: any) => v.city)).size)} sub="Distinct locations" color="text-accent" />
+                    <StatCard icon={Activity} label="Today" value={String(visitors.filter((v: any) => new Date(v.created_at).toDateString() === new Date().toDateString()).length)} sub="Visits today" color="text-signal-secondary" />
+                  </div>
+                  <button onClick={() => { setVisitors([]); setLoadingVisitors(true); supabase.from("visitor_logs").select("*").order("created_at", { ascending: false }).limit(200).then(({ data }) => { setVisitors(data || []); setLoadingVisitors(false); }); }} className="skeuo-btn">
+                    <RefreshCw size={12} /> Refresh
+                  </button>
+                  {loadingVisitors ? (
+                    <div className="flex items-center justify-center py-12">
+                      <RefreshCw size={20} className="animate-spin text-accent mr-2" />
+                      <span className="text-sm text-muted-foreground">Loading…</span>
+                    </div>
+                  ) : (
+                    <div className="skeuo-card-inset p-4 rounded overflow-x-auto">
+                      <table className="w-full text-xs">
+                        <thead>
+                          <tr className="border-b border-border/50">
+                            <th className="text-left py-2 pr-3 text-muted-foreground font-medium">IP</th>
+                            <th className="text-left py-2 pr-3 text-muted-foreground font-medium">Location</th>
+                            <th className="text-left py-2 pr-3 text-muted-foreground font-medium">Page</th>
+                            <th className="text-left py-2 text-muted-foreground font-medium">Time</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(() => {
+                            const ipCounts: Record<string, number> = {};
+                            visitors.forEach((v: any) => { ipCounts[v.ip_address] = (ipCounts[v.ip_address] || 0) + 1; });
+                            return visitors.map((v: any) => {
+                              const isRepeat = ipCounts[v.ip_address] > 2;
+                              return (
+                                <tr key={v.id} className={`border-b border-border/20 hover:bg-muted/20 ${isRepeat ? "bg-signal-secondary/5" : ""}`}>
+                                  <td className={`py-2 pr-3 font-mono ${isRepeat ? "text-signal-secondary font-bold" : "text-foreground"}`}>
+                                    {v.ip_address}{isRepeat && <span className="text-[10px] ml-1">×{ipCounts[v.ip_address]}</span>}
+                                  </td>
+                                  <td className="py-2 pr-3 text-muted-foreground">{[v.city, v.region, v.country].filter(Boolean).join(", ") || "—"}</td>
+                                  <td className="py-2 pr-3 text-accent">{v.page_path || "—"}</td>
+                                  <td className="py-2 text-muted-foreground whitespace-nowrap">{new Date(v.created_at).toLocaleString()}</td>
+                                </tr>
+                              );
+                            });
+                          })()}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              </SectionCollapsible>
+              <SectionCollapsible id="security" title="Security" icon={Shield}>
+                <div className="space-y-6">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <StatCard icon={Database} label="Tables" value="3" sub="image_cache, profiles, user_roles" color="text-accent" />
+                    <StatCard icon={Shield} label="RLS Status" value="✓ All" sub="Every table has RLS" color="text-signal-positive" />
+                    <StatCard icon={Key} label="Auth" value="Active" sub="Email + password, role-based" color="text-accent" />
+                    <StatCard icon={Activity} label="Threat Level" value="Low" sub="No user-generated content" color="text-signal-positive" />
+                  </div>
+                  <div className="skeuo-card-inset p-4 rounded">
+                    <h3 className="label-caps text-foreground mb-3">Security Checklist</h3>
+                    <div className="space-y-2">
+                      <CheckItem ok label="Authentication required for admin" detail="Auth with email verification" />
+                      <CheckItem ok label="Role-based access control (RBAC)" detail="Admin role checked server-side" />
+                      <CheckItem ok label="Master admin hardcoded" detail="inspirelawton@gmail.com — auto-granted on login" />
+                      <CheckItem ok label="RLS on all tables" detail="image_cache, profiles, user_roles, visitor_logs, admin_*" />
+                      <CheckItem ok label="Privilege escalation blocked" detail="Only service_role can assign roles" />
+                      <CheckItem ok={brokenLinks === 0} label={`Broken source links: ${brokenLinks}`} detail={brokenLinks > 0 ? "Some event sources return 404" : "All sources responding"} />
+                    </div>
+                  </div>
+                  <div className="skeuo-card-inset p-4 rounded">
+                    <h3 className="label-caps text-foreground mb-3">RLS Policy Matrix</h3>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-xs">
+                        <thead>
+                          <tr className="border-b border-border/50">
+                            <th className="text-left py-2 pr-4 text-muted-foreground font-medium">Table</th>
+                            <th className="text-center py-2 px-2 text-muted-foreground font-medium">Read</th>
+                            <th className="text-center py-2 px-2 text-muted-foreground font-medium">Write</th>
+                            <th className="text-center py-2 px-2 text-muted-foreground font-medium">Update</th>
+                            <th className="text-center py-2 px-2 text-muted-foreground font-medium">Delete</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <RLSRow table="image_cache" read="Public" write="Service only" update="Service only" delete="Service only" />
+                          <RLSRow table="profiles" read="Own only" write="Own only" update="Own only" delete="—" />
+                          <RLSRow table="user_roles" read="Own + Admin" write="Service only" update="—" delete="Service only" />
+                          <RLSRow table="visitor_logs" read="Admin only" write="Service only" update="—" delete="Service only" />
+                          <RLSRow table="admin_chat_messages" read="Own (Admin)" write="Own (Admin)" update="—" delete="Own (Admin)" />
+                          <RLSRow table="admin_settings" read="Own (Admin)" write="Own (Admin)" update="Own (Admin)" delete="Own (Admin)" />
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </SectionCollapsible>
+              <SectionCollapsible id="audit" title="Events Audit" icon={Eye}>
+                <div className="space-y-4">
+                  <div className="flex flex-col md:flex-row gap-3">
+                    <div className="relative flex-1">
+                      <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      <input type="text" value={evtSearch} onChange={(e) => setEvtSearch(e.target.value)} placeholder="Search events..." className="w-full pl-9 pr-4 py-2 bg-muted/30 border border-border/50 rounded text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-accent" />
+                    </div>
+                    <div className="flex gap-1">
+                      {(["all", "verified", "stale", "broken"] as const).map((f) => (
+                        <button key={f} onClick={() => setEvtFilter(f)} className={`px-3 py-1.5 rounded text-xs font-medium ${evtFilter === f ? "bg-accent/20 text-accent" : "text-muted-foreground hover:text-foreground"}`}>
+                          {f === "all" ? "All" : f.charAt(0).toUpperCase() + f.slice(1)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <p className="dateline text-muted-foreground">{filteredEvents.length} events</p>
+                  <div className="space-y-2">
+                    {filteredEvents.map((evt) => (<EventRow key={evt.id} event={evt} />))}
+                  </div>
+                </div>
+              </SectionCollapsible>
+            </div>
+          )}
 
-          {/* ═══ GRAPH TAB ═══ */}
-          {tab === "graph" && <GraphEditor />}
-
-          {/* ═══ NEWSROOM TAB ═══ */}
-          {tab === "newsroom" && <NewsroomPanel />}
-
-          {/* ═══ MODERATION TAB ═══ */}
-          {tab === "moderation" && <ModerationPanel />}
-
-          {/* ═══ AI / SETTINGS TAB ═══ */}
-          {tab === "ai" && (
+          {/* ═══ AI ASSISTANT TAB ═══ */}
+          {tab === "assistant" && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -574,7 +854,7 @@ const Admin = () => {
                     <div className="flex items-center gap-2">
                       <p className="text-xs text-muted-foreground">Your editorial AI — contextualized with the full platform</p>
                       {feedbackCount > 0 && (
-                        <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded bg-accent/10 text-accent font-mono">
+                        <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-accent/10 text-accent font-mono">
                           <TrendingUp size={9} /> {feedbackCount} signals
                         </span>
                       )}
@@ -595,70 +875,44 @@ const Admin = () => {
                 <div className="space-y-4">
                   <div className="skeuo-card-inset p-4 rounded">
                     <h3 className="label-caps text-foreground mb-2">Custom Instructions</h3>
-                    <p className="text-xs text-muted-foreground mb-3">
-                      These instructions are prepended to every AI conversation. Use them to set preferences, brand rules, or focus areas.
-                    </p>
+                    <p className="text-xs text-muted-foreground mb-3">Prepended to every AI conversation.</p>
                     <textarea
                       value={customInstructions}
                       onChange={(e) => setCustomInstructions(e.target.value)}
-                      placeholder="e.g., Always suggest mobile-first designs. Focus on conversion optimization. Reference Bricktown and Midtown neighborhoods..."
+                      placeholder="e.g., Always suggest mobile-first designs. Focus on conversion optimization..."
                       className="w-full px-3 py-2 bg-muted/30 border border-border/50 rounded text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-accent min-h-[120px] resize-y"
                     />
                     <div className="flex items-center gap-2 mt-2">
                       <button onClick={saveCustomInstructions} className="skeuo-btn text-xs">
                         <Save size={12} /> Save Instructions
                       </button>
-                      {instructionsSaved && <span className="text-xs text-emerald-500">Saved</span>}
+                      {instructionsSaved && <span className="text-xs text-signal-positive">Saved</span>}
                     </div>
                   </div>
                   <div className="skeuo-card-inset p-4 rounded">
                     <h3 className="label-caps text-foreground mb-2">System Context</h3>
-                    <p className="text-xs text-muted-foreground mb-2">The AI has built-in knowledge of:</p>
                     <ul className="text-xs text-muted-foreground space-y-1">
-                      <li>• Full platform architecture (React + Vite + Tailwind + Supabase)</li>
-                      <li>• All 6 directories with data structure details</li>
+                      <li>• Full platform architecture (React + Vite + Tailwind)</li>
+                      <li>• All directories with data structures</li>
                       <li>• Brand voice guidelines (broadsheet journalism)</li>
-                      <li>• Theme system (Light, Dark, Thunder, Comets)</li>
-                      <li>• Edge functions and database schema</li>
-                      <li>• Triple-verification system and confidence scoring</li>
+                      <li>• 6 themes · Edge functions · Database schema</li>
                       <li>• Knowledge graph: {graphStats.nodeCount} entities, {graphStats.edgeCount} connections</li>
-                      <li>• Entity disambiguation across {graphStats.typeCounts.listing || 0} listings</li>
-                      <li>• Freshness decay model with probabilistic confidence ranges</li>
                     </ul>
                   </div>
-                  {feedbackCount > 0 && (
-                    <div className="skeuo-card-inset p-4 rounded">
-                      <h3 className="label-caps text-foreground mb-2">Meta-Learning</h3>
-                      <div className="flex items-center gap-3">
-                        <TrendingUp size={16} className="text-accent" />
-                        <div>
-                          <p className="text-sm text-foreground font-semibold">{feedbackCount} feedback signals collected</p>
-                          <p className="text-xs text-muted-foreground">Positive-rated responses are used as few-shot examples in future AI calls</p>
-                        </div>
-                      </div>
-                    </div>
-                   )}
                   <div className="rule-thin my-4" />
                   <ThemePanel />
                 </div>
               ) : (
                 <>
-                  {/* Quick Actions */}
                   {chatMessages.length === 0 && (
                     <div className="grid grid-cols-2 gap-2">
                       {quickActions.map((action) => (
-                        <button
-                          key={action.label}
-                          onClick={() => sendChat(action.prompt)}
-                          className="skeuo-card-inset p-3 rounded text-left hover:bg-muted/30 transition-colors"
-                        >
+                        <button key={action.label} onClick={() => sendChat(action.prompt)} className="skeuo-card-inset p-3 rounded text-left hover:bg-muted/30 transition-colors">
                           <p className="text-xs font-semibold text-foreground">{action.label}</p>
                         </button>
                       ))}
                     </div>
                   )}
-
-                  {/* Chat Messages */}
                   <div className="skeuo-card-inset rounded p-4 max-h-[500px] overflow-y-auto space-y-4">
                     {chatMessages.length === 0 && (
                       <div className="text-center py-8">
@@ -668,11 +922,7 @@ const Admin = () => {
                     )}
                     {chatMessages.map((msg, i) => (
                       <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                        <div className={`max-w-[85%] rounded-lg px-4 py-3 ${
-                          msg.role === "user"
-                            ? "bg-accent/15 text-foreground"
-                            : "bg-muted/30 text-foreground"
-                        }`}>
+                        <div className={`max-w-[85%] rounded-lg px-4 py-3 ${msg.role === "user" ? "bg-accent/15 text-foreground" : "bg-muted/30 text-foreground"}`}>
                           {msg.role === "assistant" ? (
                             <>
                               <div className="prose prose-sm dark:prose-invert max-w-none text-sm [&_p]:mb-2 [&_ul]:mb-2 [&_li]:mb-0.5 [&_h1]:text-base [&_h2]:text-sm [&_h3]:text-sm [&_code]:text-xs [&_pre]:text-xs">
@@ -681,21 +931,13 @@ const Admin = () => {
                               {!chatLoading && (
                                 <div className="flex items-center gap-1 mt-2 pt-1.5 border-t border-border/20">
                                   {ratedMessages.has(i) ? (
-                                    <span className="text-[9px] text-muted-foreground/60 italic">Feedback recorded</span>
+                                    <span className="text-[10px] text-muted-foreground/60 italic">Feedback recorded</span>
                                   ) : (
                                     <>
-                                      <button
-                                        onClick={() => rateMessage(i, 1)}
-                                        className="p-1 rounded hover:bg-accent/10 transition-colors"
-                                        title="Helpful"
-                                      >
+                                      <button onClick={() => rateMessage(i, 1)} className="p-1 rounded hover:bg-accent/10 transition-colors" title="Helpful">
                                         <ThumbsUp size={11} className="text-muted-foreground/50 hover:text-accent" />
                                       </button>
-                                      <button
-                                        onClick={() => rateMessage(i, -1)}
-                                        className="p-1 rounded hover:bg-destructive/10 transition-colors"
-                                        title="Not helpful"
-                                      >
+                                      <button onClick={() => rateMessage(i, -1)} className="p-1 rounded hover:bg-destructive/10 transition-colors" title="Not helpful">
                                         <ThumbsDown size={11} className="text-muted-foreground/50 hover:text-destructive" />
                                       </button>
                                     </>
@@ -718,8 +960,6 @@ const Admin = () => {
                     )}
                     <div ref={chatEndRef} />
                   </div>
-
-                  {/* Chat Input */}
                   <div className="flex gap-2">
                     <input
                       type="text"
@@ -734,311 +974,6 @@ const Admin = () => {
                     </button>
                   </div>
                 </>
-              )}
-            </div>
-          )}
-
-          {/* ═══ CONTENT EDITOR TAB ═══ */}
-          {tab === "content" && (
-            <div className="space-y-4">
-              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
-                <div>
-                  <h2 className="headline text-foreground text-lg">Content Manager</h2>
-                  <p className="text-xs text-muted-foreground mt-0.5">View, inspect, and edit every listing across all directories</p>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => copyAsJson(
-                      contentTab === "singles" ? singlesEvents : contentTab === "fitness" ? fitnessSpots : volunteerOrgs,
-                      contentTab
-                    )}
-                    className="skeuo-btn text-xs"
-                  >
-                    <Copy size={12} /> Export {contentTab} as JSON
-                  </button>
-                </div>
-              </div>
-
-              {/* Sub-tabs */}
-              <div className="flex gap-1">
-                {([
-                  { id: "singles" as const, label: "Events & Singles", icon: Heart, count: singlesEvents.length },
-                  { id: "fitness" as const, label: "Fitness Spots", icon: Dumbbell, count: fitnessSpots.length },
-                  { id: "volunteer" as const, label: "Volunteer Orgs", icon: HandHelping, count: volunteerOrgs.length },
-                ]).map(({ id, label, icon: Icon, count }) => (
-                  <button
-                    key={id}
-                    onClick={() => { setContentTab(id); setContentSearch(""); setEditingId(null); }}
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded text-xs font-medium transition-colors ${
-                      contentTab === id ? "bg-accent/15 text-accent border border-accent/20" : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    <Icon size={12} /> {label} <span className="text-muted-foreground/60">({count})</span>
-                  </button>
-                ))}
-              </div>
-
-              {/* Search */}
-              <div className="relative">
-                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                <input
-                  type="text"
-                  value={contentSearch}
-                  onChange={(e) => setContentSearch(e.target.value)}
-                  placeholder={`Search ${contentTab}...`}
-                  className="w-full pl-9 pr-4 py-2 bg-muted/30 border border-border/50 rounded text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-accent"
-                />
-              </div>
-
-              {contentTab === "singles" && (
-                <div className="space-y-2">
-                  <p className="dateline text-muted-foreground">{filteredContentSingles.length} listings</p>
-                  {filteredContentSingles.map((evt) => (
-                    <ContentCardSingles
-                      key={evt.id}
-                      event={evt}
-                      isEditing={editingId === evt.id}
-                      editData={editData}
-                      onEdit={() => startEditing(evt.id, { name: evt.name, venue: evt.venue, neighborhood: evt.neighborhood, description: evt.description, price: evt.price, frequency: evt.frequency, tags: evt.tags.join(", ") })}
-                      onCancel={cancelEditing}
-                      onFieldChange={(field, value) => setEditData((d) => ({ ...d, [field]: value }))}
-                      onCopy={() => copyAsJson(evt, evt.name)}
-                    />
-                  ))}
-                </div>
-              )}
-
-              {contentTab === "fitness" && (
-                <div className="space-y-2">
-                  <p className="dateline text-muted-foreground">{filteredContentFitness.length} spots</p>
-                  {filteredContentFitness.map((spot) => (
-                    <ContentCardFitness
-                      key={spot.id}
-                      spot={spot}
-                      isEditing={editingId === spot.id}
-                      editData={editData}
-                      onEdit={() => startEditing(spot.id, { name: spot.name, neighborhood: spot.neighborhood, description: spot.description, source: spot.source, tags: spot.tags.join(", ") })}
-                      onCancel={cancelEditing}
-                      onFieldChange={(field, value) => setEditData((d) => ({ ...d, [field]: value }))}
-                      onCopy={() => copyAsJson(spot, spot.name)}
-                    />
-                  ))}
-                </div>
-              )}
-
-              {contentTab === "volunteer" && (
-                <div className="space-y-2">
-                  <p className="dateline text-muted-foreground">{filteredContentVolunteer.length} orgs</p>
-                  {filteredContentVolunteer.map((org) => (
-                    <ContentCardVolunteer
-                      key={org.id}
-                      org={org}
-                      isEditing={editingId === org.id}
-                      editData={editData}
-                      onEdit={() => startEditing(org.id, { name: org.name, neighborhood: org.neighborhood, description: org.description, source: org.source, tags: org.tags.join(", ") })}
-                      onCancel={cancelEditing}
-                      onFieldChange={(field, value) => setEditData((d) => ({ ...d, [field]: value }))}
-                      onCopy={() => copyAsJson(org, org.name)}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* VISITORS TAB */}
-          {tab === "visitors" && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <StatCard icon={Users} label="Total Visits" value={String(visitors.length)} sub="Last 200 logged" color="text-accent" />
-                <StatCard icon={Globe} label="Unique IPs" value={String(new Set(visitors.map((v: any) => v.ip_address)).size)} sub="Distinct addresses" color="text-emerald-500" />
-                <StatCard icon={MapPin} label="Cities" value={String(new Set(visitors.filter((v: any) => v.city).map((v: any) => v.city)).size)} sub="Distinct locations" color="text-blue-500" />
-                <StatCard icon={Activity} label="Today" value={String(visitors.filter((v: any) => new Date(v.created_at).toDateString() === new Date().toDateString()).length)} sub="Visits today" color="text-amber-500" />
-              </div>
-              <button onClick={() => { setVisitors([]); setLoadingVisitors(true); supabase.from("visitor_logs").select("*").order("created_at", { ascending: false }).limit(200).then(({ data }) => { setVisitors(data || []); setLoadingVisitors(false); }); }} className="skeuo-btn">
-                <RefreshCw size={12} /> Refresh
-              </button>
-              {loadingVisitors ? (
-                <div className="flex items-center justify-center py-12">
-                  <RefreshCw size={20} className="animate-spin text-accent mr-2" />
-                  <span className="text-sm text-muted-foreground">Loading…</span>
-                </div>
-              ) : (
-                <div className="skeuo-card-inset p-4 rounded overflow-x-auto">
-                  <table className="w-full text-xs">
-                    <thead>
-                      <tr className="border-b border-border/50">
-                        <th className="text-left py-2 pr-3 text-muted-foreground font-medium">IP</th>
-                        <th className="text-left py-2 pr-3 text-muted-foreground font-medium">Location</th>
-                        <th className="text-left py-2 pr-3 text-muted-foreground font-medium">Page</th>
-                        <th className="text-left py-2 text-muted-foreground font-medium">Time</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {(() => {
-                        const ipCounts: Record<string, number> = {};
-                        visitors.forEach((v: any) => { ipCounts[v.ip_address] = (ipCounts[v.ip_address] || 0) + 1; });
-                        return visitors.map((v: any) => {
-                          const isRepeat = ipCounts[v.ip_address] > 2;
-                          return (
-                            <tr key={v.id} className={`border-b border-border/20 hover:bg-muted/20 ${isRepeat ? "bg-amber-500/5" : ""}`}>
-                              <td className={`py-2 pr-3 font-mono ${isRepeat ? "text-amber-500 font-bold" : "text-foreground"}`}>
-                                {v.ip_address}{isRepeat && <span className="text-[9px] ml-1">×{ipCounts[v.ip_address]}</span>}
-                              </td>
-                              <td className="py-2 pr-3 text-muted-foreground">{[v.city, v.region, v.country].filter(Boolean).join(", ") || "—"}</td>
-                              <td className="py-2 pr-3 text-accent">{v.page_path || "—"}</td>
-                              <td className="py-2 text-muted-foreground whitespace-nowrap">{new Date(v.created_at).toLocaleString()}</td>
-                            </tr>
-                          );
-                        });
-                      })()}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* SECURITY TAB */}
-          {tab === "security" && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <StatCard icon={Database} label="Tables" value="3" sub="image_cache, profiles, user_roles" color="text-accent" />
-                <StatCard icon={Shield} label="RLS Status" value="✓ All" sub="Every table has RLS" color="text-emerald-500" />
-                <StatCard icon={Key} label="Auth" value="Active" sub="Email + password, role-based" color="text-accent" />
-                <StatCard icon={Activity} label="Threat Level" value="Low" sub="No user-generated content" color="text-emerald-500" />
-              </div>
-              <div className="skeuo-card-inset p-4 rounded">
-                <h3 className="label-caps text-foreground mb-3">Security Checklist</h3>
-                <div className="space-y-2">
-                  <CheckItem ok label="Authentication required for admin" detail="Auth with email verification" />
-                  <CheckItem ok label="Role-based access control (RBAC)" detail="Admin role checked server-side" />
-                  <CheckItem ok label="Master admin hardcoded" detail="inspirelawton@gmail.com — auto-granted on login" />
-                  <CheckItem ok label="RLS on all tables" detail="image_cache, profiles, user_roles, visitor_logs, admin_*" />
-                  <CheckItem ok label="Privilege escalation blocked" detail="Only service_role can assign roles" />
-                  <CheckItem ok={brokenLinks === 0} label={`Broken source links: ${brokenLinks}`} detail={brokenLinks > 0 ? "Some event sources return 404" : "All sources responding"} />
-                </div>
-              </div>
-              <div className="skeuo-card-inset p-4 rounded">
-                <h3 className="label-caps text-foreground mb-3">RLS Policy Matrix</h3>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-xs">
-                    <thead>
-                      <tr className="border-b border-border/50">
-                        <th className="text-left py-2 pr-4 text-muted-foreground font-medium">Table</th>
-                        <th className="text-center py-2 px-2 text-muted-foreground font-medium">Read</th>
-                        <th className="text-center py-2 px-2 text-muted-foreground font-medium">Write</th>
-                        <th className="text-center py-2 px-2 text-muted-foreground font-medium">Update</th>
-                        <th className="text-center py-2 px-2 text-muted-foreground font-medium">Delete</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <RLSRow table="image_cache" read="Public" write="Service only" update="Service only" delete="Service only" />
-                      <RLSRow table="profiles" read="Own only" write="Own only" update="Own only" delete="—" />
-                      <RLSRow table="user_roles" read="Own + Admin" write="Service only" update="—" delete="Service only" />
-                      <RLSRow table="visitor_logs" read="Admin only" write="Service only" update="—" delete="Service only" />
-                      <RLSRow table="admin_chat_messages" read="Own (Admin)" write="Own (Admin)" update="—" delete="Own (Admin)" />
-                      <RLSRow table="admin_settings" read="Own (Admin)" write="Own (Admin)" update="Own (Admin)" delete="Own (Admin)" />
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* EVENTS AUDIT TAB */}
-          {tab === "events" && (
-            <div className="space-y-4">
-              <div className="flex flex-col md:flex-row gap-3">
-                <div className="relative flex-1">
-                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                  <input type="text" value={evtSearch} onChange={(e) => setEvtSearch(e.target.value)} placeholder="Search events..." className="w-full pl-9 pr-4 py-2 bg-muted/30 border border-border/50 rounded text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-accent" />
-                </div>
-                <div className="flex gap-1">
-                  {(["all", "verified", "stale", "broken"] as const).map((f) => (
-                    <button key={f} onClick={() => setEvtFilter(f)} className={`px-3 py-1.5 rounded text-xs font-medium ${evtFilter === f ? "bg-accent/20 text-accent" : "text-muted-foreground hover:text-foreground"}`}>
-                      {f === "all" ? "All" : f.charAt(0).toUpperCase() + f.slice(1)}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <p className="dateline text-muted-foreground">{filteredEvents.length} events</p>
-              <div className="space-y-2">
-                {filteredEvents.map((evt) => (<EventRow key={evt.id} event={evt} />))}
-              </div>
-            </div>
-          )}
-
-          {/* AI SCANNER TAB */}
-          {tab === "scanner" && (
-            <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row gap-3">
-                <button onClick={runScan} disabled={scanning} className="skeuo-btn flex-1 justify-center">
-                  {scanning ? <><Loader2 size={14} className="animate-spin" /> Scanning…</> : <><Zap size={14} /> Run Full Scan</>}
-                </button>
-                <button onClick={getUpgrades} disabled={loadingUpgrades} className="skeuo-btn flex-1 justify-center">
-                  {loadingUpgrades ? <><Loader2 size={14} className="animate-spin" /> Generating…</> : <><Lightbulb size={14} /> Get Upgrade Ideas</>}
-                </button>
-              </div>
-              {scanError && (
-                <div className="skeuo-card-inset p-3 rounded border border-red-400/30">
-                  <p className="text-xs text-red-400">{scanError}</p>
-                </div>
-              )}
-              {scanFindings && (
-                <div className="space-y-4">
-                  <h3 className="label-caps text-foreground">Scan Results</h3>
-                  {Object.entries(scanFindings).map(([category, findings]: [string, any]) => (
-                    <div key={category} className="skeuo-card-inset p-4 rounded">
-                      <h4 className="text-sm font-bold text-foreground capitalize mb-3">{category} <span className="text-[10px] text-muted-foreground font-normal">({Array.isArray(findings) ? findings.length : 0})</span></h4>
-                      <div className="space-y-2">
-                        {Array.isArray(findings) && findings.map((f: any, i: number) => (
-                          <div key={i} className="flex items-start gap-2 py-1.5 border-b border-border/20 last:border-0">
-                            <span className={`text-[9px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded flex-shrink-0 mt-0.5 ${severityColors[f.severity] || "text-muted-foreground bg-muted/30"}`}>{f.severity}</span>
-                            <div>
-                              <p className="text-sm font-medium text-foreground">{f.title}</p>
-                              <p className="text-xs text-muted-foreground">{f.detail}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {upgradeIdeas && Array.isArray(upgradeIdeas) && (
-                <div className="space-y-4">
-                  <h3 className="label-caps text-foreground">Upgrade Ideas</h3>
-                  {upgradeIdeas.map((cat: any, ci: number) => (
-                    <div key={ci} className="skeuo-card-inset p-4 rounded">
-                      <h4 className="text-sm font-bold text-foreground capitalize mb-3"><Lightbulb size={14} className="inline text-amber-500 mr-1" />{cat.name}</h4>
-                      <div className="space-y-3">
-                        {cat.ideas?.map((idea: any, ii: number) => (
-                          <div key={ii} className="flex items-start gap-3 py-2 border-b border-border/20 last:border-0">
-                            <span className={`text-[9px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded flex-shrink-0 mt-0.5 ${difficultyColors[idea.difficulty] || "text-muted-foreground bg-muted/30"}`}>{idea.difficulty}</span>
-                            <div>
-                              <p className="text-sm font-medium text-foreground">{idea.title}</p>
-                              <p className="text-xs text-muted-foreground mt-0.5">{idea.description}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {scanHistory.length > 0 && (
-                <div className="skeuo-card-inset p-4 rounded">
-                  <h3 className="label-caps text-foreground mb-3">Scan History</h3>
-                  <div className="space-y-2">
-                    {scanHistory.map((s: any) => (
-                      <div key={s.id} className="flex items-center justify-between py-2 border-b border-border/20 last:border-0">
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground uppercase tracking-wider font-medium">{s.scan_type}</span>
-                        <span className="text-[10px] text-muted-foreground">{new Date(s.created_at).toLocaleString()}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
               )}
             </div>
           )}
@@ -1064,7 +999,7 @@ const EditableField = ({ label, field, value, editData, isEditing, onChange, mul
   label: string; field: string; value: string; editData: Record<string, any>; isEditing: boolean; onChange: (f: string, v: string) => void; multiline?: boolean;
 }) => (
   <div className="flex flex-col gap-0.5">
-    <label className="text-[9px] uppercase tracking-wider font-bold text-muted-foreground/60">{label}</label>
+    <label className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground/60">{label}</label>
     {isEditing ? (
       multiline ? (
         <textarea
