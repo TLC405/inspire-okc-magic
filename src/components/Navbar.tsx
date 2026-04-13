@@ -155,36 +155,36 @@ export function Navbar() {
         <div
           className={cn(
             "overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out will-change-[max-height,opacity]",
-            scrolled ? "max-h-0 opacity-0" : "max-h-40 opacity-100"
+            scrolled ? "max-h-0 opacity-0" : "max-h-60 opacity-100"
           )}
         >
           <div className="h-[3px] bg-foreground mt-1" />
           <div className="h-[1px] bg-foreground/20 mt-[2px]" />
 
-          <div className="py-2 md:py-4 text-center">
+          <div className="py-4 md:py-8 text-center">
             <Link to="/" className="inline-block group">
-              <div className="flex items-center justify-center gap-3 mb-0.5">
-                <span className="block w-8 md:w-16 h-[1px] bg-foreground/30 group-hover:bg-foreground/50 transition-colors" />
+              <div className="flex items-center justify-center gap-3 mb-1">
+                <span className="block w-12 md:w-24 h-[1px] bg-foreground/30 group-hover:bg-foreground/50 transition-colors" />
                 <span className="font-mono text-[6px] md:text-[8px] tracking-[0.35em] uppercase text-muted-foreground">
                   ❧ Est. 2026 ❧
                 </span>
-                <span className="block w-8 md:w-16 h-[1px] bg-foreground/30 group-hover:bg-foreground/50 transition-colors" />
+                <span className="block w-12 md:w-24 h-[1px] bg-foreground/30 group-hover:bg-foreground/50 transition-colors" />
               </div>
               <h1
                 className="font-black tracking-[-0.03em] leading-[0.82] text-foreground group-hover:tracking-[-0.02em] transition-all duration-300"
-                style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(2rem, 7vw, 4.5rem)" }}
+                style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(2.5rem, 9vw, 6rem)" }}
               >
                 INSPIRE
               </h1>
-              <div className="flex items-center justify-center gap-2 mt-0.5">
-                <span className="block w-5 md:w-12 h-[1px] bg-foreground/25" />
+              <div className="flex items-center justify-center gap-2 mt-1">
+                <span className="block w-8 md:w-16 h-[1px] bg-foreground/25" />
                 <p
                   className="tracking-[0.25em] uppercase text-foreground/60 font-semibold leading-none"
                   style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(0.45rem, 1.5vw, 0.75rem)" }}
                 >
                   Oklahoma City
                 </p>
-                <span className="block w-5 md:w-12 h-[1px] bg-foreground/25" />
+                <span className="block w-8 md:w-16 h-[1px] bg-foreground/25" />
               </div>
               <p
                 className="mt-0.5 text-muted-foreground/50 italic"

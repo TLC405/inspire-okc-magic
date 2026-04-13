@@ -28,7 +28,7 @@ export function HeroCarousel() {
   }, []);
 
   return (
-    <div className="relative w-full h-[340px] md:h-[500px] overflow-hidden">
+    <div className="relative w-full h-[380px] md:h-[560px] overflow-hidden">
       {photos.map((photo, i) => (
         <img
           key={i}
@@ -52,7 +52,7 @@ export function HeroCarousel() {
           >
             <h2
               className="text-white font-black tracking-[-0.02em] leading-[0.9] masthead-shadow"
-              style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.5rem, 5vw, 3rem)" }}
+              style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 6vw, 3.5rem)" }}
             >
               {photo.headline}
             </h2>

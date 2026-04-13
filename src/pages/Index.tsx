@@ -84,11 +84,11 @@ const showcasePhotos = [
 /** Decorative section header with ornaments */
 function SectionHeader({ title, subtitle, icon: Icon }: { title: string; subtitle: string; icon?: React.ElementType }) {
   return (
-    <div className="mb-4">
-      <div className="h-[2px] bg-foreground mb-2" />
+    <div className="mb-5">
+      <div className="h-[3px] bg-foreground mb-2" />
       <div className="flex items-center gap-2">
-        {Icon && <Icon size={16} className="text-accent" />}
-        <h2 className="section-head text-foreground text-lg md:text-xl">{title}</h2>
+        {Icon && <Icon size={18} className="text-accent" />}
+        <h2 className="section-head text-foreground text-xl md:text-2xl text-ink-press">{title}</h2>
         <span className="text-foreground/20 text-xs ml-1">✦</span>
       </div>
       <p className="dateline text-muted-foreground mt-1">{subtitle}</p>
@@ -100,7 +100,7 @@ function SectionHeader({ title, subtitle, icon: Icon }: { title: string; subtitl
 /** Folio line decoration between sections */
 function FolioLine({ page, note }: { page: string; note?: string }) {
   return (
-    <div className="flex items-center justify-center gap-3 py-3">
+    <div className="flex items-center justify-center gap-3 py-5">
       <span className="block flex-1 h-[1px] bg-foreground/10" />
       <span className="font-mono text-[8px] tracking-[0.2em] uppercase text-muted-foreground/50">
         {page}{note && ` · ${note}`}
@@ -238,7 +238,7 @@ const Index = () => {
 
         {/* ═══ Newspaper Front Page Headline ═══ */}
         <div className="container relative z-10 -mt-6">
-          <div className="bg-background border-t-[4px] border-foreground pt-4 pb-3">
+          <div className="bg-background border-t-[4px] border-foreground pt-6 pb-5">
             <div className="flex items-center justify-center gap-3 mb-2">
               <span className="block flex-1 h-[1px] bg-foreground/30" />
               <span className="font-mono text-[9px] tracking-[0.3em] uppercase text-muted-foreground">✦ {dayStr} ✦</span>
@@ -247,7 +247,7 @@ const Index = () => {
 
             <h2
               className="text-center font-black tracking-[-0.02em] leading-[0.9] text-foreground"
-              style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 5vw, 3.2rem)" }}
+              style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(2rem, 6vw, 3.8rem)" }}
             >
               Your Guide to Oklahoma City
             </h2>
@@ -352,7 +352,7 @@ const Index = () => {
         <FolioLine page="Page A2" note="Broadsheet" />
 
         {/* ═══ Broadsheet Columns ═══ */}
-        <div className="container py-4 md:py-10">
+        <div className="container py-6 md:py-14">
           {/* Desktop: 3-column broadsheet */}
           <div className="hidden md:block">
           <div className="rule-heavy mb-1" />
@@ -563,14 +563,14 @@ const Index = () => {
         <FolioLine page="Page A3" note="Lifestyle" />
 
         {/* ═══ Civic Intelligence Sidebar + Pull Quote ═══ */}
-        <div className="container py-4 md:py-8">
+        <div className="container py-8 md:py-12">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Editorial Pull Quote */}
             <div className="lg:col-span-8" ref={pullQuoteRef}>
               <div className="newspaper-fold relative">
-                <div className="max-w-xl mx-auto text-center py-6" style={{ transform: `translateY(${-parallaxOffset * 0.3}px)` }}>
+                <div className="max-w-xl mx-auto text-center py-10" style={{ transform: `translateY(${-parallaxOffset * 0.3}px)` }}>
                   <span className="text-5xl text-foreground/15 leading-none" style={{ fontFamily: "'Playfair Display', serif" }}>"</span>
-                  <p className="text-foreground/70 italic leading-relaxed -mt-4" style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1rem, 2vw, 1.3rem)" }}>
+                  <p className="text-foreground/70 italic leading-relaxed -mt-4" style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.1rem, 2.5vw, 1.5rem)" }}>
                     Oklahoma City has a way of surprising people. The ones who just moved here, still learning which districts are which. The ones who have lived here all their lives but have not yet found their crowd. The ones who are newly single, newly free, or newly arrived and looking for something to hold onto.
                   </p>
                   <span className="text-5xl text-foreground/15 leading-none" style={{ fontFamily: "'Playfair Display', serif" }}>"</span>
@@ -666,7 +666,7 @@ const Index = () => {
 
         {/* ═══ Stats Bar — Product-Value Metrics ═══ */}
         <div className="container pb-8">
-          <div className="skeuo-card-inset p-4 md:p-6 rounded-lg">
+          <div className="skeuo-card-inset p-6 md:p-10 rounded-lg">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 text-center">
               <div>
                 <p className="text-2xl md:text-4xl font-black text-foreground">{totalListings}</p>
