@@ -90,6 +90,12 @@ const Volunteering = () => {
           <img src={heroImg} alt="Volunteers packing food at a community food bank" className="w-full h-full object-cover" width={1920} height={512} />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 container pb-6">
+            {/* Section Header */}
+            <div className="flex items-center gap-3 mb-3">
+              <span className="folder-tab px-3 py-1 text-[10px] font-black uppercase tracking-wider">Section D</span>
+              <span className="ink-rule flex-1 h-px bg-border/60" />
+              <span className="text-letterpress text-muted-foreground text-xs font-bold uppercase tracking-widest">The Civic Report</span>
+            </div>
             <h1 className="section-head text-foreground text-3xl md:text-5xl drop-shadow-sm">Volunteering</h1>
             <p className="dateline text-foreground/70 mt-1 drop-shadow-sm">
               Oklahoma City · {volunteerOrgs.length} Organizations · {volunteerCategories.length - 1} Categories

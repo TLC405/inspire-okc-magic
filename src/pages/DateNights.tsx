@@ -81,6 +81,13 @@ const DateNights = () => {
           <div className="absolute inset-0 bg-gradient-to-br from-rose-500/30 via-pink-400/20 to-rose-600/10" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
           <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
+            {/* Section Header */}
+            <div className="flex items-center gap-3 mb-3 w-full max-w-md justify-center">
+              <span className="ink-rule flex-1 h-px bg-rose-300/40" />
+              <span className="folder-tab px-3 py-1 text-[10px] font-black uppercase tracking-wider border-rose-400/30 bg-rose-500/10">Section F</span>
+              <span className="text-letterpress text-rose-400/80 text-xs font-bold uppercase tracking-widest">The Social Scene</span>
+              <span className="ink-rule flex-1 h-px bg-rose-300/40" />
+            </div>
             <div className="flex items-center gap-3 mb-3">
               <Heart size={32} className="text-rose-400" fill="currentColor" />
               <Sparkles size={20} className="text-pink-300" />

@@ -72,6 +72,13 @@ const Events = () => {
           <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-accent/10 to-background" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
           <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
+            {/* Section Header */}
+            <div className="flex items-center gap-3 mb-3 w-full max-w-md justify-center">
+              <span className="ink-rule flex-1 h-px bg-border/60" />
+              <span className="folder-tab px-3 py-1 text-[10px] font-black uppercase tracking-wider">Section E</span>
+              <span className="text-letterpress text-muted-foreground text-xs font-bold uppercase tracking-widest">The Events Desk</span>
+              <span className="ink-rule flex-1 h-px bg-border/60" />
+            </div>
             <div className="flex items-center gap-2 mb-2">
               <Sparkles size={28} className="text-accent" />
             </div>
