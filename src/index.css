@@ -302,6 +302,7 @@
   }
 
   body {
+    font-family: var(--font-body), system-ui, sans-serif;
     background-image: var(--bg-vignette);
     background-attachment: fixed;
     background-size: cover;
