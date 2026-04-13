@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { Navbar } from "@/components/Navbar";
+import { SectionHeader } from "@/components/SectionHeader";
 import { Footer } from "@/components/Footer";
 import { cityShowcase, showcaseCategories, type ShowcaseCategory } from "@/data/cityShowcase";
 import { ExternalLink, Search, Building2, Scale, Leaf, Palette, TrendingUp, ChevronDown, ChevronUp, MapPin } from "lucide-react";
@@ -41,6 +42,7 @@ const Discover = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0 animate-fade-in">
       <Navbar />
+      <SectionHeader section="Section VI" deskName="The Metro" stats={[{ label: "in feed", value: feedItems.length }]} />
       <main className="flex-1">
         {/* Hero */}
         <div className="relative w-full h-[220px] md:h-[340px] overflow-hidden">

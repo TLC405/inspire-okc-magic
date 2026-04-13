@@ -6,6 +6,18 @@ interface WeatherData {
   icon: string;
 }
 
+interface ForecastDay {
+  tempMax: number;
+  tempMin: number;
+  description: string;
+  icon: string;
+}
+
+export interface WeatherResult {
+  current: WeatherData;
+  forecast: ForecastDay[];
+}
+
 const weatherCodeMap: Record<number, { desc: string; icon: string }> = {
   0: { desc: "Clear", icon: "☀️" },
   1: { desc: "Mostly Clear", icon: "🌤️" },
@@ -30,24 +42,43 @@ const weatherCodeMap: Record<number, { desc: string; icon: string }> = {
   99: { desc: "Severe Hail", icon: "⛈️" },
 };
 
-export function useWeather() {
-  const [weather, setWeather] = useState<WeatherData | null>(null);
+const dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+export function useWeather(): WeatherResult | null {
+  const [weather, setWeather] = useState<WeatherResult | null>(null);
 
   useEffect(() => {
-    // OKC coordinates: 35.4676, -97.5164
-    fetch("https://api.open-meteo.com/v1/forecast?latitude=35.4676&longitude=-97.5164&current=temperature_2m,weather_code&temperature_unit=fahrenheit&timezone=America/Chicago")
+    fetch("https://api.open-meteo.com/v1/forecast?latitude=35.4676&longitude=-97.5164&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,weather_code&temperature_unit=fahrenheit&timezone=America/Chicago&forecast_days=3")
       .then(r => r.json())
       .then(data => {
         const code = data.current?.weather_code ?? 0;
         const mapped = weatherCodeMap[code] || { desc: "Fair", icon: "☀️" };
+        
+        const forecast: ForecastDay[] = (data.daily?.time || []).slice(0, 3).map((_, i: number) => {
+          const fc = data.daily.weather_code?.[i] ?? 0;
+          const fm = weatherCodeMap[fc] || { desc: "Fair", icon: "☀️" };
+          return {
+            tempMax: Math.round(data.daily.temperature_2m_max?.[i] ?? 72),
+            tempMin: Math.round(data.daily.temperature_2m_min?.[i] ?? 55),
+            description: fm.desc,
+            icon: fm.icon,
+          };
+        });
+
         setWeather({
-          temperature: Math.round(data.current?.temperature_2m ?? 72),
-          description: mapped.desc,
-          icon: mapped.icon,
+          current: {
+            temperature: Math.round(data.current?.temperature_2m ?? 72),
+            description: mapped.desc,
+            icon: mapped.icon,
+          },
+          forecast,
         });
       })
       .catch(() => {
-        setWeather({ temperature: 72, description: "Fair", icon: "☀️" });
+        setWeather({
+          current: { temperature: 72, description: "Fair", icon: "☀️" },
+          forecast: [],
+        });
       });
   }, []);
 

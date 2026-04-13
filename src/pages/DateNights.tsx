@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
 import { Navbar } from "@/components/Navbar";
+import { SectionHeader } from "@/components/SectionHeader";
 import { Footer } from "@/components/Footer";
 import { singlesEvents, getPublishableEvents } from "@/data/singlesEvents";
 import { ListingImage } from "@/components/ListingImage";
@@ -75,6 +76,7 @@ const DateNights = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0 animate-fade-in">
       <Navbar />
+      <SectionHeader section="Section F" deskName="The Social Scene" stats={[{ label: "date nights", value: dateNights.length }]} />
       <main className="flex-1">
         {/* Hero */}
         <div className="relative h-[240px] md:h-[320px] overflow-hidden">

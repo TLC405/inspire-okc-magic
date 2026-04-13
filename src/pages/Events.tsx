@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
+import { SectionHeader } from "@/components/SectionHeader";
 import { Footer } from "@/components/Footer";
 import { singlesEvents, singlesCategories, getPublishableEvents } from "@/data/singlesEvents";
 import { ListingImage } from "@/components/ListingImage";
@@ -66,6 +67,7 @@ const Events = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0 animate-fade-in">
       <Navbar />
+      <SectionHeader section="Section E" deskName="The Events Desk" stats={[{ label: "events", value: publishable.length }]} />
       <main className="flex-1">
         {/* Hero */}
         <div className="relative h-[220px] md:h-[300px] overflow-hidden">
@@ -90,7 +92,7 @@ const Events = () => {
             </p>
             <p className="dateline text-muted-foreground/60 mt-1">
               Staff Report · Community Desk
-              {weather && <span className="ml-2">{weather.icon} {weather.temperature}°F · {weather.description}</span>}
+              {weather && <span className="ml-2">{weather.current.icon} {weather.current.temperature}°F · {weather.current.description}</span>}
             </p>
           </div>
         </div>

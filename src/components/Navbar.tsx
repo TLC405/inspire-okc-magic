@@ -17,6 +17,22 @@ const navLinks = [
   { label: "Discover", href: "/discover", numeral: "VI", desk: "Metro" },
 ];
 
+const sectionMap: Record<string, { section: string; desk: string }> = {
+  "/singles": { section: "B", desk: "The Singles Beat" },
+  "/events": { section: "E", desk: "The Events Desk" },
+  "/date-nights": { section: "F", desk: "The Social Scene" },
+  "/fitness": { section: "C", desk: "The Lifestyle Report" },
+  "/volunteering": { section: "D", desk: "The Civic Report" },
+  "/discover": { section: "VI", desk: "The Metro" },
+};
+
+const todayFocus = (() => {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Morning Pick: Yoga & Coffee Runs";
+  if (hour < 17) return "Afternoon: Volunteer Slots Open Now";
+  return "Tonight: Live Events & Date Nights";
+})();
+
 const today = new Date();
 const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -34,6 +50,15 @@ const tickerHeadlines = [
   "DISCOVER WHAT'S HAPPENING TODAY",
 ];
 
+const forecastDayLabels = (() => {
+  const d = new Date();
+  return [0, 1, 2].map(i => {
+    const nd = new Date(d);
+    nd.setDate(d.getDate() + i);
+    return i === 0 ? "Today" : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][nd.getDay()];
+  });
+})();
+
 export function Navbar() {
   const location = useLocation();
   const navScrollRef = useRef<HTMLDivElement>(null);
@@ -43,8 +68,10 @@ export function Navbar() {
   const { theme } = useTheme();
   const isTeamTheme = theme === "thunder" || theme === "comets";
   const [scrolled, setScrolled] = useState(false);
+  const [weatherOpen, setWeatherOpen] = useState(false);
 
-  // Scroll-collapse with RAF debounce
+  const currentSection = sectionMap[location.pathname];
+
   useEffect(() => {
     let raf = 0;
     const onScroll = () => {
@@ -58,13 +85,11 @@ export function Navbar() {
     };
   }, []);
 
-  // Ticker rotation
   useEffect(() => {
     const t = setInterval(() => setTickerIdx(p => (p + 1) % tickerHeadlines.length), 4000);
     return () => clearInterval(t);
   }, []);
 
-  // Auto-scroll active nav link into view on desktop
   useEffect(() => {
     if (navScrollRef.current) {
       const active = navScrollRef.current.querySelector('[data-active="true"]');
@@ -76,7 +101,7 @@ export function Navbar() {
 
   return (
     <header className="bg-background sticky top-0 z-50">
-      {/* Top thick rule — team-colored for Thunder/Comets */}
+      {/* Top thick rule */}
       <div className={cn(
         "h-[4px]",
         theme === "thunder" ? "bg-[hsl(200,100%,45%)]" :
@@ -95,51 +120,63 @@ export function Navbar() {
         <div className="flex items-center justify-between py-1 border-b border-foreground/15">
           <div className="flex items-center gap-2">
             {theme === "thunder" && (
-              <span className="flex items-center gap-1 font-mono text-[8px] md:text-[9px] tracking-[0.15em] uppercase font-extrabold px-1.5 py-0.5 border bg-[hsl(200,100%,45%,0.15)] border-[hsl(200,100%,45%,0.3)] text-[hsl(200,100%,65%)]">
+              <span className="flex items-center gap-1 font-mono text-[8px] md:text-[9px] tracking-widest uppercase font-extrabold px-1.5 py-0.5 border bg-[hsl(200,100%,45%,0.15)] border-[hsl(200,100%,45%,0.3)] text-[hsl(200,100%,65%)]">
                 <Zap size={8} className="text-[hsl(8,87%,54%)]" />
                 Thunder
               </span>
             )}
             {theme === "comets" && (
-              <span className="flex items-center gap-1 font-mono text-[8px] md:text-[9px] tracking-[0.15em] uppercase font-extrabold px-1.5 py-0.5 border bg-[hsl(270,55%,55%,0.15)] border-[hsl(270,55%,55%,0.3)] text-[hsl(270,55%,75%)]">
+              <span className="flex items-center gap-1 font-mono text-[8px] md:text-[9px] tracking-widest uppercase font-extrabold px-1.5 py-0.5 border bg-[hsl(270,55%,55%,0.15)] border-[hsl(270,55%,55%,0.3)] text-[hsl(270,55%,75%)]">
                 <Star size={8} className="text-[hsl(48,100%,50%)]" />
                 Comets
               </span>
             )}
             {!isTeamTheme && (
-              <span className="font-mono text-[8px] md:text-[9px] tracking-[0.15em] uppercase text-foreground font-bold bg-foreground/5 px-1.5 py-0.5 border border-foreground/10">
+              <span className="font-mono text-[8px] md:text-[9px] tracking-widest uppercase text-foreground font-bold bg-foreground/5 px-1.5 py-0.5 border border-foreground/10">
                 City Guide
               </span>
             )}
             <span className="hidden sm:inline text-foreground/15 text-[6px]">|</span>
-            <span className="hidden sm:inline font-mono text-[7px] md:text-[8px] tracking-[0.12em] uppercase text-muted-foreground">
+            <span className="hidden sm:inline font-mono text-[7px] md:text-[8px] tracking-wider uppercase text-muted-foreground">
               {theme === "thunder" ? "Thunder Up · OKC" : theme === "comets" ? "OKC Comets · NWSL" : "Community & Culture"}
             </span>
+            {/* Per-page section label */}
+            {currentSection && (
+              <>
+                <span className="hidden md:inline text-foreground/15 text-[6px]">|</span>
+                <span className="hidden md:inline font-mono text-[7px] tracking-wider uppercase text-accent font-bold">
+                  §{currentSection.section} {currentSection.desk}
+                </span>
+              </>
+            )}
           </div>
           <div className="hidden md:flex items-center gap-2">
-            <span className="font-mono text-[8px] tracking-[0.15em] uppercase text-muted-foreground">
+            <span className="font-mono text-[8px] tracking-widest uppercase text-muted-foreground">
               Vol. I, No. {issueNo}
             </span>
             <span className="text-foreground/15 text-[6px]">·</span>
-            <span className="font-mono text-[8px] tracking-[0.12em] uppercase text-muted-foreground/60">
+            <span className="font-mono text-[8px] tracking-wider uppercase text-muted-foreground/60">
               Printed in Oklahoma
             </span>
           </div>
           <div className="flex items-center gap-2 md:gap-3">
             {weather && (
-              <span className="flex items-center gap-1 font-mono text-[8px] md:text-[9px] tracking-[0.1em] uppercase text-muted-foreground">
-                <span className="text-[10px]">{weather.icon}</span>
-                <span className="hidden sm:inline font-semibold">{weather.description}</span>
-                <span className="font-bold text-foreground">{weather.temperature}°F</span>
-              </span>
+              <button
+                onClick={() => setWeatherOpen(!weatherOpen)}
+                className="flex items-center gap-1 font-mono text-[8px] md:text-[9px] tracking-wider uppercase text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+              >
+                <span className="text-[10px]">{weather.current.icon}</span>
+                <span className="hidden sm:inline font-semibold">{weather.current.description}</span>
+                <span className="font-bold text-foreground">{weather.current.temperature}°F</span>
+              </button>
             )}
             <span className="text-foreground/15 text-[6px]">|</span>
-            <span className="flex items-center gap-1 font-mono text-[8px] md:text-[9px] tracking-[0.1em] text-muted-foreground">
+            <span className="flex items-center gap-1 font-mono text-[8px] md:text-[9px] tracking-wider text-muted-foreground">
               <Clock size={8} className="text-muted-foreground/50" />
               <span className="font-semibold text-foreground/80">{timeStr}</span>
             </span>
             <span className="text-foreground/15 text-[6px] hidden sm:inline">|</span>
-            <span className="hidden sm:flex items-center gap-0.5 font-mono text-[8px] tracking-[0.1em] uppercase text-muted-foreground">
+            <span className="hidden sm:flex items-center gap-0.5 font-mono text-[8px] tracking-wider uppercase text-muted-foreground">
               <MapPin size={7} className="text-muted-foreground/50" />
               OKC
             </span>
@@ -150,6 +187,22 @@ export function Navbar() {
             </Link>
           </div>
         </div>
+
+        {/* ═══ WEATHER FORECAST DROPDOWN ═══ */}
+        {weatherOpen && weather && weather.forecast.length > 0 && (
+          <div className="border-b border-foreground/10 py-2 animate-in slide-in-from-top-2 duration-200">
+            <div className="flex items-center justify-center gap-6">
+              {weather.forecast.map((day, i) => (
+                <div key={i} className="flex items-center gap-2 font-mono text-[9px]">
+                  <span className="text-muted-foreground/60 uppercase tracking-wider font-bold w-10">{forecastDayLabels[i]}</span>
+                  <span className="text-sm">{day.icon}</span>
+                  <span className="text-foreground font-bold tabular-nums">{day.tempMax}°</span>
+                  <span className="text-muted-foreground/50 tabular-nums">{day.tempMin}°</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* ═══ NAMEPLATE (collapses on scroll) ═══ */}
         <div
@@ -199,20 +252,23 @@ export function Navbar() {
           <div className="h-[1px] bg-foreground/20 mt-[2px]" />
         </div>
 
-        {/* ═══ DATE + EDITION BAR ═══ */}
+        {/* ═══ DATE + EDITION + TODAY'S FOCUS BAR ═══ */}
         <div className="flex items-center justify-between py-1 border-b border-foreground/10">
-          <span className="font-mono text-[7px] md:text-[8px] tracking-[0.12em] uppercase text-muted-foreground">
+          <span className="font-mono text-[7px] md:text-[8px] tracking-wider uppercase text-muted-foreground">
             <span className="hidden md:inline">{fullDateStr}</span>
             <span className="md:hidden">{dayName} · {dateStr}</span>
           </span>
           <span
-            className="font-mono text-[7px] md:text-[8px] tracking-[0.2em] uppercase text-foreground/50 font-semibold transition-opacity duration-700"
+            className="font-mono text-[7px] md:text-[8px] tracking-widest uppercase text-foreground/50 font-semibold transition-opacity duration-700 hidden md:inline"
             key={tickerIdx}
             style={{ animation: "fadeInUp 0.6s ease-out" }}
           >
             {tickerHeadlines[tickerIdx]}
           </span>
-          <span className="font-mono text-[7px] md:text-[8px] tracking-[0.15em] uppercase text-foreground/60 font-bold">
+          <span className="font-mono text-[7px] md:text-[8px] tracking-wider uppercase text-accent/70 font-semibold md:hidden">
+            {todayFocus.split(":")[0]}
+          </span>
+          <span className="font-mono text-[7px] md:text-[8px] tracking-widest uppercase text-foreground/60 font-bold">
             {edition}
           </span>
         </div>
@@ -230,7 +286,7 @@ export function Navbar() {
                   to={link.href}
                   data-active={location.pathname === link.href}
                   className={cn(
-                    "font-mono text-[10px] tracking-[0.15em] uppercase py-1 transition-colors duration-100 relative flex items-center gap-1.5 whitespace-nowrap group",
+                    "font-mono text-[10px] tracking-widest uppercase py-1 transition-colors duration-100 relative flex items-center gap-1.5 whitespace-nowrap group",
                     location.pathname === link.href
                       ? "text-foreground font-bold"
                       : "text-muted-foreground hover:text-foreground"
@@ -249,7 +305,7 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Bottom thick + thin rule — team-colored */}
+      {/* Bottom thick + thin rule */}
       <div className={cn(
         "h-[3px]",
         theme === "thunder" ? "bg-[hsl(200,100%,45%)]" :
@@ -263,7 +319,6 @@ export function Navbar() {
         "bg-foreground/15"
       )} />
 
-      {/* Wire Ticker */}
       <WireTicker />
 
       <style>{`

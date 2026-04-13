@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useListingImage } from "@/hooks/useListingImage";
-import { ImageOff, Heart, Dumbbell, HandHelping, MapPin, Building2 } from "lucide-react";
+import { getStaticImage } from "@/data/listingImages";
+import { Heart, Dumbbell, HandHelping, MapPin, Building2 } from "lucide-react";
 
 const categoryGradients: Record<string, string> = {
   "Date Night": "from-rose-500/30 to-pink-600/20",
@@ -11,7 +11,6 @@ const categoryGradients: Record<string, string> = {
   "Activity": "from-emerald-500/30 to-teal-600/20",
   "Faith": "from-amber-400/30 to-yellow-600/20",
   "Team Building": "from-blue-500/30 to-indigo-600/20",
-  // Fitness categories
   "CrossFit": "from-orange-500/30 to-red-600/20",
   "Gym": "from-slate-500/30 to-gray-600/20",
   "Yoga": "from-indigo-400/30 to-purple-500/20",
@@ -51,25 +50,14 @@ interface ListingImageProps {
   className?: string;
 }
 
-export const ListingImage = ({ listingType, listingId, name, category, websiteUrl, className = "" }: ListingImageProps) => {
-  const { imageUrl, loading } = useListingImage(listingType, listingId, name, {
-    category,
-    websiteUrl,
-  });
+export const ListingImage = ({ listingType, listingId, name, category, className = "" }: ListingImageProps) => {
+  const staticUrl = getStaticImage(listingType, listingId, category);
   const [imgError, setImgError] = useState(false);
 
   const gradient = categoryGradients[category || ""] || categoryGradients["default"];
   const FallbackIcon = categoryIcons[category || ""] || categoryIcons[listingType] || MapPin;
 
-  if (loading) {
-    return (
-      <div className={`bg-muted/30 animate-pulse flex items-center justify-center ${className}`}>
-        <div className="w-6 h-6 rounded-full border-2 border-accent/30 border-t-accent animate-spin" />
-      </div>
-    );
-  }
-
-  if (!imageUrl || imgError) {
+  if (imgError) {
     return (
       <div className={`bg-gradient-to-br ${gradient} flex items-center justify-center ${className}`}>
         <FallbackIcon size={24} className="text-foreground/20" />
@@ -79,7 +67,7 @@ export const ListingImage = ({ listingType, listingId, name, category, websiteUr
 
   return (
     <img
-      src={imageUrl}
+      src={staticUrl}
       alt={name}
       className={`object-cover ${className}`}
       loading="lazy"
