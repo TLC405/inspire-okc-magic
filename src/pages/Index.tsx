@@ -17,6 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import heroSingles from "@/assets/hero-singles.jpg";
 import heroFitness from "@/assets/hero-fitness.jpg";
 import heroVolunteer from "@/assets/hero-volunteer.jpg";
+import { CityConcierge } from "@/components/CityConcierge";
 
 
 const today = new Date();
@@ -748,6 +749,7 @@ const Index = () => {
       </main>
 
       <Footer />
+      <CityConcierge />
     </div>
   );
 };
