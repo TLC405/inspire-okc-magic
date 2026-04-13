@@ -207,10 +207,11 @@ export function Navbar() {
         {/* ═══ NAMEPLATE (collapses on scroll) ═══ */}
         <div
           className={cn(
-            "overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out will-change-[max-height,opacity]",
-            scrolled ? "max-h-0 opacity-0" : "max-h-60 opacity-100"
+            "grid transition-[grid-template-rows,opacity] duration-300 ease-in-out",
+            scrolled ? "grid-rows-[0fr] opacity-0" : "grid-rows-[1fr] opacity-100"
           )}
         >
+          <div className="overflow-hidden">
           <div className="h-[3px] bg-foreground mt-1" />
           <div className="h-[1px] bg-foreground/20 mt-[2px]" />
 
