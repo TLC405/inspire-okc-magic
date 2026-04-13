@@ -90,7 +90,7 @@ const Events = () => {
             </p>
             <p className="dateline text-muted-foreground/60 mt-1">
               Staff Report · Community Desk
-              {weather && <span className="ml-2">{weather.icon} {weather.temperature}°F · {weather.description}</span>}
+              {weather && <span className="ml-2">{weather.current.icon} {weather.current.temperature}°F · {weather.current.description}</span>}
             </p>
           </div>
         </div>
