@@ -228,6 +228,7 @@ function CityPulse() {
       </div>
     </div>
   );
+}
 
 const Index = () => {
   const singlesTeaser = getDiverseSinglesTeaser(4);
