@@ -23,13 +23,28 @@ export interface MayorData {
   initiatives: MayorInitiative[];
 }
 
+export interface ThunderGame {
+  opponent: string;
+  result?: "W" | "L";
+  score?: string;
+  date: string;
+  time?: string;
+  venue?: string;
+  price?: string;
+  home?: boolean;
+  label?: string;
+}
+
 export interface ThunderData {
   season: string;
   record: string;
   standing: string;
   mvpCandidate: string;
+  mvpStats: string;
   nextGame: string;
   playoffSeed: string;
+  recentResults: ThunderGame[];
+  upcoming: ThunderGame[];
 }
 
 export interface CometGame {
@@ -37,6 +52,8 @@ export interface CometGame {
   opponent: string;
   venue: string;
   time: string;
+  price?: string;
+  home?: boolean;
 }
 
 export interface DateNightListing {
@@ -86,8 +103,14 @@ export const mayorData: MayorData = {
     {
       name: "Scissortail Park Phase III",
       status: "Groundbreaking May 15",
-      description: "22 additional acres of urban green space connecting the lower park to the Oklahoma River trail system.",
-      date: "Announced March 2026",
+      description: "22 acres of new urban green space expanding the park's western reach. Includes amphitheater, walking trails, and a community garden.",
+      date: "Announced April 1, 2026",
+    },
+    {
+      name: "Housing for All OKC",
+      status: "In Progress",
+      description: "Commitment to develop 1,500 affordable housing units by 2028 across five priority corridors.",
+      date: "Ongoing",
     },
   ],
 };
@@ -95,20 +118,86 @@ export const mayorData: MayorData = {
 // ── OKC Thunder ──────────────────────────
 export const thunderData: ThunderData = {
   season: "2025–26",
-  record: "62–20",
-  standing: "No. 1 Western Conference",
+  record: "67–15",
+  standing: "No. 1 Seed — Western Conference",
   mvpCandidate: "Shai Gilgeous-Alexander",
+  mvpStats: "32.4 PPG · 6.1 APG",
   nextGame: "vs. LA Clippers — April 19, 7:00 PM CT",
   playoffSeed: "#1 Seed",
+  recentResults: [
+    { opponent: "Denver Nuggets", result: "W", score: "118–103", date: "Apr 11" },
+    { opponent: "Minnesota Timberwolves", result: "W", score: "124–108", date: "Apr 9" },
+    { opponent: "Memphis Grizzlies", result: "W", score: "107–91", date: "Apr 7" },
+  ],
+  upcoming: [
+    { opponent: "LA Clippers", label: "PLAYOFFS · Round 1 Game 1", date: "Apr 19", time: "7:00 PM CT", venue: "Paycom Center", price: "From $85", home: true },
+    { opponent: "LA Clippers", label: "PLAYOFFS · Round 1 Game 2", date: "Apr 21", time: "7:30 PM CT", venue: "Paycom Center", price: "From $85", home: true },
+    { opponent: "LA Clippers", label: "PLAYOFFS · Round 1 Game 3", date: "Apr 23", time: "9:30 PM CT", venue: "Crypto.com Arena", price: "Away", home: false },
+  ],
 };
 
 // ── OKC Comets (NWSL) ──────────────────────────
 export const cometSchedule: CometGame[] = [
-  { date: "May 3", opponent: "Portland Thorns", venue: "Taft Stadium", time: "7:00 PM" },
-  { date: "May 10", opponent: "Kansas City Current", venue: "Taft Stadium", time: "7:00 PM" },
-  { date: "May 17", opponent: "at Houston Dash", venue: "Shell Energy Stadium", time: "7:30 PM" },
-  { date: "May 24", opponent: "Angel City FC", venue: "Taft Stadium", time: "7:00 PM" },
-  { date: "June 7", opponent: "at Chicago Red Stars", venue: "SeatGeek Stadium", time: "6:00 PM" },
+  { opponent: "Kansas City Current", date: "Apr 19", time: "7:00 PM", venue: "Taft Stadium", price: "$15–$40", home: true },
+  { opponent: "Portland Thorns", date: "May 3", time: "6:00 PM", venue: "Taft Stadium", price: "$18–$50", home: true },
+  { opponent: "Orlando Pride", date: "May 17", time: "6:30 PM", venue: "Taft Stadium", price: "$18–$45", home: true },
+  { opponent: "Angel City FC", date: "May 24", time: "9:30 PM", venue: "Away — Los Angeles", price: "Away", home: false },
+  { opponent: "Washington Spirit", date: "Jun 7", time: "7:00 PM", venue: "Taft Stadium", price: "$20–$55", home: true },
+  { opponent: "North Carolina Courage", date: "Jun 21", time: "6:00 PM", venue: "Taft Stadium", price: "$18–$45", home: true },
+];
+
+// ── Discover Categories (structured for admin briefing) ──
+export interface DiscoverCategory {
+  name: string;
+  items: { title: string; tag: string; description: string; image?: string }[];
+}
+
+export const discoverCategories: DiscoverCategory[] = [
+  {
+    name: "Architecture",
+    items: [
+      { title: "Devon Energy Tower", tag: "Landmark", description: "OKC's tallest building at 50 stories. The defining element of the downtown skyline, completed in 2012." },
+      { title: "Oklahoma State Capitol", tag: "Government", description: "The only state capitol with working oil wells on its grounds. Completed in 1917, dome added in 2002." },
+      { title: "First Americans Museum", tag: "Cultural", description: "AIA award-winning architecture on the Oklahoma River. Designed to reflect Native American cosmology." },
+      { title: "Oklahoma Contemporary Arts Center", tag: "Arts", description: "Modern cultural campus in the Film Row district." },
+      { title: "Myriad Botanical Gardens Crystal Bridge", tag: "Parks", description: "Iconic glass-enclosed tropical conservatory in the heart of downtown." },
+    ],
+  },
+  {
+    name: "Policy",
+    items: [
+      { title: "Oklahoma Promise (OHLAP)", tag: "Education", description: "State-funded college scholarship for low-income Oklahoma 8th graders who maintain a 2.5 GPA." },
+      { title: "MAPS 4", tag: "Infrastructure", description: "$978M Metropolitan Area Projects initiative passed in 2019 for parks, mental health, transit, and homelessness." },
+      { title: "Oklahoma Medical Marijuana Authority", tag: "Regulation", description: "Oklahoma's regulated medical marijuana framework, one of the most permissive in the US." },
+      { title: "Regional Transportation Plan 2045", tag: "Transit", description: "Long-range transportation planning for the Oklahoma City metro area." },
+    ],
+  },
+  {
+    name: "Sustainability",
+    items: [
+      { title: "Solar Growth Potential", tag: "Energy", description: "Oklahoma receives 237+ sunny days per year. Residential and commercial solar adoption growing at 18% annually." },
+      { title: "OG&E Wind Power", tag: "Utility", description: "Oklahoma Gas & Electric's large-scale wind energy generation serving OKC metro residents." },
+      { title: "Scissortail Park Stormwater System", tag: "Parks", description: "The park's 70-acre footprint incorporates a sophisticated urban stormwater management system." },
+    ],
+  },
+  {
+    name: "Culture",
+    items: [
+      { title: "Paseo Arts District", tag: "Neighborhood", description: "Oklahoma City's original arts district. Spanish Colonial Revival architecture, 80+ working artists, monthly gallery walks." },
+      { title: "Film Row", tag: "Historic", description: "OKC's historic film distribution district, now a creative hub with restaurants, galleries, and event spaces." },
+      { title: "Automobile Alley", tag: "Architecture", description: "Broadway corridor lined with 1920s brick auto dealerships, now a dining and retail destination." },
+      { title: "Bricktown", tag: "Entertainment", description: "Former warehouse district turned entertainment hub. Canal walks, music venues, sports bars." },
+      { title: "The Paseo", tag: "Arts", description: "Monthly First Friday Gallery Walk draws thousands. Annual Paseo Arts Festival every Memorial Day weekend." },
+    ],
+  },
+  {
+    name: "Growth",
+    items: [
+      { title: "Population Growth: 15% in 10 Years", tag: "Demographics", description: "OKC metro population surpassed 1.4 million. City proper at 700K+. One of the fastest-growing metros in the South." },
+      { title: "Oklahoma City's GDP Growth", tag: "Economy", description: "Metro GDP grew from $68B to $90B between 2015 and 2024." },
+      { title: "New Midtown Development", tag: "Real Estate", description: "$400M+ in new residential and mixed-use development in Midtown since 2018." },
+    ],
+  },
 ];
 
 // ── Date Night Listings ──────────────────────────
