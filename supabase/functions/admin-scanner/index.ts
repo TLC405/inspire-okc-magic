@@ -147,10 +147,9 @@ Tables: image_cache (public read), profiles (own only), user_roles (own+admin re
         return safeJson({ findings: fallbackFindings, error: "AI provider not configured. Showing fallback results.", fallback: true });
       }
 
-      const aiResp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${GROQ_API_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
+      let aiResp: Response;
+      try {
+        aiResp = await fetchGroqWithTimeout(GROQ_API_KEY, {
           model: "meta-llama/llama-4-scout-17b-16e-instruct",
           messages: [
             { role: "system", content: "You are a security and quality auditor for a web app. Analyze the provided context and return findings using the tool." },
@@ -174,8 +173,14 @@ Tables: image_cache (public read), profiles (own only), user_roles (own+admin re
             },
           }],
           tool_choice: { type: "function", function: { name: "report_findings" } },
-        }),
-      });
+        });
+      } catch (error) {
+        if (error instanceof Error && error.name === "AbortError") {
+          await supabaseAdmin.from("scan_results").insert({ scan_type: "full", findings: fallbackFindings });
+          return safeJson({ findings: fallbackFindings, error: "AI request timed out. Showing fallback results.", fallback: true });
+        }
+        throw error;
+      }
 
       if (!aiResp.ok) {
         return await handleAiFailure(aiResp, fallbackFindings, "full");
@@ -196,10 +201,9 @@ Tables: image_cache (public read), profiles (own only), user_roles (own+admin re
         return safeJson({ ...fallbackUpgrades, error: "AI provider not configured. Showing fallback results.", fallback: true });
       }
 
-      const aiResp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${GROQ_API_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
+      let aiResp: Response;
+      try {
+        aiResp = await fetchGroqWithTimeout(GROQ_API_KEY, {
           model: "meta-llama/llama-4-scout-17b-16e-instruct",
           messages: [
             { role: "system", content: "You are a product advisor for Inspire Oklahoma City, a community discovery platform covering singles events, fitness, volunteering, date nights, and city highlights in OKC. Suggest specific, actionable upgrades." },
@@ -241,8 +245,14 @@ Tables: image_cache (public read), profiles (own only), user_roles (own+admin re
             },
           }],
           tool_choice: { type: "function", function: { name: "suggest_upgrades" } },
-        }),
-      });
+        });
+      } catch (error) {
+        if (error instanceof Error && error.name === "AbortError") {
+          await supabaseAdmin.from("scan_results").insert({ scan_type: "upgrades", upgrade_ideas: fallbackUpgrades });
+          return safeJson({ ...fallbackUpgrades, error: "AI request timed out. Showing fallback results.", fallback: true });
+        }
+        throw error;
+      }
 
       if (!aiResp.ok) {
         return await handleAiFailure(aiResp, fallbackUpgrades, "upgrades");
