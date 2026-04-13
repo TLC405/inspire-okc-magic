@@ -41,11 +41,18 @@ export function Navbar() {
   const [tickerIdx, setTickerIdx] = useState(0);
   const [scrolled, setScrolled] = useState(false);
 
-  // Scroll-collapse
+  // Scroll-collapse with RAF debounce
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
+    let raf = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => setScrolled(window.scrollY > 60));
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(raf);
+    };
   }, []);
 
   // Ticker rotation
@@ -120,7 +127,7 @@ export function Navbar() {
         {/* ═══ NAMEPLATE (collapses on scroll) ═══ */}
         <div
           className={cn(
-            "overflow-hidden transition-all duration-300 ease-in-out",
+            "overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out will-change-[max-height,opacity]",
             scrolled ? "max-h-0 opacity-0" : "max-h-40 opacity-100"
           )}
         >
