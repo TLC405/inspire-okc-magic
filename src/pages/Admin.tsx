@@ -239,8 +239,9 @@ const Admin = () => {
     try {
       const { data, error } = await supabase.functions.invoke("admin-scanner", { body: { action: "scan" } });
       if (error) throw error;
-      if (data?.error) throw new Error(data.error);
+      if (!data?.findings) throw new Error(data?.error || "Scan failed");
       setScanFindings(data.findings);
+      if (data?.fallback && data?.error) setScanError(data.error);
       const { data: history } = await supabase.from("scan_results").select("*").order("created_at", { ascending: false }).limit(20);
       setScanHistory(history || []);
     } catch (e: any) {
@@ -258,8 +259,9 @@ const Admin = () => {
         body: { action: "upgrades", categories: ["homepage", "discover", "dating", "operations"] },
       });
       if (error) throw error;
-      if (data?.error) throw new Error(data.error);
+      if (!data?.categories) throw new Error(data?.error || "Failed to get upgrades");
       setUpgradeIdeas(data.categories || []);
+      if (data?.fallback && data?.error) setScanError(data.error);
     } catch (e: any) {
       setScanError(e.message || "Failed to get upgrades");
     }
