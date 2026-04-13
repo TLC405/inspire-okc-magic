@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Pin, Zap } from "lucide-react";
 
 type Briefing = {
   id: string;
@@ -12,18 +11,33 @@ type Briefing = {
   updated_at: string;
 };
 
-const categoryColors: Record<string, string> = {
-  city: "bg-accent/10 text-accent",
-  thunder: "bg-[hsl(200,100%,45%)]/10 text-[hsl(200,100%,45%)]",
-  comets: "bg-[hsl(270,55%,55%)]/10 text-[hsl(270,55%,55%)]",
-  growth: "bg-emerald-500/10 text-emerald-500",
-  culture: "bg-amber-500/10 text-amber-500",
-  breaking: "bg-red-500/10 text-red-500",
-};
+function relativeTime(dateStr: string): string {
+  const now = Date.now();
+  const then = new Date(dateStr).getTime();
+  const diff = Math.max(0, now - then);
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "Just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  return `${days}d ago`;
+}
+
+function formatTime(dateStr: string): string {
+  const d = new Date(dateStr);
+  return d.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: "America/Chicago",
+  }) + " CT";
+}
 
 export function LiveBriefings() {
   const [briefings, setBriefings] = useState<Briefing[]>([]);
   const [loading, setLoading] = useState(true);
+  const [, setTick] = useState(0);
 
   useEffect(() => {
     const fetchBriefings = async () => {
@@ -33,14 +47,13 @@ export function LiveBriefings() {
         .eq("published", true)
         .order("pinned", { ascending: false })
         .order("created_at", { ascending: false })
-        .limit(10);
+        .limit(12);
       setBriefings((data as Briefing[]) || []);
       setLoading(false);
     };
 
     fetchBriefings();
 
-    // Real-time subscription
     const channel = supabase
       .channel("briefings-live")
       .on("postgres_changes", { event: "*", schema: "public", table: "briefings" }, () => {
@@ -48,40 +61,83 @@ export function LiveBriefings() {
       })
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    // Tick every 30s to update relative timestamps
+    const ticker = setInterval(() => setTick((t) => t + 1), 30_000);
+
+    return () => {
+      supabase.removeChannel(channel);
+      clearInterval(ticker);
+    };
   }, []);
 
   if (loading || briefings.length === 0) return null;
 
   return (
-    <div className="skeuo-card p-4 md:p-6 rounded-lg">
-      <div className="flex items-center gap-2 mb-4">
-        <Zap size={14} className="text-accent" />
-        <h3 className="label-caps text-foreground">City Briefings</h3>
-        <span className="ml-auto flex items-center gap-1 text-[9px] text-accent font-mono">
-          <span className="w-1.5 h-1.5 rounded-full bg-accent signal-pulse" />
-          Live
+    <section className="w-full">
+      {/* Thick top rule */}
+      <div className="h-[3px] bg-foreground" />
+
+      {/* Section header */}
+      <div className="flex items-baseline justify-between px-4 md:px-8 py-3 border-b border-foreground/20">
+        <h3
+          className="font-serif font-black text-lg md:text-xl tracking-tight text-foreground uppercase"
+          style={{ fontVariant: "small-caps" }}
+        >
+          City Briefings
+        </h3>
+        <span className="font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
+          Live Wire
+          <span className="inline-block w-full h-px bg-accent/60 animate-pulse ml-0" />
         </span>
       </div>
-      <div className="space-y-3">
+
+      {/* Multi-column grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 md:divide-x md:divide-foreground/10">
         {briefings.map((b) => (
-          <div key={b.id} className="border-b border-foreground/[0.06] last:border-0 pb-3 last:pb-0">
-            <div className="flex items-center gap-2 mb-1">
-              {b.pinned && <Pin size={9} className="text-accent" />}
-              <span className={`text-[8px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded ${categoryColors[b.category] || categoryColors.city}`}>
-                {b.category}
+          <article
+            key={b.id}
+            className="px-4 md:px-6 py-5 border-b border-foreground/[0.06] last:border-b-0 md:last:border-b md:[&:nth-last-child(-n+3)]:border-b-0 lg:[&:nth-last-child(-n+3)]:border-b-0"
+          >
+            {/* Category dateline + timestamp */}
+            <div className="flex items-baseline gap-2 mb-1.5">
+              {b.pinned && (
+                <span className="text-foreground text-[10px] leading-none select-none" aria-label="Pinned">
+                  &#9632;
+                </span>
+              )}
+              <span
+                className="text-[10px] tracking-[0.15em] text-muted-foreground font-semibold uppercase"
+                style={{ fontVariant: "small-caps" }}
+              >
+                — {b.category}
               </span>
-              <span className="text-[9px] text-muted-foreground/50 ml-auto">
-                {new Date(b.updated_at).toLocaleDateString()}
+              <span className="ml-auto text-[9px] font-mono text-muted-foreground/60 whitespace-nowrap">
+                {relativeTime(b.updated_at)}
               </span>
             </div>
-            <h4 className="text-sm font-bold text-foreground leading-tight">{b.title}</h4>
+
+            {/* Title */}
+            <h4 className="font-serif font-bold text-[15px] md:text-base text-foreground leading-snug mb-1">
+              {b.title}
+            </h4>
+
+            {/* Content */}
             {b.content && (
-              <p className="text-xs text-muted-foreground mt-1 leading-relaxed whitespace-pre-line line-clamp-3">{b.content}</p>
+              <p className="text-[13px] text-muted-foreground leading-relaxed line-clamp-3 whitespace-pre-line">
+                {b.content}
+              </p>
             )}
-          </div>
+
+            {/* Byline timestamp */}
+            <p className="mt-2 text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">
+              Updated {formatTime(b.updated_at)}
+            </p>
+          </article>
         ))}
       </div>
-    </div>
+
+      {/* Thin bottom rule */}
+      <div className="h-px bg-foreground/20" />
+    </section>
   );
 }

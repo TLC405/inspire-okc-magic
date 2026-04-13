@@ -351,7 +351,7 @@ const Index = () => {
         </div>
 
         {/* ═══ Live City Briefings ═══ */}
-        <div className="container py-4 md:py-6">
+        <div className="py-6 md:py-10">
           <LiveBriefings />
         </div>
 
