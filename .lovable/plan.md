@@ -1,41 +1,90 @@
 
 
-# Momento Mori Showcase Page + Header Flicker Fix
+# Install Momento Mori App Natively + Enhance It
 
-## Problem
-1. **Momento Mori**: User wants the app from `github.com/TLC405/momentomori` accessible as a page within Inspire OKC -- clicking a link opens the full app as a showcase, kept separate from the main Inspire codebase.
-2. **Header flicker**: The sticky header's nameplate collapse (`grid-rows-[0fr]` + `opacity-0`) causes visual flickering during scroll. The `opacity` transition on the grid wrapper creates a flash as the layout shift and fade fight each other. Additionally, `transition-all` on the h1's letter-spacing causes reflow during the grid animation.
+## Overview
+Port the full **Memento Mori** quest/map app from the OKC Street Stories project directly into this codebase as a standalone page at `/momento-mori`. No iframe -- the full app runs natively with all its interactive SVG map, quest system, city markers, and quest detail panels.
+
+## What the App Is
+A "tactical quest map" of the Great Plains region (OK, TX, CO, KS, AR, MO, NM) with:
+- A hand-drawn parchment-style SVG map with mountains, rivers, forests, roads, state borders
+- Interactive city markers and quest star markers
+- 20 quests across 5 tiers (Legendary → Standard) with images, briefings, objectives, intel
+- Quest detail panel with scrollable content
+- Compass rose, scale bar, title cartouche, legend
 
 ## Plan
 
-### 1. Fix Header Flicker (`src/components/Navbar.tsx`)
-- Remove `opacity-0`/`opacity-100` from the grid-rows collapse wrapper -- the `grid-rows-[0fr]` + `overflow-hidden` already hides content cleanly without needing opacity.
-- Remove `transition-[grid-template-rows,opacity]` and replace with just `transition-[grid-template-rows]` to avoid the opacity causing a visible flash.
-- Remove `transition-all` from the h1 hover tracking change (the letter-spacing reflow during collapse causes jank). Use a transform-based hover effect instead or remove it.
-- Add `will-change: grid-template-rows` to hint the browser for smoother compositing.
+### 1. Copy all assets (20 quest images) from OKC Street Stories
+Copy all 20 `src/assets/quests/*.jpg` files into this project at `src/assets/momento-mori/quests/`.
 
-### 2. Create Momento Mori Showcase Page (`src/pages/MomentoMori.tsx`)
-- New page component that renders the Navbar, then a full-viewport iframe embedding the deployed Momento Mori app.
-- The iframe URL will be the published Lovable URL for that project. Since the README doesn't show a custom domain, we'll need the user to confirm the URL -- but the standard Lovable pattern is `https://<slug>.lovable.app`. I'll use a placeholder and ask.
-- The page includes a small top bar with "Back to Inspire" link and "Momento Mori" title, then the iframe fills remaining space.
-- No Inspire footer/nav overlapping the iframe -- minimal chrome so the showcase app feels standalone.
+### 2. Create data files
+- `src/data/momento-mori/cities.ts` -- 24 cities with map positions
+- `src/data/momento-mori/quests.ts` -- 20 quests with tier system, updated image imports
+- `src/data/momento-mori/districts.ts` -- 13 OKC districts with street legends
 
-### 3. Add Route (`src/App.tsx`)
-- Add `/momento-mori` route pointing to the new page.
+### 3. Create map components
+Under `src/components/momento-mori/map/`:
+- `MapDefs.tsx` -- SVG filters (parchment noise, hand-drawn, ink bleed)
+- `MapBackground.tsx` -- Parchment gradient with age spots and vignette
+- `StateBorders.tsx` -- Dashed state boundary lines
+- `Rivers.tsx` -- Arkansas, Red, Canadian, Rio Grande, etc.
+- `Mountains.tsx` -- Rockies, Wichitas, Ouachitas, etc.
+- `Forests.tsx` -- Tree clusters for forest regions
+- `Roads.tsx` -- Route 66, I-35, I-40, etc.
+- `StateLabels.tsx` -- State names and geographic region labels
+- `CompassRose.tsx` -- Cardinal direction compass
+- `TitleCartouche.tsx` -- "THE GREAT PLAINS" banner
+- `ScaleBar.tsx` -- Distance scale
+- `MapFrame.tsx` -- Double border with corner ornaments
+- `MapLegend.tsx` -- Quest tier and settlement legends
+- `CityMarkers.tsx` -- Interactive city dots
+- `QuestMarkers.tsx` -- Star-shaped quest markers with tooltips
 
-### 4. Add Nav Link (`src/components/Navbar.tsx`)
-- Add a GitHub-style link or "Momento Mori" link in the upper utility bar, linking to `/momento-mori` internally (not to GitHub).
+### 4. Create main components
+Under `src/components/momento-mori/`:
+- `RegionalMap.tsx` -- Assembles all map layers + interactive markers
+- `QuestPanel.tsx` -- Quest detail panel with image header, briefing, objectives, intel
 
-### 5. Add to Mobile Tab Bar (`src/components/MobileTabBar.tsx`)
-- Add "Momento Mori" to the "More" dropdown menu.
+### 5. Rebuild the MomentoMori page (`src/pages/MomentoMori.tsx`)
+Replace the current placeholder/iframe page with the full native app:
+- Header with skull icon, "MEMENTO MORI" title, back-to-Inspire link, quest list toggle
+- Full-viewport SVG map with all interactive elements
+- Quest panel sidebar when a quest is selected
+- Mobile sheet menu for quest list
+- Footer motto bar
 
-## Question needed
-I need to confirm the deployed URL for the Momento Mori app to embed it. It's likely something like `https://momento-mori-xxx.lovable.app` or a custom domain.
+### 6. Add Momento Mori CSS variables
+Add the parchment/ink/tier/map CSS variables and font imports (Cinzel, Orbitron, Roboto Condensed) to the page's scoped styles, plus tactical utility classes (`.tactical-glow`, `.tier-*` badges).
 
-| File | Change |
+### 7. Enhancements over the original
+- **Smoother map interactions**: Add zoom/pan with CSS transforms
+- **Better mobile UX**: Full-screen map with bottom sheet for quests instead of sidebar
+- **TLC branding integration**: Add a "TLC Presents" badge in the title cartouche
+- **Animated quest markers**: Subtle pulse animation on legendary quest stars
+- **Back navigation**: Clean "← Back to Inspire" link in header
+
+### 8. Header flicker fix (already done in previous edit)
+The Navbar scroll-collapse was already fixed by removing opacity transitions. Will verify it's still working.
+
+## Files Created/Modified
+
+| File | Action |
 |---|---|
-| `src/components/Navbar.tsx` | Remove opacity from collapse transition; add showcase link |
-| `src/pages/MomentoMori.tsx` | New iframe showcase page |
-| `src/App.tsx` | Add `/momento-mori` route |
-| `src/components/MobileTabBar.tsx` | Add to More menu |
+| `src/assets/momento-mori/quests/*.jpg` (20 files) | Copy from OKC Street Stories |
+| `src/data/momento-mori/cities.ts` | Create |
+| `src/data/momento-mori/quests.ts` | Create |
+| `src/data/momento-mori/districts.ts` | Create |
+| `src/components/momento-mori/map/*.tsx` (15 files) | Create |
+| `src/components/momento-mori/RegionalMap.tsx` | Create |
+| `src/components/momento-mori/QuestPanel.tsx` | Create |
+| `src/pages/MomentoMori.tsx` | Rewrite (replace placeholder) |
+| `src/index.css` | Add scoped Momento Mori CSS variables |
+
+## Technical Notes
+- All dependencies (lucide-react, shadcn/ui components) already exist in this project
+- Fonts loaded via Google Fonts CSS import (Cinzel, Orbitron, Roboto Condensed)
+- Map uses custom Tailwind color classes scoped via CSS variables
+- No new npm packages needed
+- The Momento Mori page is self-contained -- no interference with the rest of Inspire OKC
 
