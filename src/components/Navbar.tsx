@@ -94,12 +94,26 @@ export function Navbar() {
         {/* ═══ UPPER UTILITY BAR ═══ */}
         <div className="flex items-center justify-between py-1 border-b border-foreground/15">
           <div className="flex items-center gap-2">
-            <span className="font-mono text-[8px] md:text-[9px] tracking-[0.15em] uppercase text-foreground font-bold bg-foreground/5 px-1.5 py-0.5 border border-foreground/10">
-              City Guide
-            </span>
+            {theme === "thunder" && (
+              <span className="flex items-center gap-1 font-mono text-[8px] md:text-[9px] tracking-[0.15em] uppercase font-extrabold px-1.5 py-0.5 border bg-[hsl(200,100%,45%,0.15)] border-[hsl(200,100%,45%,0.3)] text-[hsl(200,100%,65%)]">
+                <Zap size={8} className="text-[hsl(8,87%,54%)]" />
+                Thunder
+              </span>
+            )}
+            {theme === "comets" && (
+              <span className="flex items-center gap-1 font-mono text-[8px] md:text-[9px] tracking-[0.15em] uppercase font-extrabold px-1.5 py-0.5 border bg-[hsl(270,55%,55%,0.15)] border-[hsl(270,55%,55%,0.3)] text-[hsl(270,55%,75%)]">
+                <Star size={8} className="text-[hsl(48,100%,50%)]" />
+                Comets
+              </span>
+            )}
+            {!isTeamTheme && (
+              <span className="font-mono text-[8px] md:text-[9px] tracking-[0.15em] uppercase text-foreground font-bold bg-foreground/5 px-1.5 py-0.5 border border-foreground/10">
+                City Guide
+              </span>
+            )}
             <span className="hidden sm:inline text-foreground/15 text-[6px]">|</span>
             <span className="hidden sm:inline font-mono text-[7px] md:text-[8px] tracking-[0.12em] uppercase text-muted-foreground">
-              Community & Culture
+              {theme === "thunder" ? "Thunder Up · OKC" : theme === "comets" ? "OKC Comets · NWSL" : "Community & Culture"}
             </span>
           </div>
           <div className="hidden md:flex items-center gap-2">
