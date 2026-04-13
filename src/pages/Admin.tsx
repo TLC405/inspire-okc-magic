@@ -431,6 +431,7 @@ const Admin = () => {
   }
 
   const tabs = [
+    { id: "briefing" as const, label: "Briefing", icon: TrendingUp },
     { id: "content" as const, label: "Content", icon: Edit3 },
     { id: "visitors" as const, label: "Visitors", icon: Users },
     { id: "security" as const, label: "Security", icon: Shield },
