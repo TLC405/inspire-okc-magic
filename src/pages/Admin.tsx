@@ -606,7 +606,9 @@ const Admin = () => {
                         </div>
                       </div>
                     </div>
-                  )}
+                   )}
+                  <div className="rule-thin my-4" />
+                  <ThemePanel />
                 </div>
               ) : (
                 <>
