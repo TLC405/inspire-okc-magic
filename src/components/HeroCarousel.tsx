@@ -76,7 +76,7 @@ export function HeroCarousel() {
           >
             <h2
               className="text-white font-black tracking-[-0.02em] leading-[0.9] masthead-shadow"
-              style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 6vw, 3.5rem)" }}
+              style={{ fontFamily: "var(--font-heading)", fontSize: "clamp(1.8rem, 6vw, 3.5rem)", fontWeight: "var(--font-heading-weight)" as any }}
             >
               {photo.headline}
             </h2>
