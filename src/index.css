@@ -12,6 +12,7 @@
 
 @layer base {
   /* ══ Light — elegant broadsheet ══ */
+  :root,
   .light {
     --background: 40 28% 93%;
     --foreground: 0 0% 6%;
@@ -56,7 +57,7 @@
   }
 
   /* ══ Dark — night desk, OLED-friendly ══ */
-  :root {
+  .dark {
     --background: 220 20% 3%;
     --foreground: 40 20% 92%;
     --card: 220 15% 6%;
