@@ -562,8 +562,23 @@ const Admin = () => {
                       <li>• Theme system (Signal, Editorial, Raw)</li>
                       <li>• Edge functions and database schema</li>
                       <li>• Triple-verification system and confidence scoring</li>
+                      <li>• Knowledge graph: {graphStats.nodeCount} entities, {graphStats.edgeCount} connections</li>
+                      <li>• Entity disambiguation across {graphStats.typeCounts.listing || 0} listings</li>
+                      <li>• Freshness decay model with probabilistic confidence ranges</li>
                     </ul>
                   </div>
+                  {feedbackCount > 0 && (
+                    <div className="skeuo-card-inset p-4 rounded">
+                      <h3 className="label-caps text-foreground mb-2">Meta-Learning</h3>
+                      <div className="flex items-center gap-3">
+                        <TrendingUp size={16} className="text-accent" />
+                        <div>
+                          <p className="text-sm text-foreground font-semibold">{feedbackCount} feedback signals collected</p>
+                          <p className="text-xs text-muted-foreground">Positive-rated responses are used as few-shot examples in future AI calls</p>
+                        </div>
+                      </div>
+                    </div>
+                  )
                 </div>
               ) : (
                 <>
