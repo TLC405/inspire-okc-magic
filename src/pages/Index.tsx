@@ -9,6 +9,7 @@ import { fitnessSpots } from "@/data/fitnessSpots";
 import { volunteerOrgs } from "@/data/volunteerOrgs";
 import { cityShowcase } from "@/data/cityShowcase";
 import { ArrowRight, Building2, Scale, Leaf, Palette, TrendingUp, Heart, Dumbbell, HandHelping, Mail, Clock, Sun, Moon, Sunrise } from "lucide-react";
+import { AtAGlance, MayorsDesk, SportsSidebar } from "@/components/CivicPanels";
 import { HeroCarousel } from "@/components/HeroCarousel";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -561,23 +562,31 @@ const Index = () => {
 
         <FolioLine page="Page A3" note="Lifestyle" />
 
-        {/* ═══ Pull Quote with Parallax ═══ */}
-        <div className="container py-4 md:py-6 overflow-hidden" ref={pullQuoteRef}>
-          <div
-            className="max-w-xl mx-auto text-center py-6 transition-transform duration-100"
-            style={{ transform: `translateY(${-parallaxOffset * 0.3}px)` }}
-          >
-            <span className="text-5xl text-foreground/15 leading-none" style={{ fontFamily: "'Playfair Display', serif" }}>"</span>
-            <p
-              className="text-foreground/70 italic leading-relaxed -mt-4"
-              style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1rem, 2vw, 1.3rem)" }}
-            >
-              From Bricktown to Paseo, from first dates to last reps — this is your city, curated.
-            </p>
-            <span className="text-5xl text-foreground/15 leading-none" style={{ fontFamily: "'Playfair Display', serif" }}>"</span>
-            <p className="dateline text-muted-foreground mt-2">— The Editors</p>
+        {/* ═══ Civic Intelligence Sidebar + Pull Quote ═══ */}
+        <div className="container py-4 md:py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Editorial Pull Quote */}
+            <div className="lg:col-span-8" ref={pullQuoteRef}>
+              <div className="newspaper-fold relative">
+                <div className="max-w-xl mx-auto text-center py-6" style={{ transform: `translateY(${-parallaxOffset * 0.3}px)` }}>
+                  <span className="text-5xl text-foreground/15 leading-none" style={{ fontFamily: "'Playfair Display', serif" }}>"</span>
+                  <p className="text-foreground/70 italic leading-relaxed -mt-4" style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1rem, 2vw, 1.3rem)" }}>
+                    Oklahoma City has a way of surprising people. The ones who just moved here, still learning which districts are which. The ones who have lived here all their lives but have not yet found their crowd. The ones who are newly single, newly free, or newly arrived and looking for something to hold onto.
+                  </p>
+                  <span className="text-5xl text-foreground/15 leading-none" style={{ fontFamily: "'Playfair Display', serif" }}>"</span>
+                  <p className="dateline text-muted-foreground mt-2">— The Editors</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Civic Panels Sidebar */}
+            <div className="lg:col-span-4 space-y-6">
+              <AtAGlance />
+              <MayorsDesk />
+              <SportsSidebar />
+            </div>
           </div>
-          <div className="rule-thin" />
+          <div className="rule-thin mt-4" />
         </div>
 
         {/* ═══ Date Nights Showcase ═══ */}

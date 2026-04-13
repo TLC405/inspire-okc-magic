@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { ThemeToggle } from "./ThemeToggle";
 import { cn } from "@/lib/utils";
 import { Settings, Clock, MapPin } from "lucide-react";
+import { WireTicker } from "./WireTicker";
 import { useRef, useEffect, useState } from "react";
 import { useWeather } from "@/hooks/useWeather";
 import { useLiveClock } from "@/hooks/useLiveClock";
@@ -217,6 +218,9 @@ export function Navbar() {
       {/* Bottom thick + thin rule */}
       <div className="h-[3px] bg-foreground" />
       <div className="h-[1px] bg-foreground/15 mt-[1px]" />
+
+      {/* Wire Ticker */}
+      <WireTicker />
 
       <style>{`
         @keyframes fadeInUp {

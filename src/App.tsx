@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { useVisitorLog } from "@/hooks/useVisitorLog";
 import { MobileTabBar } from "@/components/MobileTabBar";
+import { SvgFilters } from "@/components/SvgFilters";
 import Index from "./pages/Index";
 import Singles from "./pages/Singles";
 import Events from "./pages/Events";
@@ -22,6 +23,7 @@ const AppInner = () => {
   useVisitorLog();
   return (
     <>
+      <SvgFilters />
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/singles" element={<Singles />} />

@@ -484,3 +484,202 @@
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
 }
+
+/* ═══ Tactile Newspaper Classes (from reference) ═══ */
+
+/* Ink rules — authentic newspaper dividers */
+.ink-rule {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, hsl(var(--foreground) / 0.25) 10%, hsl(var(--foreground) / 0.25) 90%, transparent 100%);
+}
+.ink-rule-thick {
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, hsl(var(--foreground) / 0.6) 5%, hsl(var(--foreground) / 0.6) 95%, transparent 100%);
+}
+
+/* Text effects */
+.text-letterpress {
+  text-shadow: 0 1px 0 hsl(var(--background) / 0.6), 0 -1px 0 hsl(var(--foreground) / 0.15), 1px 0 0 hsl(var(--foreground) / 0.05), -1px 0 0 hsl(var(--foreground) / 0.05);
+}
+.text-ink-press {
+  text-shadow: 1px 1px 1px hsl(var(--foreground) / 0.18), 0 0 2px hsl(var(--foreground) / 0.06);
+}
+
+/* Paper card — aged paper surface */
+.paper-card {
+  background: hsl(var(--card));
+  box-shadow: var(--skeuo-shadow);
+  border: 1px solid hsl(var(--border) / 0.4);
+  position: relative;
+}
+.paper-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, hsl(var(--background) / 0.15) 0%, transparent 50%, hsl(var(--foreground) / 0.02) 100%);
+  pointer-events: none;
+}
+
+/* Clipping card — newspaper clipping pinned to board */
+.clipping-card {
+  background: hsl(var(--card));
+  box-shadow: 2px 3px 8px hsl(var(--foreground) / 0.12), 0 1px 2px hsl(var(--foreground) / 0.08);
+  border: 1px solid hsl(var(--border) / 0.5);
+  position: relative;
+}
+.clipping-card::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 4px;
+  right: 4px;
+  height: 6px;
+  background: hsl(var(--card));
+  box-shadow: 0 4px 6px hsl(var(--foreground) / 0.08);
+  pointer-events: none;
+}
+
+/* Photo mat — framed photograph */
+.photo-mat {
+  border: 1px solid hsl(var(--border) / 0.3);
+  overflow: hidden;
+  position: relative;
+}
+.photo-mat img {
+  transition: all 0.7s ease;
+}
+
+/* Folder tab — category navigation */
+.folder-tab {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 8px 14px;
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border) / 0.5);
+  border-bottom: none;
+  position: relative;
+  bottom: -1px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  color: hsl(var(--muted-foreground));
+}
+.folder-tab:hover {
+  color: hsl(var(--foreground));
+  background: hsl(var(--card));
+  box-shadow: 0 -2px 4px hsl(var(--foreground) / 0.05);
+}
+.folder-tab.active {
+  color: hsl(var(--foreground));
+  background: hsl(var(--background));
+  border-bottom: 1px solid hsl(var(--background));
+  font-weight: 700;
+  box-shadow: 0 -3px 6px hsl(var(--foreground) / 0.08);
+}
+
+/* Stamp seal — rubber stamp effect */
+.stamp-seal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid hsl(var(--destructive));
+  color: hsl(var(--destructive));
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.1;
+  opacity: 0.85;
+  filter: url(#stamp-roughen);
+  mix-blend-mode: multiply;
+  padding: 2px 6px;
+}
+
+/* Registration marks — subtle crop marks */
+.registration-marks::before,
+.registration-marks::after {
+  content: '+';
+  position: absolute;
+  font-size: 10px;
+  color: hsl(var(--foreground) / 0.06);
+  font-family: monospace;
+  pointer-events: none;
+}
+.registration-marks::before { top: 4px; left: 4px; }
+.registration-marks::after { top: 4px; right: 4px; }
+
+/* Column rule for multi-column layouts */
+.has-column-rule {
+  column-rule: 1px solid hsl(var(--foreground) / 0.1);
+}
+
+/* Newspaper fold center crease */
+.newspaper-fold {
+  position: relative;
+}
+.newspaper-fold::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(180deg, transparent 0%, hsl(var(--foreground) / 0.06) 15%, hsl(var(--foreground) / 0.09) 50%, hsl(var(--foreground) / 0.06) 85%, transparent 100%);
+  pointer-events: none;
+}
+
+/* ═══ Wire Ticker ═══ */
+.wire-ticker {
+  background: hsl(var(--foreground));
+  border-top: 2px solid hsl(var(--destructive));
+  border-bottom: 1px solid hsl(var(--foreground) / 0.3);
+  overflow: hidden;
+}
+
+.wire-ticker-badge {
+  background: hsl(var(--destructive));
+  color: hsl(var(--destructive-foreground));
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.wire-ticker-track {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: wire-scroll 90s linear infinite;
+}
+
+@keyframes wire-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* For-Who tagline */
+.for-who-tagline {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: hsl(var(--accent));
+  position: relative;
+  padding-top: 8px;
+}
+.for-who-tagline::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 24px;
+  height: 1px;
+  background: hsl(var(--accent) / 0.5);
+}
