@@ -61,7 +61,8 @@ const Admin = () => {
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const [authError, setAuthError] = useState("");
   const [authMsg, setAuthMsg] = useState("");
-  const [tab, setTab] = useState<"content" | "visitors" | "security" | "events" | "scanner" | "ai" | "briefing" | "site" | "media" | "feeds" | "graph" | "newsroom" | "moderation">("briefing");
+  const [tab, setTab] = useState<"editorial" | "site" | "intelligence" | "operations" | "assistant">("editorial");
+  const [openSections, setOpenSections] = useState<Set<string>>(new Set(["briefing", "settings", "graph", "visitors", "site-editor"]));
   const [evtSearch, setEvtSearch] = useState("");
   const [evtFilter, setEvtFilter] = useState<"all" | VerificationStatus>("all");
   const [visitors, setVisitors] = useState<any[]>([]);
