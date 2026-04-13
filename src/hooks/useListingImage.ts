@@ -29,7 +29,20 @@ export function useListingImage(
 
     const promise = (async () => {
       try {
-        // Check DB cache first
+        // Check manual override first
+        const { data: override } = await supabase
+          .from("media_overrides")
+          .select("image_url")
+          .eq("listing_type", listingType)
+          .eq("listing_id", listingId)
+          .maybeSingle();
+
+        if (override?.image_url) {
+          imageMemoryCache.set(cacheKey, override.image_url);
+          return override.image_url;
+        }
+
+        // Check DB cache
         const { data: cached } = await supabase
           .from("image_cache")
           .select("image_url")
