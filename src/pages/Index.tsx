@@ -9,6 +9,7 @@ import { fitnessSpots } from "@/data/fitnessSpots";
 import { volunteerOrgs } from "@/data/volunteerOrgs";
 import { cityShowcase } from "@/data/cityShowcase";
 import { ArrowRight, Building2, Scale, Leaf, Palette, TrendingUp, Heart, Dumbbell, HandHelping, Mail, Clock, Sun, Moon, Sunrise } from "lucide-react";
+import { AtAGlance, MayorsDesk, SportsSidebar } from "@/components/CivicPanels";
 import { HeroCarousel } from "@/components/HeroCarousel";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
