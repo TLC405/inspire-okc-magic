@@ -281,7 +281,7 @@
     --bg-vignette: radial-gradient(ellipse at 50% 30%, hsl(220 15% 8%) 0%, hsl(220 18% 4%) 100%);
   }
   .light {
-    --paper-grain-opacity: 0.12;
+    --paper-grain-opacity: 0.14;
     --bg-vignette: radial-gradient(ellipse at 50% 30%, hsl(42 30% 96%) 0%, hsl(40 20% 90%) 100%);
   }
   .thunder {
@@ -293,7 +293,7 @@
     --bg-vignette: radial-gradient(ellipse at 50% 20%, hsl(218 40% 12%) 0%, hsl(220 50% 5%) 100%);
   }
   .bricktown {
-    --paper-grain-opacity: 0.1;
+    --paper-grain-opacity: 0.15;
     --bg-vignette: radial-gradient(ellipse at 50% 30%, hsl(15 20% 14%) 0%, hsl(15 25% 7%) 100%);
   }
   .tlc {
