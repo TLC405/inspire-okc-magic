@@ -14,6 +14,10 @@ import { HeroSlideEditor } from "@/components/admin/HeroSlideEditor";
 import { TickerEditor } from "@/components/admin/TickerEditor";
 import { PullQuoteEditor } from "@/components/admin/PullQuoteEditor";
 import { ThemePanel } from "@/components/admin/ThemePanel";
+import { SiteModulesEditor } from "@/components/admin/SiteModulesEditor";
+import { SiteCopyEditor } from "@/components/admin/SiteCopyEditor";
+import { MediaAuditPanel } from "@/components/admin/MediaAuditPanel";
+import { FeedManager } from "@/components/admin/FeedManager";
 import {
   Shield, ShieldCheck, ShieldAlert, AlertTriangle, Search, MapPin, Eye, Database, Key,
   CheckCircle2, XCircle, RefreshCw, LogOut, Fingerprint,
@@ -54,7 +58,7 @@ const Admin = () => {
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const [authError, setAuthError] = useState("");
   const [authMsg, setAuthMsg] = useState("");
-  const [tab, setTab] = useState<"content" | "visitors" | "security" | "events" | "scanner" | "ai" | "briefing" | "site">("briefing");
+  const [tab, setTab] = useState<"content" | "visitors" | "security" | "events" | "scanner" | "ai" | "briefing" | "site" | "media" | "feeds">("briefing");
   const [evtSearch, setEvtSearch] = useState("");
   const [evtFilter, setEvtFilter] = useState<"all" | VerificationStatus>("all");
   const [visitors, setVisitors] = useState<any[]>([]);
@@ -438,6 +442,8 @@ const Admin = () => {
   const tabs = [
     { id: "briefing" as const, label: "Briefing", icon: TrendingUp },
     { id: "site" as const, label: "Site Editor", icon: Settings },
+    { id: "media" as const, label: "Media", icon: Eye },
+    { id: "feeds" as const, label: "Feeds", icon: Activity },
     { id: "content" as const, label: "Content", icon: Edit3 },
     { id: "visitors" as const, label: "Visitors", icon: Users },
     { id: "security" as const, label: "Security", icon: Shield },
@@ -524,6 +530,10 @@ const Admin = () => {
           {/* ═══ SITE EDITOR TAB ═══ */}
           {tab === "site" && (
             <div className="space-y-8">
+              <SiteModulesEditor />
+              <div className="rule-thin" />
+              <SiteCopyEditor />
+              <div className="rule-thin" />
               <HeroSlideEditor />
               <div className="rule-thin" />
               <TickerEditor />
@@ -531,6 +541,12 @@ const Admin = () => {
               <PullQuoteEditor />
             </div>
           )}
+
+          {/* ═══ MEDIA TAB ═══ */}
+          {tab === "media" && <MediaAuditPanel />}
+
+          {/* ═══ FEEDS TAB ═══ */}
+          {tab === "feeds" && <FeedManager />}
 
           {/* ═══ AI / SETTINGS TAB ═══ */}
           {tab === "ai" && (
