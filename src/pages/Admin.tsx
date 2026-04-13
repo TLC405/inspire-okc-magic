@@ -521,6 +521,17 @@ const Admin = () => {
             </div>
           )}
 
+          {/* ═══ SITE EDITOR TAB ═══ */}
+          {tab === "site" && (
+            <div className="space-y-8">
+              <HeroSlideEditor />
+              <div className="rule-thin" />
+              <TickerEditor />
+              <div className="rule-thin" />
+              <PullQuoteEditor />
+            </div>
+          )}
+
           {/* ═══ AI / SETTINGS TAB ═══ */}
           {tab === "ai" && (
             <div className="space-y-4">
