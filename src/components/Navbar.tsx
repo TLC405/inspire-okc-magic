@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { ThemeToggle } from "./ThemeToggle";
 import { cn } from "@/lib/utils";
-import { Settings, Clock, MapPin, Zap, Star, Heart } from "lucide-react";
+import { Settings, Clock, MapPin, Zap, Star, Heart, Github } from "lucide-react";
 import { ThunderPlayoffTeaser } from "./ThunderPlayoffBracket";
 import { WireTicker } from "./WireTicker";
 import { useRef, useEffect, useState } from "react";
@@ -198,6 +198,9 @@ export function Navbar() {
               OKC
             </span>
             <span className="text-foreground/15 text-[6px] hidden md:inline">|</span>
+            <Link to="/momento-mori" className="text-muted-foreground hover:text-foreground transition-colors" title="Momento Mori">
+              <Github size={10} />
+            </Link>
             <ThemeToggle className="text-muted-foreground hover:text-foreground" />
             <Link to="/admin" className="text-muted-foreground hover:text-foreground transition-colors">
               <Settings size={10} />
@@ -224,8 +227,8 @@ export function Navbar() {
         {/* ═══ NAMEPLATE (collapses on scroll) ═══ */}
         <div
           className={cn(
-            "grid transition-[grid-template-rows,opacity] duration-300 ease-in-out",
-            scrolled ? "grid-rows-[0fr] opacity-0" : "grid-rows-[1fr] opacity-100"
+            "grid transition-[grid-template-rows] duration-300 ease-in-out will-change-[grid-template-rows]",
+            scrolled ? "grid-rows-[0fr]" : "grid-rows-[1fr]"
           )}
         >
           <div className="overflow-hidden">
@@ -242,7 +245,7 @@ export function Navbar() {
                 <span className="block w-12 md:w-24 h-[1px] bg-foreground/30 group-hover:bg-foreground/50 transition-colors" />
               </div>
               <h1
-                className="font-black tracking-[-0.03em] leading-[0.82] text-foreground group-hover:tracking-[-0.02em] transition-all duration-300"
+                className="font-black tracking-[-0.03em] leading-[0.82] text-foreground"
                 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(2.5rem, 9vw, 6rem)" }}
               >
                 INSPIRE
