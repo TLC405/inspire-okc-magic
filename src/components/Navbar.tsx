@@ -224,8 +224,8 @@ export function Navbar() {
         {/* ═══ NAMEPLATE (collapses on scroll) ═══ */}
         <div
           className={cn(
-            "grid transition-[grid-template-rows,opacity] duration-300 ease-in-out",
-            scrolled ? "grid-rows-[0fr] opacity-0" : "grid-rows-[1fr] opacity-100"
+            "grid transition-[grid-template-rows] duration-300 ease-in-out will-change-[grid-template-rows]",
+            scrolled ? "grid-rows-[0fr]" : "grid-rows-[1fr]"
           )}
         >
           <div className="overflow-hidden">
@@ -242,7 +242,7 @@ export function Navbar() {
                 <span className="block w-12 md:w-24 h-[1px] bg-foreground/30 group-hover:bg-foreground/50 transition-colors" />
               </div>
               <h1
-                className="font-black tracking-[-0.03em] leading-[0.82] text-foreground group-hover:tracking-[-0.02em] transition-all duration-300"
+                className="font-black tracking-[-0.03em] leading-[0.82] text-foreground"
                 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(2.5rem, 9vw, 6rem)" }}
               >
                 INSPIRE
