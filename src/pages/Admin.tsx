@@ -18,12 +18,15 @@ import { SiteModulesEditor } from "@/components/admin/SiteModulesEditor";
 import { SiteCopyEditor } from "@/components/admin/SiteCopyEditor";
 import { MediaAuditPanel } from "@/components/admin/MediaAuditPanel";
 import { FeedManager } from "@/components/admin/FeedManager";
+import { GraphEditor } from "@/components/admin/GraphEditor";
+import { NewsroomPanel } from "@/components/admin/NewsroomPanel";
+import { ModerationPanel } from "@/components/admin/ModerationPanel";
 import {
   Shield, ShieldCheck, ShieldAlert, AlertTriangle, Search, MapPin, Eye, Database, Key,
   CheckCircle2, XCircle, RefreshCw, LogOut, Fingerprint,
   Globe, Activity, Users, Zap, Lightbulb, Loader2,
   Edit3, Save, X, Heart, Dumbbell, HandHelping, ChevronDown, ChevronUp, ExternalLink, Trash2, Copy,
-  MessageSquare, Send, Settings, Sparkles, Brain, ThumbsUp, ThumbsDown, TrendingUp
+  MessageSquare, Send, Settings, Sparkles, Brain, ThumbsUp, ThumbsDown, TrendingUp, Network, Newspaper, ShieldCheck as ShieldMod
 } from "lucide-react";
 import { knowledgeGraph } from "@/lib/knowledgeGraph";
 
@@ -58,7 +61,7 @@ const Admin = () => {
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const [authError, setAuthError] = useState("");
   const [authMsg, setAuthMsg] = useState("");
-  const [tab, setTab] = useState<"content" | "visitors" | "security" | "events" | "scanner" | "ai" | "briefing" | "site" | "media" | "feeds">("briefing");
+  const [tab, setTab] = useState<"content" | "visitors" | "security" | "events" | "scanner" | "ai" | "briefing" | "site" | "media" | "feeds" | "graph" | "newsroom" | "moderation">("briefing");
   const [evtSearch, setEvtSearch] = useState("");
   const [evtFilter, setEvtFilter] = useState<"all" | VerificationStatus>("all");
   const [visitors, setVisitors] = useState<any[]>([]);
@@ -448,6 +451,9 @@ const Admin = () => {
     { id: "visitors" as const, label: "Visitors", icon: Users },
     { id: "security" as const, label: "Security", icon: Shield },
     { id: "events" as const, label: "Audit", icon: Eye },
+    { id: "graph" as const, label: "Graph", icon: Network },
+    { id: "newsroom" as const, label: "Newsroom", icon: Newspaper },
+    { id: "moderation" as const, label: "Moderation", icon: ShieldMod },
     { id: "scanner" as const, label: "AI Scanner", icon: Zap },
     { id: "ai" as const, label: "AI / Settings", icon: Brain },
   ];
