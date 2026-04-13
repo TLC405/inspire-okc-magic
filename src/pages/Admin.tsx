@@ -21,6 +21,7 @@ import { FeedManager } from "@/components/admin/FeedManager";
 import { GraphEditor } from "@/components/admin/GraphEditor";
 import { NewsroomPanel } from "@/components/admin/NewsroomPanel";
 import { ModerationPanel } from "@/components/admin/ModerationPanel";
+import { VisitorDashboard } from "@/components/admin/VisitorDashboard";
 import {
   Shield, ShieldCheck, ShieldAlert, AlertTriangle, Search, MapPin, Eye, Database, Key,
   CheckCircle2, XCircle, RefreshCw, LogOut, Fingerprint,
@@ -723,56 +724,8 @@ const Admin = () => {
           {/* ═══ OPERATIONS TAB ═══ */}
           {tab === "operations" && (
             <div>
-              <SectionCollapsible id="visitors" title="Visitors" icon={Users}>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <StatCard icon={Users} label="Total Visits" value={String(visitors.length)} sub="Last 200 logged" color="text-accent" />
-                    <StatCard icon={Globe} label="Unique IPs" value={String(new Set(visitors.map((v: any) => v.ip_address)).size)} sub="Distinct addresses" color="text-signal-positive" />
-                    <StatCard icon={MapPin} label="Cities" value={String(new Set(visitors.filter((v: any) => v.city).map((v: any) => v.city)).size)} sub="Distinct locations" color="text-accent" />
-                    <StatCard icon={Activity} label="Today" value={String(visitors.filter((v: any) => new Date(v.created_at).toDateString() === new Date().toDateString()).length)} sub="Visits today" color="text-signal-secondary" />
-                  </div>
-                  <button onClick={() => { setVisitors([]); setLoadingVisitors(true); supabase.from("visitor_logs").select("*").order("created_at", { ascending: false }).limit(200).then(({ data }) => { setVisitors(data || []); setLoadingVisitors(false); }); }} className="skeuo-btn">
-                    <RefreshCw size={12} /> Refresh
-                  </button>
-                  {loadingVisitors ? (
-                    <div className="flex items-center justify-center py-12">
-                      <RefreshCw size={20} className="animate-spin text-accent mr-2" />
-                      <span className="text-sm text-muted-foreground">Loading…</span>
-                    </div>
-                  ) : (
-                    <div className="skeuo-card-inset p-4 rounded overflow-x-auto">
-                      <table className="w-full text-xs">
-                        <thead>
-                          <tr className="border-b border-border/50">
-                            <th className="text-left py-2 pr-3 text-muted-foreground font-medium">IP</th>
-                            <th className="text-left py-2 pr-3 text-muted-foreground font-medium">Location</th>
-                            <th className="text-left py-2 pr-3 text-muted-foreground font-medium">Page</th>
-                            <th className="text-left py-2 text-muted-foreground font-medium">Time</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {(() => {
-                            const ipCounts: Record<string, number> = {};
-                            visitors.forEach((v: any) => { ipCounts[v.ip_address] = (ipCounts[v.ip_address] || 0) + 1; });
-                            return visitors.map((v: any) => {
-                              const isRepeat = ipCounts[v.ip_address] > 2;
-                              return (
-                                <tr key={v.id} className={`border-b border-border/20 hover:bg-muted/20 ${isRepeat ? "bg-signal-secondary/5" : ""}`}>
-                                  <td className={`py-2 pr-3 font-mono ${isRepeat ? "text-signal-secondary font-bold" : "text-foreground"}`}>
-                                    {v.ip_address}{isRepeat && <span className="text-[10px] ml-1">×{ipCounts[v.ip_address]}</span>}
-                                  </td>
-                                  <td className="py-2 pr-3 text-muted-foreground">{[v.city, v.region, v.country].filter(Boolean).join(", ") || "—"}</td>
-                                  <td className="py-2 pr-3 text-accent">{v.page_path || "—"}</td>
-                                  <td className="py-2 text-muted-foreground whitespace-nowrap">{new Date(v.created_at).toLocaleString()}</td>
-                                </tr>
-                              );
-                            });
-                          })()}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </div>
+              <SectionCollapsible id="visitors" title="Visitor Intelligence" icon={Users}>
+                <VisitorDashboard />
               </SectionCollapsible>
               <SectionCollapsible id="security" title="Security" icon={Shield}>
                 <div className="space-y-6">
