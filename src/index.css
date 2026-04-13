@@ -56,7 +56,7 @@
   }
 
   /* ══ Dark — night desk, OLED-friendly ══ */
-  :root {
+  .dark {
     --background: 220 20% 3%;
     --foreground: 40 20% 92%;
     --card: 220 15% 6%;
