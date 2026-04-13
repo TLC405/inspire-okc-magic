@@ -67,7 +67,7 @@ export function Navbar() {
   const { timeStr, edition } = useLiveClock();
   const [tickerIdx, setTickerIdx] = useState(0);
   const { theme } = useTheme();
-  const isTeamTheme = theme === "thunder" || theme === "comets";
+  const isTeamTheme = theme === "thunder" || theme === "comets" || theme === "tlc";
   const [scrolled, setScrolled] = useState(false);
   const [weatherOpen, setWeatherOpen] = useState(false);
 
@@ -107,12 +107,14 @@ export function Navbar() {
         "h-[4px]",
         theme === "thunder" ? "bg-[hsl(200,100%,45%)]" :
         theme === "comets" ? "bg-[hsl(270,55%,55%)]" :
+        theme === "tlc" ? "bg-[hsl(340,35%,50%)]" :
         "bg-foreground"
       )} />
       <div className={cn(
         "h-[1px] mt-[2px]",
         theme === "thunder" ? "bg-[hsl(8,87%,54%,0.5)]" :
         theme === "comets" ? "bg-[hsl(168,100%,39%,0.5)]" :
+        theme === "tlc" ? "bg-[hsl(340,35%,50%,0.3)]" :
         "bg-foreground/30"
       )} />
 
@@ -132,6 +134,12 @@ export function Navbar() {
                 Comets
               </span>
             )}
+            {theme === "tlc" && (
+              <span className="flex items-center gap-1 font-mono text-[8px] md:text-[9px] tracking-widest uppercase font-extrabold px-1.5 py-0.5 border bg-[hsl(340,35%,50%,0.1)] border-[hsl(340,35%,50%,0.25)] text-[hsl(340,35%,45%)]" style={{ fontFamily: "'Quicksand', sans-serif" }}>
+                <Heart size={8} className="text-[hsl(340,55%,55%)]" />
+                TLC
+              </span>
+            )}
             {!isTeamTheme && (
               <span className="font-mono text-[8px] md:text-[9px] tracking-widest uppercase text-foreground font-bold bg-foreground/5 px-1.5 py-0.5 border border-foreground/10">
                 City Guide
@@ -139,7 +147,7 @@ export function Navbar() {
             )}
             <span className="hidden sm:inline text-foreground/15 text-[6px]">|</span>
             <span className="hidden sm:inline font-mono text-[7px] md:text-[8px] tracking-wider uppercase text-muted-foreground">
-              {theme === "thunder" ? "Thunder Up · OKC" : theme === "comets" ? "OKC Comets · NWSL" : "Community & Culture"}
+              {theme === "thunder" ? "Thunder Up · OKC" : theme === "comets" ? "OKC Comets · NWSL" : theme === "tlc" ? "Tender Love & Care · OKC" : "Community & Culture"}
             </span>
             {/* Per-page section label */}
             {currentSection && (
@@ -320,12 +328,14 @@ export function Navbar() {
         "h-[3px]",
         theme === "thunder" ? "bg-[hsl(200,100%,45%)]" :
         theme === "comets" ? "bg-[hsl(270,55%,55%)]" :
+        theme === "tlc" ? "bg-[hsl(340,35%,50%)]" :
         "bg-foreground"
       )} />
       <div className={cn(
         "h-[1px] mt-[1px]",
         theme === "thunder" ? "bg-[hsl(8,87%,54%,0.4)]" :
         theme === "comets" ? "bg-[hsl(168,100%,39%,0.4)]" :
+        theme === "tlc" ? "bg-[hsl(340,35%,50%,0.25)]" :
         "bg-foreground/15"
       )} />
 
