@@ -77,7 +77,8 @@ const Admin = () => {
   const [instructionsSaved, setInstructionsSaved] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
-
+  const [feedbackCount, setFeedbackCount] = useState(0);
+  const [ratedMessages, setRatedMessages] = useState<Set<number>>(new Set());
   const verifiedEvents = singlesEvents.filter((e) => e.verificationStatus === "verified").length;
   const brokenLinks = singlesEvents.flatMap((e) => e.sources).filter((s) => s.status === "broken").length;
   const totalListings = singlesEvents.length + fitnessSpots.length + volunteerOrgs.length + cityShowcase.length;
