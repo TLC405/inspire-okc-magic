@@ -7,11 +7,33 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const EXTERNAL_TIMEOUT_MS = 12000;
+const AI_TIMEOUT_MS = 20000;
+
+async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs: number) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { name, category, location, listingType, listingId, websiteUrl } = await req.json();
+    const body = await req.json().catch(() => ({}));
+    const { name, category, location, listingType, listingId, websiteUrl } = body as {
+      name?: string;
+      category?: string;
+      location?: string;
+      listingType?: string;
+      listingId?: string;
+      websiteUrl?: string;
+    };
 
     if (!name || !listingType || !listingId) {
       return new Response(JSON.stringify({ error: "name, listingType, listingId required" }), {
@@ -47,11 +69,15 @@ serve(async (req) => {
     if (FIRECRAWL_API_KEY && websiteUrl) {
       try {
         console.log("Scraping website for images:", websiteUrl);
-        const scrapeRes = await fetch("https://api.firecrawl.dev/v1/scrape", {
-          method: "POST",
-          headers: { "Authorization": `Bearer ${FIRECRAWL_API_KEY}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ url: websiteUrl, formats: ["links", "screenshot"], onlyMainContent: true }),
-        });
+        const scrapeRes = await fetchWithTimeout(
+          "https://api.firecrawl.dev/v1/scrape",
+          {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${FIRECRAWL_API_KEY}`, "Content-Type": "application/json" },
+            body: JSON.stringify({ url: websiteUrl, formats: ["links", "screenshot"], onlyMainContent: true }),
+          },
+          EXTERNAL_TIMEOUT_MS
+        );
 
         if (scrapeRes.ok) {
           const scrapeData = await scrapeRes.json();
@@ -74,11 +100,15 @@ serve(async (req) => {
       try {
         const searchQuery = `${name} ${location || "Oklahoma City"} ${category || ""} photo`;
         console.log("Firecrawl search for:", searchQuery);
-        const searchRes = await fetch("https://api.firecrawl.dev/v1/search", {
-          method: "POST",
-          headers: { "Authorization": `Bearer ${FIRECRAWL_API_KEY}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ query: searchQuery, limit: 5 }),
-        });
+        const searchRes = await fetchWithTimeout(
+          "https://api.firecrawl.dev/v1/search",
+          {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${FIRECRAWL_API_KEY}`, "Content-Type": "application/json" },
+            body: JSON.stringify({ query: searchQuery, limit: 5 }),
+          },
+          EXTERNAL_TIMEOUT_MS
+        );
 
         if (searchRes.ok) {
           const searchData = await searchRes.json();
@@ -104,17 +134,21 @@ serve(async (req) => {
       const GROQ_API_KEY = Deno.env.get("GROQ_API_KEY");
       if (GROQ_API_KEY) {
         try {
-          const aiRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-            method: "POST",
-            headers: { Authorization: `Bearer ${GROQ_API_KEY}`, "Content-Type": "application/json" },
-            body: JSON.stringify({
-              model: "meta-llama/llama-4-scout-17b-16e-instruct",
-              messages: [
-                { role: "system", content: "You find real, publicly accessible image URLs for businesses and places. Return ONLY a direct image URL (jpg/png/webp) that is publicly accessible. If you cannot find one with high confidence, return NONE." },
-                { role: "user", content: `Find a real photo URL for: ${name} in ${location || "Oklahoma City, OK"}. Category: ${category || "business"}. ${websiteUrl ? `Website: ${websiteUrl}` : ""}` },
-              ],
-            }),
-          });
+          const aiRes = await fetchWithTimeout(
+            "https://api.groq.com/openai/v1/chat/completions",
+            {
+              method: "POST",
+              headers: { Authorization: `Bearer ${GROQ_API_KEY}`, "Content-Type": "application/json" },
+              body: JSON.stringify({
+                model: "meta-llama/llama-4-scout-17b-16e-instruct",
+                messages: [
+                  { role: "system", content: "You find real, publicly accessible image URLs for businesses and places. Return ONLY a direct image URL (jpg/png/webp) that is publicly accessible. If you cannot find one with high confidence, return NONE." },
+                  { role: "user", content: `Find a real photo URL for: ${name} in ${location || "Oklahoma City, OK"}. Category: ${category || "business"}. ${websiteUrl ? `Website: ${websiteUrl}` : ""}` },
+                ],
+              }),
+            },
+            AI_TIMEOUT_MS
+          );
 
           if (aiRes.ok) {
             const aiData = await aiRes.json();
@@ -144,7 +178,7 @@ serve(async (req) => {
     return new Response(JSON.stringify({
       success: true,
       imageUrl: imageUrl || null,
-      source: imageUrl ? (sourceUrl === "cache" ? "cache" : "fresh") : "none",
+      source: imageUrl ? "fresh" : "none",
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

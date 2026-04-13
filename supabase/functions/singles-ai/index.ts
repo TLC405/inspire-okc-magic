@@ -6,10 +6,24 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const GROQ_TIMEOUT_MS = 25000;
+const FIRECRAWL_TIMEOUT_MS = 15000;
+
 function getGroqKey() {
   const key = Deno.env.get("GROQ_API_KEY");
   if (!key) throw new Error("GROQ_API_KEY is not configured");
   return key;
+}
+
+async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs: number) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 async function groqChat(messages: any[], tools?: any[], toolChoice?: any) {
@@ -17,87 +31,113 @@ async function groqChat(messages: any[], tools?: any[], toolChoice?: any) {
     model: "meta-llama/llama-4-scout-17b-16e-instruct",
     messages,
   };
+
   if (tools) body.tools = tools;
   if (toolChoice) body.tool_choice = toolChoice;
 
-  const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${getGroqKey()}`, "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  return response;
+  return await fetchWithTimeout(
+    "https://api.groq.com/openai/v1/chat/completions",
+    {
+      method: "POST",
+      headers: { Authorization: `Bearer ${getGroqKey()}`, "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    },
+    GROQ_TIMEOUT_MS
+  );
 }
 
 async function aiDiscover(query: string) {
-  const response = await groqChat(
-    [
-      {
-        role: "system",
-        content: `You are a research assistant specialized in finding real, verified singles events in Oklahoma City. 
+  try {
+    const response = await groqChat(
+      [
+        {
+          role: "system",
+          content: `You are a research assistant specialized in finding real, verified singles events in Oklahoma City.
 Only return events you have high confidence are real and currently active.
 Return structured JSON via the tool call.`,
-      },
-      {
-        role: "user",
-        content: query || "Find all active singles events, speed dating, mixers, and social gatherings currently running in Oklahoma City, OK.",
-      },
-    ],
-    [
-      {
-        type: "function",
-        function: {
-          name: "return_events",
-          description: "Return discovered singles events",
-          parameters: {
-            type: "object",
-            properties: {
-              events: {
-                type: "array",
-                items: {
-                  type: "object",
-                  properties: {
-                    name: { type: "string" },
-                    organizer: { type: "string" },
-                    venue: { type: "string" },
-                    neighborhood: { type: "string" },
-                    frequency: { type: "string" },
-                    price: { type: "string" },
-                    category: { type: "string" },
-                    ageRange: { type: "string" },
-                    description: { type: "string" },
-                    sourceUrl: { type: "string" },
-                    sourceProvider: { type: "string" },
-                    confidenceScore: { type: "number" },
-                    evidenceNotes: { type: "string" },
+        },
+        {
+          role: "user",
+          content: query || "Find all active singles events, speed dating, mixers, and social gatherings currently running in Oklahoma City, OK.",
+        },
+      ],
+      [
+        {
+          type: "function",
+          function: {
+            name: "return_events",
+            description: "Return discovered singles events",
+            parameters: {
+              type: "object",
+              properties: {
+                events: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      name: { type: "string" },
+                      organizer: { type: "string" },
+                      venue: { type: "string" },
+                      neighborhood: { type: "string" },
+                      frequency: { type: "string" },
+                      price: { type: "string" },
+                      category: { type: "string" },
+                      ageRange: { type: "string" },
+                      description: { type: "string" },
+                      sourceUrl: { type: "string" },
+                      sourceProvider: { type: "string" },
+                      confidenceScore: { type: "number" },
+                      evidenceNotes: { type: "string" },
+                    },
+                    required: ["name", "organizer", "venue", "category", "description", "sourceUrl", "confidenceScore"],
                   },
-                  required: ["name", "organizer", "venue", "category", "description", "sourceUrl", "confidenceScore"],
                 },
               },
+              required: ["events"],
             },
-            required: ["events"],
           },
         },
-      },
-    ],
-    { type: "function", function: { name: "return_events" } }
-  );
+      ],
+      { type: "function", function: { name: "return_events" } }
+    );
 
-  if (!response.ok) return { events: [], status: response.status };
-  const data = await response.json();
-  const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
-  if (toolCall?.function?.arguments) {
-    return { events: JSON.parse(toolCall.function.arguments).events, status: 200 };
+    if (!response.ok) {
+      return { events: [], status: response.status };
+    }
+
+    const data = await response.json();
+    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
+
+    if (toolCall?.function?.arguments) {
+      try {
+        const parsed = JSON.parse(toolCall.function.arguments);
+        return { events: parsed.events || [], status: 200 };
+      } catch {
+        return { events: [], status: 200 };
+      }
+    }
+
+    return { events: [], status: 200 };
+  } catch (e) {
+    if (e instanceof Error && e.name === "AbortError") {
+      return { events: [], status: 504 };
+    }
+    throw e;
   }
-  return { events: [], status: 200 };
 }
 
 async function firecrawlSearch(query: string, apiKey: string) {
   try {
-    const res = await fetch("https://api.firecrawl.dev/v1/search", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ query, limit: 10, scrapeOptions: { formats: ["markdown"] } }),
-    });
+    const res = await fetchWithTimeout(
+      "https://api.firecrawl.dev/v1/search",
+      {
+        method: "POST",
+        headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ query, limit: 10, scrapeOptions: { formats: ["markdown"] } }),
+      },
+      FIRECRAWL_TIMEOUT_MS
+    );
+
     if (!res.ok) return [];
     const data = await res.json();
     return data.data || [];
@@ -147,13 +187,20 @@ async function aiExtractEvents(markdown: string, sourceUrl: string) {
       }],
       { type: "function", function: { name: "extract_events" } }
     );
+
     if (!res.ok) return [];
+
     const data = await res.json();
     const tc = data.choices?.[0]?.message?.tool_calls?.[0];
     if (tc?.function?.arguments) {
-      const parsed = JSON.parse(tc.function.arguments);
-      return (parsed.events || []).map((e: any) => ({ ...e, sourceUrl, sourceProvider: new URL(sourceUrl).hostname }));
+      try {
+        const parsed = JSON.parse(tc.function.arguments);
+        return (parsed.events || []).map((e: any) => ({ ...e, sourceUrl, sourceProvider: new URL(sourceUrl).hostname }));
+      } catch {
+        return [];
+      }
     }
+
     return [];
   } catch (e) {
     console.error("AI extract error:", e);
@@ -165,15 +212,21 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { action, query } = await req.json();
-    
-    // Verify GROQ_API_KEY is available
+    const body = await req.json().catch(() => ({}));
+    const { action, query, eventName, sourceUrl, organizer } = body as {
+      action?: string;
+      query?: string;
+      eventName?: string;
+      sourceUrl?: string;
+      organizer?: string;
+    };
+
     getGroqKey();
 
     if (action === "discover") {
       const FIRECRAWL_API_KEY = Deno.env.get("FIRECRAWL_API_KEY");
 
-      const aiPromise = aiDiscover(query);
+      const aiPromise = aiDiscover(query || "");
 
       const firecrawlPromise = FIRECRAWL_API_KEY
         ? Promise.all([
@@ -187,6 +240,18 @@ serve(async (req) => {
       if (aiResult.status === 429) {
         return new Response(JSON.stringify({ error: "Rate limited. Please try again in a moment." }), {
           status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      if (aiResult.status === 402) {
+        return new Response(JSON.stringify({ error: "AI credits exhausted. Please try again later." }), {
+          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      if (aiResult.status === 504) {
+        return new Response(JSON.stringify({ error: "AI request timed out. Please try again." }), {
+          status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
 
@@ -221,18 +286,29 @@ serve(async (req) => {
     }
 
     if (action === "verify") {
-      const { eventName, sourceUrl, organizer } = await req.json();
+      if (!eventName || !sourceUrl) {
+        return new Response(JSON.stringify({ error: "eventName and sourceUrl are required" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
       const FIRECRAWL_API_KEY = Deno.env.get("FIRECRAWL_API_KEY");
 
       let pageContent = "";
       let pageAccessible = false;
       if (FIRECRAWL_API_KEY && sourceUrl) {
         try {
-          const scrapeRes = await fetch("https://api.firecrawl.dev/v1/scrape", {
-            method: "POST",
-            headers: { Authorization: `Bearer ${FIRECRAWL_API_KEY}`, "Content-Type": "application/json" },
-            body: JSON.stringify({ url: sourceUrl, formats: ["markdown"], onlyMainContent: true }),
-          });
+          const scrapeRes = await fetchWithTimeout(
+            "https://api.firecrawl.dev/v1/scrape",
+            {
+              method: "POST",
+              headers: { Authorization: `Bearer ${FIRECRAWL_API_KEY}`, "Content-Type": "application/json" },
+              body: JSON.stringify({ url: sourceUrl, formats: ["markdown"], onlyMainContent: true }),
+            },
+            FIRECRAWL_TIMEOUT_MS
+          );
+
           if (scrapeRes.ok) {
             const scrapeData = await scrapeRes.json();
             pageContent = scrapeData.data?.markdown || scrapeData.markdown || "";
@@ -243,51 +319,70 @@ serve(async (req) => {
         }
       }
 
-      const response = await groqChat(
-        [
-          {
-            role: "system",
-            content: `You verify singles events. Given an event name, organizer, source URL, and optionally scraped page content, determine if this event is real and active. ${pageAccessible ? "Page was successfully scraped." : "Page could NOT be accessed - likely broken."}`,
-          },
-          {
-            role: "user",
-            content: `Event: ${eventName}\nOrganizer: ${organizer}\nSource: ${sourceUrl}\n${pageContent ? `\nPage content:\n${pageContent.slice(0, 3000)}` : "\nPage could not be reached."}`,
-          },
-        ],
-        [{
-          type: "function",
-          function: {
-            name: "verification_result",
-            description: "Return verification result",
-            parameters: {
-              type: "object",
-              properties: {
-                isVerified: { type: "boolean" },
-                confidenceScore: { type: "number" },
-                status: { type: "string", enum: ["verified", "stale", "broken", "conflict", "unverified"] },
-                notes: { type: "string" },
-                alternateSourceUrl: { type: "string" },
-              },
-              required: ["isVerified", "confidenceScore", "status", "notes"],
+      let response: Response;
+      try {
+        response = await groqChat(
+          [
+            {
+              role: "system",
+              content: `You verify singles events. Given an event name, organizer, source URL, and optionally scraped page content, determine if this event is real and active. ${pageAccessible ? "Page was successfully scraped." : "Page could NOT be accessed - likely broken."}`,
             },
-          },
-        }],
-        { type: "function", function: { name: "verification_result" } }
-      );
+            {
+              role: "user",
+              content: `Event: ${eventName}\nOrganizer: ${organizer || "Unknown"}\nSource: ${sourceUrl}\n${pageContent ? `\nPage content:\n${pageContent.slice(0, 3000)}` : "\nPage could not be reached."}`,
+            },
+          ],
+          [{
+            type: "function",
+            function: {
+              name: "verification_result",
+              description: "Return verification result",
+              parameters: {
+                type: "object",
+                properties: {
+                  isVerified: { type: "boolean" },
+                  confidenceScore: { type: "number" },
+                  status: { type: "string", enum: ["verified", "stale", "broken", "conflict", "unverified"] },
+                  notes: { type: "string" },
+                  alternateSourceUrl: { type: "string" },
+                },
+                required: ["isVerified", "confidenceScore", "status", "notes"],
+              },
+            },
+          }],
+          { type: "function", function: { name: "verification_result" } }
+        );
+      } catch (e) {
+        if (e instanceof Error && e.name === "AbortError") {
+          return new Response(JSON.stringify({ error: "AI request timed out." }), {
+            status: 504,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        throw e;
+      }
 
       if (!response.ok) {
         const status = response.status;
         if (status === 429) return new Response(JSON.stringify({ error: "Rate limited." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        if (status === 402) return new Response(JSON.stringify({ error: "AI credits exhausted." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
         throw new Error(`Groq API error: ${status}`);
       }
 
       const data = await response.json();
       const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
       if (toolCall?.function?.arguments) {
-        const parsed = JSON.parse(toolCall.function.arguments);
-        return new Response(JSON.stringify({ success: true, verification: parsed, pageAccessible }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+        try {
+          const parsed = JSON.parse(toolCall.function.arguments);
+          return new Response(JSON.stringify({ success: true, verification: parsed, pageAccessible }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        } catch {
+          return new Response(JSON.stringify({ success: false, error: "Invalid AI response format" }), {
+            status: 502,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
       }
 
       return new Response(JSON.stringify({ success: false, error: "No verification result" }), {

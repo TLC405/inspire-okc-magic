@@ -146,12 +146,13 @@ const Admin = () => {
     setChatMessages(prev => [...prev, userMsg]);
     setChatLoading(true);
 
-    // Persist user message
     if (user) {
       supabase.from("admin_chat_messages").insert({ user_id: user.id, role: "user", content: text }).then(() => {});
     }
 
     let assistantSoFar = "";
+    let streamDone = false;
+
     try {
       const session = await supabase.auth.getSession();
       const token = session.data.session?.access_token;
@@ -169,16 +170,16 @@ const Admin = () => {
         }),
       });
 
-      if (!resp.ok) {
+      if (!resp.ok || !resp.body) {
         const err = await resp.json().catch(() => ({ error: "Stream failed" }));
         throw new Error(err.error || `Error ${resp.status}`);
       }
 
-      const reader = resp.body!.getReader();
+      const reader = resp.body.getReader();
       const decoder = new TextDecoder();
       let textBuffer = "";
 
-      while (true) {
+      while (!streamDone) {
         const { done, value } = await reader.read();
         if (done) break;
         textBuffer += decoder.decode(value, { stream: true });
@@ -192,7 +193,10 @@ const Admin = () => {
           if (!line.startsWith("data: ")) continue;
 
           const jsonStr = line.slice(6).trim();
-          if (jsonStr === "[DONE]") break;
+          if (jsonStr === "[DONE]") {
+            streamDone = true;
+            break;
+          }
 
           try {
             const parsed = JSON.parse(jsonStr);
@@ -214,15 +218,14 @@ const Admin = () => {
         }
       }
 
-      // Persist assistant message
       if (user && assistantSoFar) {
         supabase.from("admin_chat_messages").insert({ user_id: user.id, role: "assistant", content: assistantSoFar }).then(() => {});
       }
     } catch (e: any) {
       setChatMessages(prev => [...prev, { role: "assistant", content: `Error: ${e.message}` }]);
+    } finally {
+      setChatLoading(false);
     }
-
-    setChatLoading(false);
   }, [chatInput, chatMessages, chatLoading, user, customInstructions]);
 
   const clearChat = async () => {
