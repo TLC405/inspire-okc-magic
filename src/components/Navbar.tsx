@@ -1,11 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
 import { ThemeToggle } from "./ThemeToggle";
 import { cn } from "@/lib/utils";
-import { Settings, Clock, MapPin } from "lucide-react";
+import { Settings, Clock, MapPin, Zap, Star } from "lucide-react";
 import { WireTicker } from "./WireTicker";
 import { useRef, useEffect, useState } from "react";
 import { useWeather } from "@/hooks/useWeather";
 import { useLiveClock } from "@/hooks/useLiveClock";
+import { useTheme } from "next-themes";
 
 const navLinks = [
   { label: "Singles", href: "/singles", numeral: "I", desk: "Social" },
@@ -39,6 +40,8 @@ export function Navbar() {
   const weather = useWeather();
   const { timeStr, edition } = useLiveClock();
   const [tickerIdx, setTickerIdx] = useState(0);
+  const { theme } = useTheme();
+  const isTeamTheme = theme === "thunder" || theme === "comets";
   const [scrolled, setScrolled] = useState(false);
 
   // Scroll-collapse with RAF debounce
@@ -73,20 +76,44 @@ export function Navbar() {
 
   return (
     <header className="bg-background sticky top-0 z-50">
-      {/* Top thick rule */}
-      <div className="h-[4px] bg-foreground" />
-      <div className="h-[1px] bg-foreground/30 mt-[2px]" />
+      {/* Top thick rule — team-colored for Thunder/Comets */}
+      <div className={cn(
+        "h-[4px]",
+        theme === "thunder" ? "bg-[hsl(200,100%,45%)]" :
+        theme === "comets" ? "bg-[hsl(270,55%,55%)]" :
+        "bg-foreground"
+      )} />
+      <div className={cn(
+        "h-[1px] mt-[2px]",
+        theme === "thunder" ? "bg-[hsl(8,87%,54%,0.5)]" :
+        theme === "comets" ? "bg-[hsl(168,100%,39%,0.5)]" :
+        "bg-foreground/30"
+      )} />
 
       <div className="container">
         {/* ═══ UPPER UTILITY BAR ═══ */}
         <div className="flex items-center justify-between py-1 border-b border-foreground/15">
           <div className="flex items-center gap-2">
-            <span className="font-mono text-[8px] md:text-[9px] tracking-[0.15em] uppercase text-foreground font-bold bg-foreground/5 px-1.5 py-0.5 border border-foreground/10">
-              City Guide
-            </span>
+            {theme === "thunder" && (
+              <span className="flex items-center gap-1 font-mono text-[8px] md:text-[9px] tracking-[0.15em] uppercase font-extrabold px-1.5 py-0.5 border bg-[hsl(200,100%,45%,0.15)] border-[hsl(200,100%,45%,0.3)] text-[hsl(200,100%,65%)]">
+                <Zap size={8} className="text-[hsl(8,87%,54%)]" />
+                Thunder
+              </span>
+            )}
+            {theme === "comets" && (
+              <span className="flex items-center gap-1 font-mono text-[8px] md:text-[9px] tracking-[0.15em] uppercase font-extrabold px-1.5 py-0.5 border bg-[hsl(270,55%,55%,0.15)] border-[hsl(270,55%,55%,0.3)] text-[hsl(270,55%,75%)]">
+                <Star size={8} className="text-[hsl(48,100%,50%)]" />
+                Comets
+              </span>
+            )}
+            {!isTeamTheme && (
+              <span className="font-mono text-[8px] md:text-[9px] tracking-[0.15em] uppercase text-foreground font-bold bg-foreground/5 px-1.5 py-0.5 border border-foreground/10">
+                City Guide
+              </span>
+            )}
             <span className="hidden sm:inline text-foreground/15 text-[6px]">|</span>
             <span className="hidden sm:inline font-mono text-[7px] md:text-[8px] tracking-[0.12em] uppercase text-muted-foreground">
-              Community & Culture
+              {theme === "thunder" ? "Thunder Up · OKC" : theme === "comets" ? "OKC Comets · NWSL" : "Community & Culture"}
             </span>
           </div>
           <div className="hidden md:flex items-center gap-2">
@@ -222,9 +249,19 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Bottom thick + thin rule */}
-      <div className="h-[3px] bg-foreground" />
-      <div className="h-[1px] bg-foreground/15 mt-[1px]" />
+      {/* Bottom thick + thin rule — team-colored */}
+      <div className={cn(
+        "h-[3px]",
+        theme === "thunder" ? "bg-[hsl(200,100%,45%)]" :
+        theme === "comets" ? "bg-[hsl(270,55%,55%)]" :
+        "bg-foreground"
+      )} />
+      <div className={cn(
+        "h-[1px] mt-[1px]",
+        theme === "thunder" ? "bg-[hsl(8,87%,54%,0.4)]" :
+        theme === "comets" ? "bg-[hsl(168,100%,39%,0.4)]" :
+        "bg-foreground/15"
+      )} />
 
       {/* Wire Ticker */}
       <WireTicker />
