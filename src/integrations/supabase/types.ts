@@ -226,6 +226,154 @@ export type Database = {
         }
         Relationships: []
       }
+      entities: {
+        Row: {
+          bio: string | null
+          category: string | null
+          created_at: string | null
+          entity_type: string
+          id: string
+          lat: number | null
+          lng: number | null
+          metadata: Json | null
+          name: string
+          neighborhood: string | null
+          updated_at: string | null
+          verified: boolean | null
+        }
+        Insert: {
+          bio?: string | null
+          category?: string | null
+          created_at?: string | null
+          entity_type?: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          metadata?: Json | null
+          name: string
+          neighborhood?: string | null
+          updated_at?: string | null
+          verified?: boolean | null
+        }
+        Update: {
+          bio?: string | null
+          category?: string | null
+          created_at?: string | null
+          entity_type?: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          metadata?: Json | null
+          name?: string
+          neighborhood?: string | null
+          updated_at?: string | null
+          verified?: boolean | null
+        }
+        Relationships: []
+      }
+      entity_aliases: {
+        Row: {
+          alias: string
+          created_at: string | null
+          entity_id: string
+          id: string
+        }
+        Insert: {
+          alias: string
+          created_at?: string | null
+          entity_id: string
+          id?: string
+        }
+        Update: {
+          alias?: string
+          created_at?: string | null
+          entity_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entity_aliases_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: false
+            referencedRelation: "entities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      entity_relationships: {
+        Row: {
+          created_at: string | null
+          id: string
+          relationship_type: string
+          source_id: string
+          target_id: string
+          weight: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          relationship_type?: string
+          source_id: string
+          target_id: string
+          weight?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          relationship_type?: string
+          source_id?: string
+          target_id?: string
+          weight?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entity_relationships_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entity_relationships_target_id_fkey"
+            columns: ["target_id"]
+            isOneToOne: false
+            referencedRelation: "entities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      entity_sources: {
+        Row: {
+          created_at: string | null
+          entity_id: string
+          id: string
+          source_label: string | null
+          source_url: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          entity_id: string
+          id?: string
+          source_label?: string | null
+          source_url?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          entity_id?: string
+          id?: string
+          source_label?: string | null
+          source_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entity_sources_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: false
+            referencedRelation: "entities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       feed_items: {
         Row: {
           content: string
@@ -411,6 +559,77 @@ export type Database = {
           notes?: string | null
           status?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      moderation_decisions: {
+        Row: {
+          created_at: string | null
+          decision: string
+          id: string
+          queue_item_id: string
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          decision: string
+          id?: string
+          queue_item_id: string
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          decision?: string
+          id?: string
+          queue_item_id?: string
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "moderation_decisions_queue_item_id_fkey"
+            columns: ["queue_item_id"]
+            isOneToOne: false
+            referencedRelation: "moderation_queue"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      moderation_queue: {
+        Row: {
+          ai_explanation: string | null
+          content_id: string | null
+          content_preview: string | null
+          content_type: string
+          created_at: string | null
+          id: string
+          severity: string
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          ai_explanation?: string | null
+          content_id?: string | null
+          content_preview?: string | null
+          content_type?: string
+          created_at?: string | null
+          id?: string
+          severity?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          ai_explanation?: string | null
+          content_id?: string | null
+          content_preview?: string | null
+          content_type?: string
+          created_at?: string | null
+          id?: string
+          severity?: string
+          status?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
