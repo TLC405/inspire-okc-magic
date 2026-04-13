@@ -99,9 +99,11 @@ export function FeedManager() {
   };
 
   const updateItemStatus = async (id: string, status: string) => {
-    const updates: Record<string, any> = { status };
-    if (status === "published") updates.published_at = new Date().toISOString();
-    await supabase.from("feed_items").update(updates).eq("id", id);
+    if (status === "published") {
+      await supabase.from("feed_items").update({ status, published_at: new Date().toISOString() }).eq("id", id);
+    } else {
+      await supabase.from("feed_items").update({ status }).eq("id", id);
+    }
     fetchData();
   };
 
