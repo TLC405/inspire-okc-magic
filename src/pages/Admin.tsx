@@ -107,7 +107,7 @@ const Admin = () => {
   }, [evtSearch, evtFilter]);
 
   useEffect(() => {
-    if (tab === "visitors" && visitors.length === 0 && isAdmin) {
+    if (tab === "operations" && visitors.length === 0 && isAdmin) {
       setLoadingVisitors(true);
       supabase.from("visitor_logs").select("*").order("created_at", { ascending: false }).limit(200).then(({ data }) => {
         setVisitors(data || []);
@@ -117,7 +117,7 @@ const Admin = () => {
   }, [tab, isAdmin]);
 
   useEffect(() => {
-    if (tab === "scanner" && isAdmin && scanHistory.length === 0) {
+    if (tab === "intelligence" && isAdmin && scanHistory.length === 0) {
       supabase.from("scan_results").select("*").order("created_at", { ascending: false }).limit(20).then(({ data }) => {
         setScanHistory(data || []);
       });
@@ -126,7 +126,7 @@ const Admin = () => {
 
   // Load chat history, custom instructions, and feedback count
   useEffect(() => {
-    if (tab === "ai" && isAdmin && user) {
+    if (tab === "assistant" && isAdmin && user) {
       supabase.from("admin_chat_messages").select("*").eq("user_id", user.id).order("created_at", { ascending: true }).limit(100).then(({ data }) => {
         if (data && data.length > 0) {
           setChatMessages(data.map((m: any) => ({ role: m.role as "user" | "assistant", content: m.content })));
