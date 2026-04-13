@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { ThemeToggle } from "./ThemeToggle";
 import { cn } from "@/lib/utils";
-import { Settings, Clock, MapPin, Zap, Star } from "lucide-react";
+import { Settings, Clock, MapPin, Zap, Star, Heart } from "lucide-react";
 import { ThunderPlayoffTeaser } from "./ThunderPlayoffBracket";
 import { WireTicker } from "./WireTicker";
 import { useRef, useEffect, useState } from "react";
