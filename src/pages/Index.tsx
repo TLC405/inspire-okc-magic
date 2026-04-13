@@ -11,6 +11,7 @@ import { cityShowcase } from "@/data/cityShowcase";
 import { ArrowRight, Building2, Scale, Leaf, Palette, TrendingUp, Heart, Dumbbell, HandHelping, Mail, Clock, Sun, Moon, Sunrise } from "lucide-react";
 import { AtAGlance, MayorsDesk, SportsSidebar } from "@/components/CivicPanels";
 import { HeroCarousel } from "@/components/HeroCarousel";
+import { LiveBriefings } from "@/components/LiveBriefings";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import heroSingles from "@/assets/hero-singles.jpg";
@@ -347,6 +348,11 @@ const Index = () => {
         {/* ═══ Tonight in OKC ═══ */}
         <div className="container py-4 md:py-6">
           <TonightBlock />
+        </div>
+
+        {/* ═══ Live City Briefings ═══ */}
+        <div className="container py-4 md:py-6">
+          <LiveBriefings />
         </div>
 
         <FolioLine page="Page A2" note="Broadsheet" />
