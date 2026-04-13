@@ -39,12 +39,12 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
 
-    const fallbackFindings = {
+    const createFallbackFindings = (imageCount = 0) => ({
       security: [{ severity: "info", title: "RLS Active", detail: "All tables have row-level security enabled" }],
       content: [{ severity: "info", title: "Static data", detail: "Events data is hardcoded - consider database migration" }],
-      links: [{ severity: "info", title: "Image cache", detail: `${imageCount ?? 0} cached images` }],
+      links: [{ severity: "info", title: "Image cache", detail: `${imageCount} cached images` }],
       events: [{ severity: "info", title: "Data source", detail: "Events loaded from static TypeScript files" }],
-    };
+    });
 
     const fallbackUpgrades = {
       categories: (categories || ["homepage", "discover", "dating", "operations"]).map((name: string) => ({
@@ -107,6 +107,7 @@ serve(async (req) => {
       const { data: recentVisitors } = await supabaseAdmin.from("visitor_logs").select("ip_address, city, country, page_path, user_agent").order("created_at", { ascending: false }).limit(20);
       const { count: profileCount } = await supabaseAdmin.from("profiles").select("*", { count: "exact", head: true });
       const { count: roleCount } = await supabaseAdmin.from("user_roles").select("*", { count: "exact", head: true });
+      const fallbackFindings = createFallbackFindings(imageCount ?? 0);
 
       const context = `
 App: Inspire Oklahoma City - community discovery platform
