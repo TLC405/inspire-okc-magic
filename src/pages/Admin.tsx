@@ -10,6 +10,10 @@ import { supabase } from "@/integrations/supabase/client";
 import ReactMarkdown from "react-markdown";
 import { AdminBriefing } from "@/components/AdminBriefing";
 import { BriefingEditor } from "@/components/BriefingEditor";
+import { HeroSlideEditor } from "@/components/admin/HeroSlideEditor";
+import { TickerEditor } from "@/components/admin/TickerEditor";
+import { PullQuoteEditor } from "@/components/admin/PullQuoteEditor";
+import { ThemePanel } from "@/components/admin/ThemePanel";
 import {
   Shield, ShieldCheck, ShieldAlert, AlertTriangle, Search, MapPin, Eye, Database, Key,
   CheckCircle2, XCircle, RefreshCw, LogOut, Fingerprint,
