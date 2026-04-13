@@ -1,16 +1,31 @@
 
+# Fix Masthead Scroll-Collapse Glitch
 
-# Apply `--font-body` CSS Variable to Body Text
+## Problem
+The nameplate section uses `max-height` transition from `max-h-60` to `max-h-0` with `opacity`. This causes:
+1. **Layout jump** — `max-height: 0` collapses the element but the transition is imprecise (max-h-60 = 240px but actual content is ~120px, so the animation starts with dead time)
+2. **Composite layer thrash** — `will-change` on both `max-height` and `opacity` forces repaints
 
-The `--font-body` variable is already defined per-theme (Bricktown = Archivo, TLC = Quicksand, others = Inter) but never applied anywhere. Two small changes fix this:
+## Fix (single file: `Navbar.tsx`)
+Replace the `max-height` hack with a proper `grid` row collapse pattern — this is the modern, glitch-free way to animate height to/from 0:
 
-## Changes
+```tsx
+// Replace the nameplate wrapper (lines 208-212)
+<div
+  className={cn(
+    "grid transition-[grid-template-rows,opacity] duration-300 ease-in-out",
+    scrolled ? "grid-rows-[0fr] opacity-0" : "grid-rows-[1fr] opacity-100"
+  )}
+>
+  <div className="overflow-hidden">
+    {/* ...existing nameplate content unchanged... */}
+  </div>
+</div>
+```
 
-### 1. `src/index.css` — Add base body rule
-Add `font-family: var(--font-body);` to the `body` element in `@layer base` so every theme's body font takes effect automatically.
+This uses CSS `grid-rows-[0fr]` → `grid-rows-[1fr]` which smoothly animates the actual content height with no jump, no guessing max-height values, and no layout thrash. The inner `overflow-hidden` div clips content during collapse.
 
-### 2. `tailwind.config.ts` — Wire up Tailwind's `font-sans`
-Update the `fontFamily.sans` definition to reference `var(--font-body)` as the primary font, so all Tailwind `font-sans` utility usage also respects the theme.
-
-This is a two-line change total. No new files, no component edits.
-
+## Files Modified
+| File | Change |
+|---|---|
+| `src/components/Navbar.tsx` | Replace `max-h` collapse with `grid-rows` collapse pattern (~3 lines changed) |
