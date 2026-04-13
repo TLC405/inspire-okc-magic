@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { ThemeToggle } from "./ThemeToggle";
 import { cn } from "@/lib/utils";
-import { Settings, Clock, MapPin, Zap, Star, Heart } from "lucide-react";
+import { Settings, Clock, MapPin, Zap, Star, Heart, Github } from "lucide-react";
 import { ThunderPlayoffTeaser } from "./ThunderPlayoffBracket";
 import { WireTicker } from "./WireTicker";
 import { useRef, useEffect, useState } from "react";
@@ -198,6 +198,9 @@ export function Navbar() {
               OKC
             </span>
             <span className="text-foreground/15 text-[6px] hidden md:inline">|</span>
+            <Link to="/momento-mori" className="text-muted-foreground hover:text-foreground transition-colors" title="Momento Mori">
+              <Github size={10} />
+            </Link>
             <ThemeToggle className="text-muted-foreground hover:text-foreground" />
             <Link to="/admin" className="text-muted-foreground hover:text-foreground transition-colors">
               <Settings size={10} />

@@ -15,6 +15,7 @@ import Admin from "./pages/Admin";
 import Workouts from "./pages/Workouts";
 import Volunteering from "./pages/Volunteering";
 import Discover from "./pages/Discover";
+import MomentoMori from "./pages/MomentoMori";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,8 @@ const AppInner = () => {
         <Route path="/fitness" element={<Workouts />} />
         <Route path="/volunteering" element={<Volunteering />} />
         <Route path="/discover" element={<Discover />} />
+        <Route path="/discover" element={<Discover />} />
+        <Route path="/momento-mori" element={<MomentoMori />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/workouts" element={<Navigate to="/fitness" replace />} />
         <Route path="*" element={<NotFound />} />

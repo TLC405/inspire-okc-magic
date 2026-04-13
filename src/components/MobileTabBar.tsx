@@ -15,6 +15,7 @@ const moreLinks = [
   { to: "/events", label: "Events" },
   { to: "/date-nights", label: "Date Nights" },
   { to: "/discover", label: "Discover" },
+  { to: "/momento-mori", label: "Momento Mori" },
 ];
 
 export function MobileTabBar() {
