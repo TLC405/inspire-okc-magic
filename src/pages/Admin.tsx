@@ -13,8 +13,9 @@ import {
   CheckCircle2, XCircle, RefreshCw, LogOut, Fingerprint,
   Globe, Activity, Users, Zap, Lightbulb, Loader2,
   Edit3, Save, X, Heart, Dumbbell, HandHelping, ChevronDown, ChevronUp, ExternalLink, Trash2, Copy,
-  MessageSquare, Send, Settings, Sparkles, Brain
+  MessageSquare, Send, Settings, Sparkles, Brain, ThumbsUp, ThumbsDown, TrendingUp
 } from "lucide-react";
+import { knowledgeGraph } from "@/lib/knowledgeGraph";
 
 const statusColors: Record<VerificationStatus, string> = {
   verified: "text-emerald-500",
@@ -76,7 +77,8 @@ const Admin = () => {
   const [instructionsSaved, setInstructionsSaved] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
-
+  const [feedbackCount, setFeedbackCount] = useState(0);
+  const [ratedMessages, setRatedMessages] = useState<Set<number>>(new Set());
   const verifiedEvents = singlesEvents.filter((e) => e.verificationStatus === "verified").length;
   const brokenLinks = singlesEvents.flatMap((e) => e.sources).filter((s) => s.status === "broken").length;
   const totalListings = singlesEvents.length + fitnessSpots.length + volunteerOrgs.length + cityShowcase.length;
@@ -108,7 +110,7 @@ const Admin = () => {
     }
   }, [tab, isAdmin]);
 
-  // Load chat history and custom instructions
+  // Load chat history, custom instructions, and feedback count
   useEffect(() => {
     if (tab === "ai" && isAdmin && user) {
       supabase.from("admin_chat_messages").select("*").eq("user_id", user.id).order("created_at", { ascending: true }).limit(100).then(({ data }) => {
@@ -118,6 +120,9 @@ const Admin = () => {
       });
       supabase.from("admin_settings").select("*").eq("user_id", user.id).eq("setting_key", "custom_instructions").single().then(({ data }) => {
         if (data) setCustomInstructions(data.setting_value);
+      });
+      supabase.from("admin_prompt_history").select("id", { count: "exact", head: true }).eq("user_id", user.id).then(({ count }) => {
+        setFeedbackCount(count || 0);
       });
     }
   }, [tab, isAdmin, user]);
@@ -230,10 +235,32 @@ const Admin = () => {
 
   const clearChat = async () => {
     setChatMessages([]);
+    setRatedMessages(new Set());
     if (user) {
       await supabase.from("admin_chat_messages").delete().eq("user_id", user.id);
     }
   };
+
+  const rateMessage = async (messageIndex: number, rating: -1 | 1) => {
+    if (!user || ratedMessages.has(messageIndex)) return;
+    const msg = chatMessages[messageIndex];
+    if (!msg || msg.role !== "assistant") return;
+
+    // Find the preceding user message for context
+    const userMsg = messageIndex > 0 ? chatMessages[messageIndex - 1] : null;
+
+    await supabase.from("admin_prompt_history").insert({
+      user_id: user.id,
+      rating,
+      context: msg.content.slice(0, 500),
+      query_text: userMsg?.content?.slice(0, 300) || null,
+    });
+
+    setRatedMessages((prev) => new Set([...prev, messageIndex]));
+    setFeedbackCount((c) => c + 1);
+  };
+
+  const graphStats = useMemo(() => knowledgeGraph.getStats(), []);
 
   const runScan = async () => {
     setScanning(true);
@@ -485,7 +512,14 @@ const Admin = () => {
                   <Sparkles size={20} className="text-accent" />
                   <div>
                     <h2 className="headline text-foreground text-lg">INSPIRE Intelligence</h2>
-                    <p className="text-xs text-muted-foreground">Your editorial AI — contextualized with the full platform</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-xs text-muted-foreground">Your editorial AI — contextualized with the full platform</p>
+                      {feedbackCount > 0 && (
+                        <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded bg-accent/10 text-accent font-mono">
+                          <TrendingUp size={9} /> {feedbackCount} signals
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -528,8 +562,23 @@ const Admin = () => {
                       <li>• Theme system (Signal, Editorial, Raw)</li>
                       <li>• Edge functions and database schema</li>
                       <li>• Triple-verification system and confidence scoring</li>
+                      <li>• Knowledge graph: {graphStats.nodeCount} entities, {graphStats.edgeCount} connections</li>
+                      <li>• Entity disambiguation across {graphStats.typeCounts.listing || 0} listings</li>
+                      <li>• Freshness decay model with probabilistic confidence ranges</li>
                     </ul>
                   </div>
+                  {feedbackCount > 0 && (
+                    <div className="skeuo-card-inset p-4 rounded">
+                      <h3 className="label-caps text-foreground mb-2">Meta-Learning</h3>
+                      <div className="flex items-center gap-3">
+                        <TrendingUp size={16} className="text-accent" />
+                        <div>
+                          <p className="text-sm text-foreground font-semibold">{feedbackCount} feedback signals collected</p>
+                          <p className="text-xs text-muted-foreground">Positive-rated responses are used as few-shot examples in future AI calls</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <>
@@ -564,9 +613,35 @@ const Admin = () => {
                             : "bg-muted/30 text-foreground"
                         }`}>
                           {msg.role === "assistant" ? (
-                            <div className="prose prose-sm dark:prose-invert max-w-none text-sm [&_p]:mb-2 [&_ul]:mb-2 [&_li]:mb-0.5 [&_h1]:text-base [&_h2]:text-sm [&_h3]:text-sm [&_code]:text-xs [&_pre]:text-xs">
-                              <ReactMarkdown>{msg.content}</ReactMarkdown>
-                            </div>
+                            <>
+                              <div className="prose prose-sm dark:prose-invert max-w-none text-sm [&_p]:mb-2 [&_ul]:mb-2 [&_li]:mb-0.5 [&_h1]:text-base [&_h2]:text-sm [&_h3]:text-sm [&_code]:text-xs [&_pre]:text-xs">
+                                <ReactMarkdown>{msg.content}</ReactMarkdown>
+                              </div>
+                              {!chatLoading && (
+                                <div className="flex items-center gap-1 mt-2 pt-1.5 border-t border-border/20">
+                                  {ratedMessages.has(i) ? (
+                                    <span className="text-[9px] text-muted-foreground/60 italic">Feedback recorded</span>
+                                  ) : (
+                                    <>
+                                      <button
+                                        onClick={() => rateMessage(i, 1)}
+                                        className="p-1 rounded hover:bg-accent/10 transition-colors"
+                                        title="Helpful"
+                                      >
+                                        <ThumbsUp size={11} className="text-muted-foreground/50 hover:text-accent" />
+                                      </button>
+                                      <button
+                                        onClick={() => rateMessage(i, -1)}
+                                        className="p-1 rounded hover:bg-destructive/10 transition-colors"
+                                        title="Not helpful"
+                                      >
+                                        <ThumbsDown size={11} className="text-muted-foreground/50 hover:text-destructive" />
+                                      </button>
+                                    </>
+                                  )}
+                                </div>
+                              )}
+                            </>
                           ) : (
                             <p className="text-sm">{msg.content}</p>
                           )}

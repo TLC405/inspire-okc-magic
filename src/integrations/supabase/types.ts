@@ -38,6 +38,44 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_prompt_history: {
+        Row: {
+          context: string | null
+          created_at: string
+          id: string
+          message_id: string | null
+          query_text: string | null
+          rating: number
+          user_id: string
+        }
+        Insert: {
+          context?: string | null
+          created_at?: string
+          id?: string
+          message_id?: string | null
+          query_text?: string | null
+          rating: number
+          user_id: string
+        }
+        Update: {
+          context?: string | null
+          created_at?: string
+          id?: string
+          message_id?: string | null
+          query_text?: string | null
+          rating?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_prompt_history_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "admin_chat_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admin_settings: {
         Row: {
           created_at: string
@@ -251,6 +289,33 @@ export type Database = {
           id?: string
           scan_type?: string
           upgrade_ideas?: Json | null
+        }
+        Relationships: []
+      }
+      search_intent_cache: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          parsed_intent: Json
+          query: string
+          query_hash: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          parsed_intent?: Json
+          query: string
+          query_hash: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          parsed_intent?: Json
+          query?: string
+          query_hash?: string
         }
         Relationships: []
       }

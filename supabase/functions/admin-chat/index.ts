@@ -21,9 +21,16 @@ PLATFORM CONTEXT:
 ARCHITECTURE:
 - React 18 + Vite 5 + Tailwind CSS v3 + TypeScript 5 + Supabase (Lovable Cloud)
 - Static data files for listings: singlesEvents.ts, fitnessSpots.ts, volunteerOrgs.ts, cityShowcase.ts
-- Edge functions: admin-scanner (audits), image-search (photos), log-visitor (analytics), singles-ai, process-email-queue, admin-chat (you)
-- Tables: visitor_logs, user_roles, profiles, image_cache, newsletter_subscribers, scan_results, admin_chat_messages, admin_settings
+- Edge functions: admin-scanner (audits), image-search (photos), log-visitor (analytics), singles-ai, process-email-queue, admin-chat (you), smart-search (semantic AI search)
+- Tables: visitor_logs, user_roles, profiles, image_cache, newsletter_subscribers, scan_results, admin_chat_messages, admin_settings, search_intent_cache, admin_prompt_history
 - Master admin: inspirelawton@gmail.com (hardcoded, auto-granted)
+
+INTELLIGENT FEATURES:
+- Entity disambiguation: NER-lite resolver maps aliases to canonical OKC entities (neighborhoods, venues, categories, organizations)
+- Knowledge graph: In-memory graph connecting venues, neighborhoods, categories, organizers, and tags across all listings
+- Probabilistic confidence: Freshness decay model — confidence scores drop over time since last verification, displayed as ranges
+- Smart search: AI-powered semantic query interpretation via Groq tool calling, cached in search_intent_cache
+- Meta-learning: Admin feedback (thumbs up/down) stored in admin_prompt_history, used as few-shot examples
 
 CONTENT STATS:
 - Singles events include Speed Dating and Mixer categories
@@ -55,11 +62,13 @@ Deno.serve(async (req) => {
     }
 
     // Verify admin
-    const supabaseUser = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } }
-    );
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    const supabaseUser = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
     const { data: { user }, error: userError } = await supabaseUser.auth.getUser();
     if (userError || !user) {
       return new Response(JSON.stringify({ error: "Invalid token" }), {
@@ -92,9 +101,35 @@ Deno.serve(async (req) => {
       });
     }
 
-    const systemContent = customInstructions
-      ? `${SYSTEM_PROMPT}\n\nADMIN CUSTOM INSTRUCTIONS:\n${customInstructions}`
-      : SYSTEM_PROMPT;
+    // Meta-learning: fetch recent positive feedback as few-shot examples
+    let fewShotContext = "";
+    try {
+      const supabaseAdmin = createClient(supabaseUrl, serviceKey);
+      const { data: feedback } = await supabaseAdmin
+        .from("admin_prompt_history")
+        .select("query_text, context")
+        .eq("user_id", user.id)
+        .eq("rating", 1)
+        .order("created_at", { ascending: false })
+        .limit(3);
+
+      if (feedback && feedback.length > 0) {
+        const examples = feedback
+          .filter((f: any) => f.query_text && f.context)
+          .map((f: any) => `Q: ${f.query_text.slice(0, 200)}\nA: ${f.context.slice(0, 300)}`)
+          .join("\n\n");
+        if (examples) {
+          fewShotContext = `\n\nPREVIOUS HIGH-RATED EXCHANGES (match this style):\n${examples}`;
+        }
+      }
+    } catch (e) {
+      console.error("Failed to load feedback:", e);
+    }
+
+    let systemContent = SYSTEM_PROMPT + fewShotContext;
+    if (customInstructions) {
+      systemContent += `\n\nADMIN CUSTOM INSTRUCTIONS:\n${customInstructions}`;
+    }
 
     let response: Response;
     try {
@@ -133,12 +168,6 @@ Deno.serve(async (req) => {
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "Rate limited. Try again in a moment." }), {
           status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "AI credits exhausted. Add funds in Settings > Workspace > Usage." }), {
-          status: 402,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
