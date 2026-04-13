@@ -66,7 +66,8 @@ export function Navbar() {
   const weather = useWeather();
   const { timeStr, edition } = useLiveClock();
   const [tickerIdx, setTickerIdx] = useState(0);
-  const { theme } = useTheme();
+  const { theme: rawTheme, resolvedTheme } = useTheme();
+  const theme = rawTheme || resolvedTheme;
   const isTeamTheme = theme === "thunder" || theme === "comets" || theme === "tlc";
   const [scrolled, setScrolled] = useState(false);
   const [weatherOpen, setWeatherOpen] = useState(false);
