@@ -613,9 +613,35 @@ const Admin = () => {
                             : "bg-muted/30 text-foreground"
                         }`}>
                           {msg.role === "assistant" ? (
-                            <div className="prose prose-sm dark:prose-invert max-w-none text-sm [&_p]:mb-2 [&_ul]:mb-2 [&_li]:mb-0.5 [&_h1]:text-base [&_h2]:text-sm [&_h3]:text-sm [&_code]:text-xs [&_pre]:text-xs">
-                              <ReactMarkdown>{msg.content}</ReactMarkdown>
-                            </div>
+                            <>
+                              <div className="prose prose-sm dark:prose-invert max-w-none text-sm [&_p]:mb-2 [&_ul]:mb-2 [&_li]:mb-0.5 [&_h1]:text-base [&_h2]:text-sm [&_h3]:text-sm [&_code]:text-xs [&_pre]:text-xs">
+                                <ReactMarkdown>{msg.content}</ReactMarkdown>
+                              </div>
+                              {!chatLoading && (
+                                <div className="flex items-center gap-1 mt-2 pt-1.5 border-t border-border/20">
+                                  {ratedMessages.has(i) ? (
+                                    <span className="text-[9px] text-muted-foreground/60 italic">Feedback recorded</span>
+                                  ) : (
+                                    <>
+                                      <button
+                                        onClick={() => rateMessage(i, 1)}
+                                        className="p-1 rounded hover:bg-accent/10 transition-colors"
+                                        title="Helpful"
+                                      >
+                                        <ThumbsUp size={11} className="text-muted-foreground/50 hover:text-accent" />
+                                      </button>
+                                      <button
+                                        onClick={() => rateMessage(i, -1)}
+                                        className="p-1 rounded hover:bg-destructive/10 transition-colors"
+                                        title="Not helpful"
+                                      >
+                                        <ThumbsDown size={11} className="text-muted-foreground/50 hover:text-destructive" />
+                                      </button>
+                                    </>
+                                  )}
+                                </div>
+                              )}
+                            </>
                           ) : (
                             <p className="text-sm">{msg.content}</p>
                           )}
