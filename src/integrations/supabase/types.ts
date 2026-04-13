@@ -226,6 +226,89 @@ export type Database = {
         }
         Relationships: []
       }
+      feed_items: {
+        Row: {
+          content: string
+          created_at: string
+          external_url: string | null
+          id: string
+          published_at: string | null
+          raw_data: Json | null
+          source_id: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          external_url?: string | null
+          id?: string
+          published_at?: string | null
+          raw_data?: Json | null
+          source_id?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          external_url?: string | null
+          id?: string
+          published_at?: string | null
+          raw_data?: Json | null
+          source_id?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feed_items_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "feed_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feed_sources: {
+        Row: {
+          active: boolean
+          config: Json
+          created_at: string
+          id: string
+          last_fetched_at: string | null
+          name: string
+          source_type: string
+          source_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          config?: Json
+          created_at?: string
+          id?: string
+          last_fetched_at?: string | null
+          name: string
+          source_type?: string
+          source_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          config?: Json
+          created_at?: string
+          id?: string
+          last_fetched_at?: string | null
+          name?: string
+          source_type?: string
+          source_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       hero_slides: {
         Row: {
           active: boolean
@@ -295,6 +378,39 @@ export type Database = {
           listing_type?: string
           quality_score?: number | null
           source_url?: string | null
+        }
+        Relationships: []
+      }
+      media_overrides: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string
+          listing_id: string
+          listing_type: string
+          notes: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url: string
+          listing_id: string
+          listing_type: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string
+          listing_id?: string
+          listing_type?: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -391,6 +507,66 @@ export type Database = {
           parsed_intent?: Json
           query?: string
           query_hash?: string
+        }
+        Relationships: []
+      }
+      site_copy: {
+        Row: {
+          context: string
+          copy_key: string
+          copy_value: string
+          created_at: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          context?: string
+          copy_key: string
+          copy_value?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          context?: string
+          copy_key?: string
+          copy_value?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      site_modules: {
+        Row: {
+          config: Json
+          created_at: string
+          id: string
+          label: string
+          section_key: string
+          sort_order: number
+          updated_at: string
+          visible: boolean
+        }
+        Insert: {
+          config?: Json
+          created_at?: string
+          id?: string
+          label: string
+          section_key: string
+          sort_order?: number
+          updated_at?: string
+          visible?: boolean
+        }
+        Update: {
+          config?: Json
+          created_at?: string
+          id?: string
+          label?: string
+          section_key?: string
+          sort_order?: number
+          updated_at?: string
+          visible?: boolean
         }
         Relationships: []
       }
