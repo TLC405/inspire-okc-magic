@@ -8,6 +8,7 @@ import { volunteerOrgs, type VolunteerOrg } from "@/data/volunteerOrgs";
 import { cityShowcase } from "@/data/cityShowcase";
 import { supabase } from "@/integrations/supabase/client";
 import ReactMarkdown from "react-markdown";
+import { AdminBriefing } from "@/components/AdminBriefing";
 import {
   Shield, ShieldCheck, ShieldAlert, AlertTriangle, Search, MapPin, Eye, Database, Key,
   CheckCircle2, XCircle, RefreshCw, LogOut, Fingerprint,
@@ -48,7 +49,7 @@ const Admin = () => {
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const [authError, setAuthError] = useState("");
   const [authMsg, setAuthMsg] = useState("");
-  const [tab, setTab] = useState<"content" | "visitors" | "security" | "events" | "scanner" | "ai">("content");
+  const [tab, setTab] = useState<"content" | "visitors" | "security" | "events" | "scanner" | "ai" | "briefing">("briefing");
   const [evtSearch, setEvtSearch] = useState("");
   const [evtFilter, setEvtFilter] = useState<"all" | VerificationStatus>("all");
   const [visitors, setVisitors] = useState<any[]>([]);
@@ -430,6 +431,7 @@ const Admin = () => {
   }
 
   const tabs = [
+    { id: "briefing" as const, label: "Briefing", icon: TrendingUp },
     { id: "content" as const, label: "Content", icon: Edit3 },
     { id: "visitors" as const, label: "Visitors", icon: Users },
     { id: "security" as const, label: "Security", icon: Shield },
@@ -504,6 +506,9 @@ const Admin = () => {
         )}
 
         <div className="skeuo-card rounded-lg p-6">
+          {/* ═══ BRIEFING TAB ═══ */}
+          {tab === "briefing" && <AdminBriefing />}
+
           {/* ═══ AI / SETTINGS TAB ═══ */}
           {tab === "ai" && (
             <div className="space-y-4">
