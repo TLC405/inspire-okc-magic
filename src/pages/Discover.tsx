@@ -39,7 +39,7 @@ const Discover = () => {
   }, [factCategory, searchQuery]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-background animate-fade-in">
+    <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0 animate-fade-in">
       <Navbar />
       <main className="flex-1">
         {/* Hero */}
