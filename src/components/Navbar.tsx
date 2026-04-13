@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { ThemeToggle } from "./ThemeToggle";
 import { cn } from "@/lib/utils";
 import { Settings, Clock, MapPin, Zap, Star } from "lucide-react";
+import { ThunderPlayoffTeaser } from "./ThunderPlayoffBracket";
 import { WireTicker } from "./WireTicker";
 import { useRef, useEffect, useState } from "react";
 import { useWeather } from "@/hooks/useWeather";
@@ -147,6 +148,13 @@ export function Navbar() {
                 <span className="hidden md:inline font-mono text-[7px] tracking-wider uppercase text-accent font-bold">
                   §{currentSection.section} {currentSection.desk}
                 </span>
+              </>
+            )}
+            {/* Thunder playoff teaser */}
+            {theme === "thunder" && (
+              <>
+                <span className="hidden sm:inline text-foreground/15 text-[6px]">|</span>
+                <ThunderPlayoffTeaser />
               </>
             )}
           </div>
