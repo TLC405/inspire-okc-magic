@@ -235,10 +235,32 @@ const Admin = () => {
 
   const clearChat = async () => {
     setChatMessages([]);
+    setRatedMessages(new Set());
     if (user) {
       await supabase.from("admin_chat_messages").delete().eq("user_id", user.id);
     }
   };
+
+  const rateMessage = async (messageIndex: number, rating: -1 | 1) => {
+    if (!user || ratedMessages.has(messageIndex)) return;
+    const msg = chatMessages[messageIndex];
+    if (!msg || msg.role !== "assistant") return;
+
+    // Find the preceding user message for context
+    const userMsg = messageIndex > 0 ? chatMessages[messageIndex - 1] : null;
+
+    await supabase.from("admin_prompt_history").insert({
+      user_id: user.id,
+      rating,
+      context: msg.content.slice(0, 500),
+      query_text: userMsg?.content?.slice(0, 300) || null,
+    });
+
+    setRatedMessages((prev) => new Set([...prev, messageIndex]));
+    setFeedbackCount((c) => c + 1);
+  };
+
+  const graphStats = useMemo(() => knowledgeGraph.getStats(), []);
 
   const runScan = async () => {
     setScanning(true);
