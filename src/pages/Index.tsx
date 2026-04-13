@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -8,7 +8,7 @@ import { ListingImage } from "@/components/ListingImage";
 import { fitnessSpots } from "@/data/fitnessSpots";
 import { volunteerOrgs } from "@/data/volunteerOrgs";
 import { cityShowcase } from "@/data/cityShowcase";
-import { ArrowRight, Building2, Scale, Leaf, Palette, TrendingUp, Heart, Dumbbell, HandHelping, Mail, Clock, Sun, Moon, Sunrise } from "lucide-react";
+import { ArrowRight, Building2, Scale, Leaf, Palette, TrendingUp, Heart, Dumbbell, HandHelping, Mail, Clock, Sun, Moon, Sunrise, Network, Activity, Shield, Sparkles } from "lucide-react";
 import { AtAGlance, MayorsDesk, SportsSidebar } from "@/components/CivicPanels";
 import { HeroCarousel } from "@/components/HeroCarousel";
 import { LiveBriefings } from "@/components/LiveBriefings";
@@ -183,6 +183,52 @@ function TonightBlock() {
   );
 }
 
+/** City Pulse — real-time intelligence counters */
+function CityPulse() {
+  const [stats, setStats] = useState({ entities: 0, briefings: 0, feedItems: 0 });
+
+  useEffect(() => {
+    Promise.all([
+      supabase.from("entities").select("id", { count: "exact", head: true }),
+      supabase.from("briefings").select("id", { count: "exact", head: true }).eq("published", true),
+      supabase.from("feed_items").select("id", { count: "exact", head: true }),
+    ]).then(([e, b, f]) => {
+      setStats({
+        entities: e.count || 0,
+        briefings: b.count || 0,
+        feedItems: f.count || 0,
+      });
+    });
+  }, []);
+
+  if (stats.entities === 0 && stats.briefings === 0 && stats.feedItems === 0) return null;
+
+  return (
+    <div className="skeuo-card p-4 md:p-6 rounded-lg">
+      <div className="flex items-center gap-2 mb-3">
+        <Activity size={16} className="text-accent" />
+        <span className="label-caps text-accent text-[10px] font-bold">City Pulse — Live Intelligence</span>
+      </div>
+      <div className="grid grid-cols-3 gap-3 text-center">
+        <div>
+          <Network size={16} className="mx-auto mb-1 text-accent/60" />
+          <p className="text-xl font-black text-foreground">{stats.entities}</p>
+          <p className="text-[10px] text-muted-foreground">Graph Entities</p>
+        </div>
+        <div>
+          <Sparkles size={16} className="mx-auto mb-1 text-accent/60" />
+          <p className="text-xl font-black text-foreground">{stats.briefings}</p>
+          <p className="text-[10px] text-muted-foreground">Live Briefings</p>
+        </div>
+        <div>
+          <Shield size={16} className="mx-auto mb-1 text-accent/60" />
+          <p className="text-xl font-black text-foreground">{stats.feedItems}</p>
+          <p className="text-[10px] text-muted-foreground">Feed Items</p>
+        </div>
+      </div>
+    </div>
+  );
+
 const Index = () => {
   const singlesTeaser = getDiverseSinglesTeaser(4);
   const fitnessTeaser = getDiverseFitnessTeaser(4);
@@ -348,6 +394,11 @@ const Index = () => {
         {/* ═══ Tonight in OKC ═══ */}
         <div className="container py-4 md:py-6">
           <TonightBlock />
+        </div>
+
+        {/* ═══ City Pulse — Intelligence Widget ═══ */}
+        <div className="container py-4 md:py-6">
+          <CityPulse />
         </div>
 
         {/* ═══ Live City Briefings ═══ */}
