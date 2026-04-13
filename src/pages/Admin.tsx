@@ -982,6 +982,44 @@ const Admin = () => {
       <Footer />
     </div>
   );
+};
+
+/* ── Content Editor Cards ── */
+
+interface ContentCardProps {
+  isEditing: boolean;
+  editData: Record<string, any>;
+  onEdit: () => void;
+  onCancel: () => void;
+  onFieldChange: (field: string, value: string) => void;
+  onCopy: () => void;
+}
+
+const EditableField = ({ label, field, value, editData, isEditing, onChange, multiline }: {
+  label: string; field: string; value: string; editData: Record<string, any>; isEditing: boolean; onChange: (f: string, v: string) => void; multiline?: boolean;
+}) => (
+  <div className="flex flex-col gap-0.5">
+    <label className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground/60">{label}</label>
+    {isEditing ? (
+      multiline ? (
+        <textarea
+          value={editData[field] ?? value}
+          onChange={(e) => onChange(field, e.target.value)}
+          className="px-2 py-1.5 bg-muted/40 border border-accent/30 rounded text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-accent resize-y min-h-[60px]"
+        />
+      ) : (
+        <input
+          value={editData[field] ?? value}
+          onChange={(e) => onChange(field, e.target.value)}
+          className="px-2 py-1 bg-muted/40 border border-accent/30 rounded text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-accent"
+        />
+      )
+    ) : (
+      <p className="text-sm text-foreground/80 leading-relaxed">{value}</p>
+    )}
+  </div>
+);
+
 const ContentCardSingles = ({ event: evt, isEditing, editData, onEdit, onCancel, onFieldChange, onCopy }: ContentCardProps & { event: SinglesEvent }) => {
   const [expanded, setExpanded] = useState(false);
   return (
