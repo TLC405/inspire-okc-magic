@@ -587,7 +587,7 @@ const Admin = () => {
                       <li>• Full platform architecture (React + Vite + Tailwind + Supabase)</li>
                       <li>• All 6 directories with data structure details</li>
                       <li>• Brand voice guidelines (broadsheet journalism)</li>
-                      <li>• Theme system (Signal, Editorial, Raw)</li>
+                      <li>• Theme system (Light, Dark, Thunder, Comets)</li>
                       <li>• Edge functions and database schema</li>
                       <li>• Triple-verification system and confidence scoring</li>
                       <li>• Knowledge graph: {graphStats.nodeCount} entities, {graphStats.edgeCount} connections</li>
