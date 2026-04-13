@@ -8,6 +8,7 @@ import { volunteerOrgs, type VolunteerOrg } from "@/data/volunteerOrgs";
 import { cityShowcase } from "@/data/cityShowcase";
 import { supabase } from "@/integrations/supabase/client";
 import ReactMarkdown from "react-markdown";
+import { AdminBriefing } from "@/components/AdminBriefing";
 import {
   Shield, ShieldCheck, ShieldAlert, AlertTriangle, Search, MapPin, Eye, Database, Key,
   CheckCircle2, XCircle, RefreshCw, LogOut, Fingerprint,
