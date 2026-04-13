@@ -1,247 +1,144 @@
 
-## Comprehensive Roadmap Plan — Realistic Version for a Solo Builder at ~$40/month
 
-### What I found in the current app
-- You already have strong foundations:
-  - editable admin for briefings, hero slides, ticker, themes
-  - live briefings on the homepage
-  - an in-memory semantic layer via `src/lib/knowledgeGraph.ts`
-  - AI-powered admin chat and semantic search via backend functions
-  - image enrichment pipeline with cache via `image_cache` + `image-search`
-- The biggest current gaps relative to your vision:
-  - the “knowledge graph for the city” is still static/in-memory, not a persistent city graph
-  - no true real-time external event ingestion pipeline yet
-  - image coverage is fragile because listing cards depend on lazy on-demand lookup instead of a managed media workflow
-  - admin can edit content, but not yet operate the entire site as a true newsroom/CMS/control center
-  - advanced hardware integrations, drones, smart billboards, gaze control, and automated journalism are far beyond a solo $40/month phase-one scope
+# Cosmic-Level Build — Realistic Implementation Sprint
 
-## Core recommendation
-Do not attempt the full 4-year vision all at once. Build a durable “city intelligence platform” in layers.
+This plan takes the most impactful, actually-buildable pieces from the cosmic vision and delivers them in one implementation pass. Everything uses your existing Vite/React/Supabase stack with zero new infrastructure costs.
 
-```text
-Layer 1: Fix the current product so it feels complete
-Layer 2: Build a real content/feeds/media operating system
-Layer 3: Add persistent city graph + moderation + newsroom AI
-Layer 4: Add premium hardware and immersive interfaces
+## What Gets Built
+
+### 1. Persistent City Knowledge Graph (Database)
+New tables to power the semantic intelligence layer:
+- `entities` — canonical record for every person, place, org, event in OKC (name, type, bio, neighborhood, category, lat/lng, verified flag)
+- `entity_aliases` — alternate names for deduplication
+- `entity_relationships` — typed edges between entities (hosts, sponsors, located_in, related_to)
+- `entity_sources` — evidence trail linking entities to source URLs/documents
+
+Seed the graph from existing static data (singlesEvents, fitnessSpots, volunteerOrgs) via a migration that inserts initial entities.
+
+### 2. Admin Knowledge Graph Editor (New Tab)
+New "Graph" tab in `/admin`:
+- Search entities by name/type
+- Create/edit/delete entities with type, neighborhood, category, bio
+- View and manage relationships between entities
+- Merge duplicate entities (select two, pick canonical, merge aliases)
+- View source evidence for each entity
+
+### 3. AI Newsroom Pipeline
+New "Newsroom" tab in `/admin`:
+- **Draft generation**: Button calls an edge function that uses Lovable AI to draft a city briefing from recent feed items + entity context
+- **Edit/approve/publish flow**: AI draft appears in editor, admin edits, then publishes to briefings table
+- **Auto-summary**: Generate one-paragraph city summary from all published briefings for homepage display
+
+New edge function: `supabase/functions/newsroom-draft/index.ts`
+
+### 4. Adaptive Content Moderation System
+New tables:
+- `moderation_queue` — items flagged for review (content, source, severity, ai_explanation, status)
+- `moderation_decisions` — admin actions (approve/reject/redact with reasoning)
+
+New "Moderation" tab in `/admin`:
+- Queue of flagged items with severity labels and AI explanations
+- Approve/reject/redact actions with audit trail
+- Auto-flag logic via edge function that checks new feed items and briefings
+
+New edge function: `supabase/functions/moderate-content/index.ts`
+
+### 5. Homepage Intelligence Upgrades
+- **Related Items sidebar**: Use the persistent graph to show "Connected to this" on listing cards
+- **City Pulse widget**: Real-time counter showing total entities, active briefings, feed items, moderation queue depth
+- **AI Concierge teaser**: Small "Ask about OKC" prompt on homepage that routes to a public-facing search powered by the knowledge graph
+
+### 6. Real-Time Everywhere
+Enable Supabase Realtime on: `entities`, `moderation_queue`, `feed_items`
+- Admin sees new feed items and moderation flags appear live
+- Homepage briefings already have realtime; extend to entity count and feed activity
+
+## Database Migration (Single SQL File)
+
+```sql
+-- Entities
+CREATE TABLE public.entities (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name text NOT NULL,
+  entity_type text NOT NULL DEFAULT 'place',
+  bio text DEFAULT '',
+  neighborhood text,
+  category text,
+  lat double precision,
+  lng double precision,
+  verified boolean DEFAULT false,
+  metadata jsonb DEFAULT '{}',
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+CREATE TABLE public.entity_aliases (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  entity_id uuid REFERENCES public.entities(id) ON DELETE CASCADE,
+  alias text NOT NULL,
+  created_at timestamptz DEFAULT now()
+);
+
+CREATE TABLE public.entity_relationships (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  source_id uuid REFERENCES public.entities(id) ON DELETE CASCADE,
+  target_id uuid REFERENCES public.entities(id) ON DELETE CASCADE,
+  relationship_type text NOT NULL DEFAULT 'related_to',
+  weight integer DEFAULT 1,
+  created_at timestamptz DEFAULT now()
+);
+
+CREATE TABLE public.entity_sources (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  entity_id uuid REFERENCES public.entities(id) ON DELETE CASCADE,
+  source_url text,
+  source_label text,
+  created_at timestamptz DEFAULT now()
+);
+
+CREATE TABLE public.moderation_queue (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  content_type text NOT NULL DEFAULT 'feed_item',
+  content_id uuid,
+  content_preview text DEFAULT '',
+  severity text NOT NULL DEFAULT 'info',
+  ai_explanation text DEFAULT '',
+  status text NOT NULL DEFAULT 'pending',
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+CREATE TABLE public.moderation_decisions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  queue_item_id uuid REFERENCES public.moderation_queue(id) ON DELETE CASCADE,
+  decision text NOT NULL,
+  reason text DEFAULT '',
+  user_id uuid NOT NULL,
+  created_at timestamptz DEFAULT now()
+);
+
+-- RLS + Realtime on all new tables
+-- Public read on entities; admin CRUD on everything else
 ```
 
-## Priority build sequence
+## Files Created/Modified
 
-### Phase 1 — Stabilize and complete the current product
-Goal: make the site look finished, editable, and reliable.
+| File | Action |
+|---|---|
+| Migration SQL | New — 6 tables with RLS |
+| `src/components/admin/GraphEditor.tsx` | New — entity CRUD, search, merge, relationships |
+| `src/components/admin/NewsroomPanel.tsx` | New — AI draft, edit, publish flow |
+| `src/components/admin/ModerationPanel.tsx` | New — queue, decisions, severity labels |
+| `supabase/functions/newsroom-draft/index.ts` | New — AI briefing generation |
+| `supabase/functions/moderate-content/index.ts` | New — AI content flagging |
+| `src/pages/Admin.tsx` | Modified — add Graph, Newsroom, Moderation tabs |
+| `src/pages/Index.tsx` | Modified — add City Pulse widget, AI concierge teaser |
+| `src/lib/knowledgeGraph.ts` | Modified — add DB-backed query methods alongside in-memory graph |
 
-#### 1. Admin Site Control Center
-Upgrade `/admin` into a true site operator console:
-- homepage section toggles, ordering, and visibility
-- editable homepage headline/dek/dateline blocks
-- editable navbar/nameplate copy and theme-specific taglines
-- editable section headers, pull quotes, footer copy, newsletter copy
-- reusable “site settings” records instead of hardcoded text
+## Technical Approach
+- AI functions use Lovable AI Gateway (LOVABLE_API_KEY already configured)
+- All new tables get admin-only RLS for writes, public read for entities
+- Moderation uses AI to generate explanations, but all decisions are human-approved
+- Graph editor uses optimistic UI with Supabase realtime subscriptions
+- Newsroom drafts are stored as unpublished briefings until admin approves
 
-#### 2. Real image coverage fix
-Current issue: cards are missing images across the app.
-Plan:
-- add an admin media audit panel showing items with no image, weak image, or broken image
-- support manual image override per listing
-- preserve AI/image-search fallback, but stop relying on it as the only path
-- prefill cards with deterministic fallback artwork by category until real media exists
-- add image status metadata so cards can distinguish:
-  - verified manual image
-  - auto-enriched image
-  - fallback placeholder
-
-#### 3. Better real-time feeds
-Build a “Live Feeds” system for homepage and admin:
-- event feed table for incoming external items
-- newsroom queue for review/publish/ignore
-- source labels, freshness, timestamps, confidence
-- homepage “latest updates” rail fed from live data instead of mostly static content
-
-### Phase 2 — Persistent city graph and editable intelligence
-Goal: turn the current static intelligence into a real backend model.
-
-#### 4. Persistent OKC semantic graph
-Convert the current in-memory graph into backend tables:
-- entities
-- entity_aliases
-- entity_relationships
-- entity_mentions
-- source_documents
-- canonical event/place/org records
-
-This enables:
-- one canonical record per person/place/org/event
-- aliases and deduplication
-- relationship browsing in admin
-- “related items” and “why this is connected” on the public site
-- future journalism, moderation, search, and analytics all using the same graph
-
-#### 5. AI-assisted entity resolution
-Use backend AI functions to:
-- resolve duplicate venues/orgs/events
-- propose merges for admin approval
-- auto-tag neighborhoods, categories, orgs, and related entities
-- generate confidence/explanation trails
-
-#### 6. Admin graph editor
-New admin capabilities:
-- search entities
-- merge duplicates
-- inspect source evidence
-- approve/reject AI-suggested links
-- edit canonical names, tags, neighborhoods, and relationships
-
-## Phase 3 — Newsroom, moderation, and automation
-Goal: make it operate like a civic newsroom, not just a directory.
-
-#### 7. Automated journalism with human oversight
-Add a newsroom pipeline:
-- ingest source items
-- AI drafts briefing/news summary/Q&A
-- admin reviews, edits, publishes
-- published stories feed homepage and archives
-
-Important:
-- AI should draft, summarize, and structure
-- publishing should remain explicitly human-approved in this phase
-
-#### 8. Adaptive moderation system
-For future user submissions/posts/images/events:
-- flag risky content
-- redact sensitive fields when needed
-- assign severity
-- explain why it was flagged
-- route items into moderation queues
-
-This should include:
-- moderation tables
-- admin moderation dashboard
-- explainable labels, not black-box accept/reject only
-
-#### 9. Real event ingestion pipeline
-Instead of scraping ad hoc at render time:
-- scheduled source collection
-- normalization into feed tables
-- dedupe against graph entities
-- editorial review queue
-- publish to briefings, events, and timeline modules
-
-## Phase 4 — Ambitious advanced systems
-Goal: only after the above is stable.
-
-#### 10. Accessibility expansion
-High-value first:
-- keyboard-first interaction audit
-- screen-reader landmarks and editorial navigation
-- reduced motion tuning
-- higher-contrast theme variants
-- optional voice control for search/navigation
-
-Defer for later:
-- sip-and-puff
-- gaze tracking
-These are possible long-term, but not good first budget priorities.
-
-#### 11. Dynamic designer-driven UI system
-Build a theme architecture that supports:
-- section-specific mood presets
-- editorial vs sports vs civic presentation modes
-- component tokens per theme
-- controlled motion language, not flashy random effects
-
-Avoid early:
-- arbitrary 3D transitions everywhere
-- morphing layouts on all screens
-Those are expensive, brittle, and likely to hurt accessibility.
-
-#### 12. Hardware integrations
-Only after the software platform is mature:
-- billboard API connectors
-- livestream ingest endpoints
-- ops dashboard for public screens
-- curated sensor/event overlays
-
-Drones and IoT should be treated as separate future programs, not core MVP scope.
-
-## What is realistic on your budget
-With just you and about $40/month total, the realistic near-term target is:
-
-### Realistic now
-- stronger admin CMS
-- reliable image management
-- better live event/news feeds
-- persistent city graph v1
-- newsroom drafting workflow
-- moderation queue foundation
-
-### Not realistic now
-- custom live drone platform
-- smart billboard fleet integrations
-- citywide IoT ingestion at scale
-- “semantic graph of every person/place/org/event in OKC” fully completed in one pass
-- advanced gaze/sip hardware accessibility stack
-- infinitely scaling automated journalism with no operational cost
-
-## 4-year timeline recommendation
-
-### Year 1
-- complete admin operating system
-- fix images permanently
-- launch live feeds + newsroom queue
-- create persistent entity graph v1
-- improve search and related-item intelligence
-
-### Year 2
-- add source ingestion automation
-- add AI-assisted story drafting
-- add graph merge/review tools
-- add moderation system for submissions/events/media
-
-### Year 3
-- public knowledge graph experiences
-- timeline/history/context modules
-- richer newsroom analytics
-- structured civic topic pages for neighborhoods, orgs, issues, venues
-
-### Year 4
-- immersive interfaces
-- public display surfaces
-- external hardware integrations
-- advanced accessibility controls
-- selective live sensor/media integrations
-
-## Files/systems likely involved in the next implementation round
-- `src/pages/Admin.tsx`
-- `src/components/BriefingEditor.tsx`
-- `src/components/admin/ThemePanel.tsx`
-- `src/components/HeroCarousel.tsx`
-- `src/components/WireTicker.tsx`
-- `src/components/ListingImage.tsx`
-- `src/hooks/useListingImage.ts`
-- `src/lib/knowledgeGraph.ts`
-- `supabase/functions/image-search/index.ts`
-- `supabase/functions/admin-chat/index.ts`
-- `supabase/functions/smart-search/index.ts`
-
-And likely new backend tables for:
-- site settings / homepage modules
-- media overrides / media audit
-- feed sources / feed items / ingestion jobs
-- entities / aliases / relationships / mentions / documents
-- moderation queues / flags / decisions
-- article drafts / article revisions / publishing state
-
-## Best next build order I recommend
-1. Admin control center for editing more of the site
-2. Image reliability overhaul across all cards
-3. Real-time event/news feed infrastructure
-4. Persistent city graph v1
-5. AI newsroom drafting with approval flow
-6. Moderation queue foundation
-
-## Technical notes
-- The current AI stack already supports backend AI features, but the existing functions use Groq directly. Future work should standardize AI orchestration and keep prompts server-side.
-- The current knowledge graph is useful as a prototype, but it must move to backend tables to support persistent city intelligence.
-- The current image pipeline is useful, but it needs auditability, overrides, and precomputation.
-- Realtime is already present for briefings; the same pattern can extend to feeds, moderation queues, and newsroom operations.
-- Your strongest path is not “build everything futuristic now,” but “build a premium civic operating system first, then attach advanced interfaces later.”
