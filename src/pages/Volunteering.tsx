@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
+import { SectionHeader } from "@/components/SectionHeader";
 import { Footer } from "@/components/Footer";
 import { volunteerOrgs, volunteerCategories, volunteerCommitments, volunteerTypes } from "@/data/volunteerOrgs";
 import { ExternalLink, Search, SlidersHorizontal, X, MapPin, HandHelping } from "lucide-react";
@@ -84,6 +85,7 @@ const Volunteering = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0 animate-fade-in">
       <Navbar />
+      <SectionHeader section="Section D" deskName="The Civic Report" stats={[{ label: "orgs", value: volunteerOrgs.length }, { label: "categories", value: volunteerCategories.length - 1 }]} />
       <main className="flex-1">
         {/* Hero Banner */}
         <div className="relative w-full h-[200px] md:h-[300px] overflow-hidden">

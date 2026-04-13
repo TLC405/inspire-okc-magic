@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
+import { SectionHeader } from "@/components/SectionHeader";
 import { Footer } from "@/components/Footer";
 import { singlesEvents, singlesCategories, singlesTimeFilters, type SinglesEvent, type VerificationStatus } from "@/data/singlesEvents";
 import { searchAndRank } from "@/lib/singlesSearch";
@@ -159,6 +160,7 @@ const Singles = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0 animate-fade-in">
       <Navbar />
+      <SectionHeader section="Section B" deskName="The Singles Beat" stats={[{ label: "verified", value: verifiedCount }, { label: "total", value: singlesEvents.length }]} />
       <main className="flex-1">
         {/* Hero Banner */}
         <div className="relative w-full h-[200px] md:h-[300px] overflow-hidden">
