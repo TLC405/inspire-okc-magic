@@ -226,6 +226,45 @@ export type Database = {
         }
         Relationships: []
       }
+      hero_slides: {
+        Row: {
+          active: boolean
+          created_at: string
+          cta_link: string
+          cta_text: string
+          id: string
+          image_url: string
+          sort_order: number
+          subtitle: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          cta_link?: string
+          cta_text?: string
+          id?: string
+          image_url?: string
+          sort_order?: number
+          subtitle?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          cta_link?: string
+          cta_text?: string
+          id?: string
+          image_url?: string
+          sort_order?: number
+          subtitle?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       image_cache: {
         Row: {
           created_at: string
@@ -376,6 +415,39 @@ export type Database = {
           id?: string
           metadata?: Json | null
           reason?: string
+        }
+        Relationships: []
+      }
+      ticker_items: {
+        Row: {
+          active: boolean
+          category: string
+          created_at: string
+          headline: string
+          id: string
+          link: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          category?: string
+          created_at?: string
+          headline: string
+          id?: string
+          link?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          category?: string
+          created_at?: string
+          headline?: string
+          id?: string
+          link?: string
+          sort_order?: number
+          updated_at?: string
         }
         Relationships: []
       }

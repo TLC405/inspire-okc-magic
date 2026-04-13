@@ -1,6 +1,32 @@
-import { tickerItems } from "@/data/civicData";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { tickerItems as staticTickerItems } from "@/data/civicData";
+
+type DBTickerItem = {
+  id: string;
+  headline: string;
+  link: string;
+  category: string;
+};
 
 export function WireTicker() {
+  const [dbItems, setDbItems] = useState<DBTickerItem[] | null>(null);
+
+  useEffect(() => {
+    supabase
+      .from("ticker_items")
+      .select("id, headline, link, category")
+      .eq("active", true)
+      .order("sort_order", { ascending: true })
+      .then(({ data }) => {
+        if (data && data.length > 0) setDbItems(data as DBTickerItem[]);
+      });
+  }, []);
+
+  const items = dbItems
+    ? dbItems.map((d) => ({ tag: d.category, headline: d.headline }))
+    : staticTickerItems;
+
   return (
     <div className="wire-ticker">
       <div className="flex items-stretch">
@@ -13,7 +39,7 @@ export function WireTicker() {
         </div>
         <div className="overflow-hidden flex-1 relative">
           <div className="wire-ticker-track">
-            {[...tickerItems, ...tickerItems].map((item, i) => (
+            {[...items, ...items].map((item, i) => (
               <span
                 key={i}
                 className="inline-flex items-center font-mono text-[11px] tracking-wide py-[9px]"

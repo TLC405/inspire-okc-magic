@@ -10,6 +10,10 @@ import { supabase } from "@/integrations/supabase/client";
 import ReactMarkdown from "react-markdown";
 import { AdminBriefing } from "@/components/AdminBriefing";
 import { BriefingEditor } from "@/components/BriefingEditor";
+import { HeroSlideEditor } from "@/components/admin/HeroSlideEditor";
+import { TickerEditor } from "@/components/admin/TickerEditor";
+import { PullQuoteEditor } from "@/components/admin/PullQuoteEditor";
+import { ThemePanel } from "@/components/admin/ThemePanel";
 import {
   Shield, ShieldCheck, ShieldAlert, AlertTriangle, Search, MapPin, Eye, Database, Key,
   CheckCircle2, XCircle, RefreshCw, LogOut, Fingerprint,
@@ -50,7 +54,7 @@ const Admin = () => {
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const [authError, setAuthError] = useState("");
   const [authMsg, setAuthMsg] = useState("");
-  const [tab, setTab] = useState<"content" | "visitors" | "security" | "events" | "scanner" | "ai" | "briefing">("briefing");
+  const [tab, setTab] = useState<"content" | "visitors" | "security" | "events" | "scanner" | "ai" | "briefing" | "site">("briefing");
   const [evtSearch, setEvtSearch] = useState("");
   const [evtFilter, setEvtFilter] = useState<"all" | VerificationStatus>("all");
   const [visitors, setVisitors] = useState<any[]>([]);
@@ -433,6 +437,7 @@ const Admin = () => {
 
   const tabs = [
     { id: "briefing" as const, label: "Briefing", icon: TrendingUp },
+    { id: "site" as const, label: "Site Editor", icon: Settings },
     { id: "content" as const, label: "Content", icon: Edit3 },
     { id: "visitors" as const, label: "Visitors", icon: Users },
     { id: "security" as const, label: "Security", icon: Shield },
@@ -516,6 +521,17 @@ const Admin = () => {
             </div>
           )}
 
+          {/* ═══ SITE EDITOR TAB ═══ */}
+          {tab === "site" && (
+            <div className="space-y-8">
+              <HeroSlideEditor />
+              <div className="rule-thin" />
+              <TickerEditor />
+              <div className="rule-thin" />
+              <PullQuoteEditor />
+            </div>
+          )}
+
           {/* ═══ AI / SETTINGS TAB ═══ */}
           {tab === "ai" && (
             <div className="space-y-4">
@@ -571,7 +587,7 @@ const Admin = () => {
                       <li>• Full platform architecture (React + Vite + Tailwind + Supabase)</li>
                       <li>• All 6 directories with data structure details</li>
                       <li>• Brand voice guidelines (broadsheet journalism)</li>
-                      <li>• Theme system (Signal, Editorial, Raw)</li>
+                      <li>• Theme system (Light, Dark, Thunder, Comets)</li>
                       <li>• Edge functions and database schema</li>
                       <li>• Triple-verification system and confidence scoring</li>
                       <li>• Knowledge graph: {graphStats.nodeCount} entities, {graphStats.edgeCount} connections</li>
@@ -590,7 +606,9 @@ const Admin = () => {
                         </div>
                       </div>
                     </div>
-                  )}
+                   )}
+                  <div className="rule-thin my-4" />
+                  <ThemePanel />
                 </div>
               ) : (
                 <>
