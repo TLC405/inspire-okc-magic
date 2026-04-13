@@ -554,6 +554,15 @@ const Admin = () => {
           {/* ═══ FEEDS TAB ═══ */}
           {tab === "feeds" && <FeedManager />}
 
+          {/* ═══ GRAPH TAB ═══ */}
+          {tab === "graph" && <GraphEditor />}
+
+          {/* ═══ NEWSROOM TAB ═══ */}
+          {tab === "newsroom" && <NewsroomPanel />}
+
+          {/* ═══ MODERATION TAB ═══ */}
+          {tab === "moderation" && <ModerationPanel />}
+
           {/* ═══ AI / SETTINGS TAB ═══ */}
           {tab === "ai" && (
             <div className="space-y-4">
