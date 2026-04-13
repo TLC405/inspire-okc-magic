@@ -12,6 +12,7 @@
 
 @layer base {
   /* ══ Light — elegant broadsheet ══ */
+  :root,
   .light {
     --background: 40 28% 93%;
     --foreground: 0 0% 6%;
