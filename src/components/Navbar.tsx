@@ -249,9 +249,19 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Bottom thick + thin rule */}
-      <div className="h-[3px] bg-foreground" />
-      <div className="h-[1px] bg-foreground/15 mt-[1px]" />
+      {/* Bottom thick + thin rule — team-colored */}
+      <div className={cn(
+        "h-[3px]",
+        theme === "thunder" ? "bg-[hsl(200,100%,45%)]" :
+        theme === "comets" ? "bg-[hsl(270,55%,55%)]" :
+        "bg-foreground"
+      )} />
+      <div className={cn(
+        "h-[1px] mt-[1px]",
+        theme === "thunder" ? "bg-[hsl(8,87%,54%,0.4)]" :
+        theme === "comets" ? "bg-[hsl(168,100%,39%,0.4)]" :
+        "bg-foreground/15"
+      )} />
 
       {/* Wire Ticker */}
       <WireTicker />
