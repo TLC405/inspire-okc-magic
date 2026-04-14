@@ -476,6 +476,10 @@ export function VisitorDashboard() {
                           </div>
                         </div>
                         <div className="text-[10px]">
+                          <span className="text-muted-foreground">Session duration:</span>{" "}
+                          <span className="text-foreground font-semibold">{profile.sessionDuration > 0 ? `${profile.sessionDuration} min` : "Single hit"}</span>
+                        </div>
+                        <div className="text-[10px]">
                           <span className="text-muted-foreground">First seen:</span>{" "}
                           <span className="text-foreground">{new Date(profile.firstSeen).toLocaleString()}</span>
                         </div>
