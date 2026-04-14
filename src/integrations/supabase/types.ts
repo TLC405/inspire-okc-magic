@@ -939,6 +939,33 @@ export type Database = {
         }
         Relationships: []
       }
+      wire_feed_cache: {
+        Row: {
+          category: string
+          created_at: string
+          expires_at: string
+          generated_at: string
+          headline: string
+          id: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          expires_at?: string
+          generated_at?: string
+          headline: string
+          id?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          expires_at?: string
+          generated_at?: string
+          headline?: string
+          id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
