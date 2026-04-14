@@ -1031,7 +1031,10 @@ const ContentCardSingles = ({ event: evt, isEditing, editData, onEdit, onCancel,
             <Copy size={12} className="text-muted-foreground" />
           </button>
           {isEditing ? (
-            <button onClick={onCancel} className="p-1.5 hover:bg-muted/30 rounded"><X size={12} className="text-muted-foreground" /></button>
+            <>
+              <button onClick={onSave} className="p-1.5 hover:bg-accent/20 rounded" title="Save"><Save size={12} className="text-accent" /></button>
+              <button onClick={onCancel} className="p-1.5 hover:bg-muted/30 rounded"><X size={12} className="text-muted-foreground" /></button>
+            </>
           ) : (
             <button onClick={onEdit} className="p-1.5 hover:bg-muted/30 rounded"><Edit3 size={12} className="text-accent" /></button>
           )}
