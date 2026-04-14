@@ -1115,7 +1115,7 @@ const ContentCardFitness = ({ spot, isEditing, editData, onEdit, onCancel, onSav
   );
 };
 
-const ContentCardVolunteer = ({ org, isEditing, editData, onEdit, onCancel, onFieldChange, onCopy }: ContentCardProps & { org: VolunteerOrg }) => {
+const ContentCardVolunteer = ({ org, isEditing, editData, onEdit, onCancel, onSave, onFieldChange, onCopy }: ContentCardProps & { org: VolunteerOrg }) => {
   const [expanded, setExpanded] = useState(false);
   return (
     <div className={`skeuo-card-inset p-4 rounded ${isEditing ? "ring-2 ring-accent/30" : ""}`}>
