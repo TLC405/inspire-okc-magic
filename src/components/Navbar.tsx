@@ -76,9 +76,16 @@ export function Navbar() {
 
   useEffect(() => {
     let raf = 0;
+    let lastScrolled = false;
     const onScroll = () => {
       cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => setScrolled(window.scrollY > 60));
+      raf = requestAnimationFrame(() => {
+        const nowScrolled = window.scrollY > 80;
+        if (nowScrolled !== lastScrolled) {
+          lastScrolled = nowScrolled;
+          setScrolled(nowScrolled);
+        }
+      });
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
