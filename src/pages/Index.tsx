@@ -651,6 +651,7 @@ const Index = () => {
         <FolioLine page="Page A3" note="Lifestyle" />
 
         {/* ═══ Civic Intelligence Sidebar + Pull Quote ═══ */}
+        {isModuleVisible("civic_panels") && (
         <div className="container py-8 md:py-12">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Editorial Pull Quote */}
@@ -659,7 +660,7 @@ const Index = () => {
                 <div className="max-w-xl mx-auto text-center py-10" style={{ transform: `translateY(${-parallaxOffset * 0.3}px)` }}>
                   <span className="text-5xl text-foreground/15 leading-none" style={{ fontFamily: "'Playfair Display', serif" }}>"</span>
                   <p className="text-foreground/70 italic leading-relaxed -mt-4" style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.1rem, 2.5vw, 1.5rem)" }}>
-                    Oklahoma City has a way of surprising people. The ones who just moved here, still learning which districts are which. The ones who have lived here all their lives but have not yet found their crowd. The ones who are newly single, newly free, or newly arrived and looking for something to hold onto.
+                    {getCopy("pull_quote", "Oklahoma City has a way of surprising people. The ones who just moved here, still learning which districts are which. The ones who have lived here all their lives but have not yet found their crowd. The ones who are newly single, newly free, or newly arrived and looking for something to hold onto.")}
                   </p>
                   <span className="text-5xl text-foreground/15 leading-none" style={{ fontFamily: "'Playfair Display', serif" }}>"</span>
                   <p className="dateline text-muted-foreground mt-2">— The Editors</p>
@@ -678,6 +679,7 @@ const Index = () => {
           </div>
           <div className="rule-thin mt-4" />
         </div>
+        )}
 
         {/* ═══ Date Nights Showcase ═══ */}
         <div className="container py-4 md:py-8">
