@@ -812,6 +812,9 @@ const Admin = () => {
                   </div>
                 </div>
               </SectionCollapsible>
+              <SectionCollapsible id="developer" title="Developer / Integration" icon={Globe}>
+                <DeveloperPanel />
+              </SectionCollapsible>
             </div>
           )}
 
