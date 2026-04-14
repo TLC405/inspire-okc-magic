@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { useVisitorLog } from "@/hooks/useVisitorLog";
 import { MobileTabBar } from "@/components/MobileTabBar";
 import { SvgFilters } from "@/components/SvgFilters";
+import { SiteConfigContext, useSiteConfigLoader } from "@/hooks/useSiteConfig";
 import Index from "./pages/Index";
 import Singles from "./pages/Singles";
 import Events from "./pages/Events";
@@ -33,7 +34,6 @@ const AppInner = () => {
         <Route path="/fitness" element={<Workouts />} />
         <Route path="/volunteering" element={<Volunteering />} />
         <Route path="/discover" element={<Discover />} />
-        <Route path="/discover" element={<Discover />} />
         <Route path="/momento-mori" element={<MomentoMori />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/workouts" element={<Navigate to="/fitness" replace />} />
@@ -44,17 +44,24 @@ const AppInner = () => {
   );
 };
 
+const SiteConfigWrapper = ({ children }: { children: React.ReactNode }) => {
+  const config = useSiteConfigLoader();
+  return <SiteConfigContext.Provider value={config}>{children}</SiteConfigContext.Provider>;
+};
+
 const App = () => {
   return (
     <ThemeProvider>
       <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <AppInner />
-          </BrowserRouter>
-        </TooltipProvider>
+        <SiteConfigWrapper>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <AppInner />
+            </BrowserRouter>
+          </TooltipProvider>
+        </SiteConfigWrapper>
       </QueryClientProvider>
     </ThemeProvider>
   );
