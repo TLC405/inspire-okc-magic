@@ -22,6 +22,7 @@ import { GraphEditor } from "@/components/admin/GraphEditor";
 import { NewsroomPanel } from "@/components/admin/NewsroomPanel";
 import { ModerationPanel } from "@/components/admin/ModerationPanel";
 import { VisitorDashboard } from "@/components/admin/VisitorDashboard";
+import { DeveloperPanel } from "@/components/admin/DeveloperPanel";
 import {
   Shield, ShieldCheck, ShieldAlert, AlertTriangle, Search, MapPin, Eye, Database, Key,
   CheckCircle2, XCircle, RefreshCw, LogOut, Fingerprint,
