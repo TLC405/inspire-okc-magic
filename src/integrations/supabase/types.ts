@@ -529,6 +529,36 @@ export type Database = {
         }
         Relationships: []
       }
+      listing_overrides: {
+        Row: {
+          created_at: string
+          field_overrides: Json
+          id: string
+          listing_id: string
+          listing_type: string
+          updated_at: string
+          updated_by: string
+        }
+        Insert: {
+          created_at?: string
+          field_overrides?: Json
+          id?: string
+          listing_id: string
+          listing_type: string
+          updated_at?: string
+          updated_by: string
+        }
+        Update: {
+          created_at?: string
+          field_overrides?: Json
+          id?: string
+          listing_id?: string
+          listing_type?: string
+          updated_at?: string
+          updated_by?: string
+        }
+        Relationships: []
+      }
       media_overrides: {
         Row: {
           created_at: string
