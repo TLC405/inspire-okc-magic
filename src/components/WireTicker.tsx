@@ -152,10 +152,11 @@ export function WireTicker() {
             </div>
           </PopoverTrigger>
           <PopoverContent
-            className="w-72 p-3 max-h-80 overflow-y-auto"
+            className="w-64 sm:w-72 p-3 max-h-72 overflow-y-auto"
             side="bottom"
             align="start"
             sideOffset={4}
+            collisionPadding={8}
           >
             <div className="space-y-3">
               <div className="flex items-center justify-between">
