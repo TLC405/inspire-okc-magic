@@ -20,6 +20,7 @@ import heroSingles from "@/assets/hero-singles.jpg";
 import heroFitness from "@/assets/hero-fitness.jpg";
 import heroVolunteer from "@/assets/hero-volunteer.jpg";
 import { CityConcierge } from "@/components/CityConcierge";
+import { useSiteConfig } from "@/hooks/useSiteConfig";
 
 
 const today = new Date();
@@ -241,6 +242,7 @@ const Index = () => {
   const { toast } = useToast();
   const pullQuoteRef = useRef<HTMLDivElement>(null);
   const [parallaxOffset, setParallaxOffset] = useState(0);
+  const { isModuleVisible, getCopy } = useSiteConfig();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -283,11 +285,14 @@ const Index = () => {
 
       <main className="flex-1">
         {/* ═══ Hero Photo Carousel ═══ */}
+        {isModuleVisible("hero_carousel") && (
         <div className="relative">
           <HeroCarousel />
         </div>
+        )}
 
         {/* ═══ Newspaper Front Page Headline ═══ */}
+        {isModuleVisible("headline_block") && (
         <div className="container relative z-10 -mt-6">
           <div className="bg-background border-t-[4px] border-foreground pt-6 pb-5">
             <div className="flex items-center justify-center gap-3 mb-2">
@@ -300,7 +305,7 @@ const Index = () => {
               className="text-center font-black tracking-[-0.02em] leading-[0.9] text-foreground"
               style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(2rem, 6vw, 3.8rem)" }}
             >
-              Your Guide to Oklahoma City
+              {getCopy("headline", "Your Guide to Oklahoma City")}
             </h2>
 
             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mt-2">
@@ -308,7 +313,7 @@ const Index = () => {
               <span className="text-foreground/20">·</span>
               <span className="dateline text-foreground font-bold">{totalListings} Listings</span>
               <span className="text-foreground/20">·</span>
-              <span className="dateline text-muted-foreground">Singles · Fitness · Volunteering · Date Nights</span>
+              <span className="dateline text-muted-foreground">{getCopy("tagline", "Singles · Fitness · Volunteering · Date Nights")}</span>
             </div>
 
             <div className="flex items-center gap-3 mt-3">
@@ -318,8 +323,10 @@ const Index = () => {
             </div>
           </div>
         </div>
+        )}
 
         {/* ═══ Search ═══ */}
+        {isModuleVisible("search") && (
         <div className="container mt-6 relative z-10 mb-4 md:mb-8">
           <div className="max-w-2xl mx-auto">
             <div className="skeuo-card p-4 md:p-6 rounded-lg">
@@ -327,10 +334,12 @@ const Index = () => {
             </div>
           </div>
         </div>
+        )}
 
         <FolioLine page="Page A1" note="Front Page" />
 
         {/* ═══ Photo Grid Showcase ═══ */}
+        {isModuleVisible("photo_grid") && (
         <div className="container py-4 md:py-6">
           <SectionHeader title="📸 Around the City" subtitle="Staff Photography · Community Highlights" />
           <div className="photo-grid-showcase">
@@ -344,6 +353,7 @@ const Index = () => {
           </div>
           <div className="rule-thin mt-4" />
         </div>
+        )}
 
         {/* ═══ Quick-Nav Cards (mobile) ═══ */}
         <div className="container py-4 md:hidden">
@@ -370,11 +380,12 @@ const Index = () => {
         </div>
 
         {/* ═══ Newsletter CTA ═══ */}
+        {isModuleVisible("newsletter") && (
         <div className="container py-4 md:py-6">
           <div className="skeuo-card p-4 md:p-6 rounded-lg max-w-2xl mx-auto text-center">
             <Mail size={20} className="mx-auto mb-2 text-accent" />
-            <h3 className="headline text-foreground text-base md:text-lg">Get the Weekly Brief</h3>
-            <p className="dateline text-muted-foreground mt-1 mb-3">Oklahoma City's best events, fitness, and community — delivered every Monday.</p>
+            <h3 className="headline text-foreground text-base md:text-lg">{getCopy("newsletter_title", "Get the Weekly Brief")}</h3>
+            <p className="dateline text-muted-foreground mt-1 mb-3">{getCopy("newsletter_subtitle", "Oklahoma City's best events, fitness, and community — delivered every Monday.")}</p>
             {subscribed ? (
               <p className="text-sm text-accent font-semibold">You're on the list.</p>
             ) : (
@@ -394,11 +405,23 @@ const Index = () => {
             )}
           </div>
         </div>
+        )}
+                  className="flex-1 px-3 py-2 bg-muted/30 border border-border/50 rounded text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-accent"
+                />
+                <button type="submit" className="skeuo-btn rounded px-4 py-2 text-sm font-semibold">
+                  Subscribe
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
 
         {/* ═══ Tonight in OKC ═══ */}
+        {isModuleVisible("tonight_block") && (
         <div className="container py-4 md:py-6">
           <TonightBlock />
         </div>
+        )}
 
         {/* ═══ City Pulse — Intelligence Widget ═══ */}
         <div className="container py-4 md:py-6">
@@ -406,13 +429,16 @@ const Index = () => {
         </div>
 
         {/* ═══ Live City Briefings ═══ */}
+        {isModuleVisible("live_briefings") && (
         <div className="py-6 md:py-10">
           <LiveBriefings />
         </div>
+        )}
 
         <FolioLine page="Page A2" note="Broadsheet" />
 
         {/* ═══ Broadsheet Columns ═══ */}
+        {isModuleVisible("broadsheet") && (
         <div className="container py-6 md:py-14">
           {/* Desktop: 3-column broadsheet */}
           <div className="hidden md:block">
@@ -620,6 +646,7 @@ const Index = () => {
             </div>
           </div>
         </div>
+        )}
 
         <FolioLine page="Page A3" note="Lifestyle" />
 
