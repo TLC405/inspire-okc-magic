@@ -70,15 +70,67 @@ export interface DateNightListing {
 
 // ── Wire Ticker Headlines ──────────────────────────
 export const tickerItems: TickerItem[] = [
+  // ── THUNDER ──
   { tag: "THUNDER WIRE", headline: "SGA drops 36 pts as OKC defeats Denver 118–103, clinches No. 1 seed in the Western Conference — playoffs begin April 19" },
+  { tag: "THUNDER WIRE", headline: "Chet Holmgren records triple-double (18-12-10) in Thunder's dominant win over Sacramento Kings" },
+  { tag: "THUNDER WIRE", headline: "Jalen Williams named to All-Star reserves — third Thunder player selected this season" },
+  { tag: "THUNDER WIRE", headline: "Thunder set franchise record with 67 regular-season wins, surpassing 2012–13 mark" },
+  // ── COMETS ──
   { tag: "COMET WATCH", headline: "OKC Comets announce 2026 NWSL home schedule — season opener vs. Portland Thorns, May 3 at Taft Stadium, tickets from $18" },
+  { tag: "COMET WATCH", headline: "Comets sign Colombian international midfielder Catalina Usme to two-year deal" },
+  { tag: "COMET WATCH", headline: "Taft Stadium expansion to 12,000 seats approved — construction begins July 2026" },
+  // ── ENERGY FC ──
+  { tag: "ENERGY FC", headline: "OKC Energy FC opens USL Championship season with 3–1 home win over San Antonio" },
+  { tag: "ENERGY FC", headline: "Energy FC academy product signs first professional contract at age 17" },
+  // ── DODGERS ──
+  { tag: "OKC BASEBALL", headline: "Oklahoma City Dodgers 2026 season underway — home games at Chickasaw Bricktown Ballpark through September" },
+  { tag: "OKC BASEBALL", headline: "Dodgers prospect hits for the cycle in 9–2 win over Sugar Land Space Cowboys" },
+  // ── CITY HALL ──
   { tag: "CITY HALL", headline: "Mayor Holt signs Broadband Equity Act, directing $12M to connect 28 underserved OKC neighborhoods by 2027" },
+  { tag: "CITY HALL", headline: "City Council approves $45M affordable housing bond for five priority corridors" },
+  { tag: "CITY HALL", headline: "OKC announces free citywide Wi-Fi pilot in Bricktown, Midtown, and Paseo districts" },
+  // ── MAPS 4 ──
   { tag: "MAPS 4 UPDATE", headline: "City Council greenlights downtown light-rail feasibility study — OKC-to-Edmond corridor environmental review underway" },
-  { tag: "SPORTS BRIEF", headline: "Thunder vs. LA Clippers — Playoffs Round 1 Game 1, April 19 at Paycom Center, 7:00 PM CT — tickets from $85" },
+  { tag: "MAPS 4 UPDATE", headline: "MAPS 4 mental health campus groundbreaking scheduled for June 2026 on NE 23rd Street" },
+  // ── PARKS ──
   { tag: "PARKS DESK", headline: "Scissortail Park Phase III groundbreaking set for May 15 — 22 additional acres of urban green space to be added by 2028" },
-  { tag: "GROWTH REPORT", headline: "Oklahoma City ranks No. 3 fastest-growing major US city — Census Bureau preliminary 2025 estimates confirm metro surge" },
+  { tag: "PARKS DESK", headline: "Myriad Botanical Gardens launches free summer concert series every Friday in June and July" },
+  // ── ARTS & CULTURE ──
   { tag: "ARTS & CULTURE", headline: "Paseo Arts Festival confirms May 24–26 dates — 100+ working artists, live music on three stages, free admission" },
+  { tag: "ARTS & CULTURE", headline: "Oklahoma Contemporary opens 'Future Frequencies' digital art exhibition — runs through August" },
+  { tag: "ARTS & CULTURE", headline: "Factory Obscura announces new immersive installation 'Echoes' opening Memorial Day weekend" },
+  // ── WEATHER ──
   { tag: "WEATHER DESK", headline: "NWS urges OKC metro preparedness as severe weather season enters peak window — shelter map posted at okc.gov" },
+  { tag: "WEATHER DESK", headline: "High of 88°F today with 20% chance of afternoon storms — stay hydrated, OKC" },
+  // ── BUSINESS ──
+  { tag: "BUSINESS", headline: "Boeing confirms 800-job expansion at Tinker Air Force Base maintenance facility" },
+  { tag: "BUSINESS", headline: "OKC tech startup Tailwind Health raises $22M Series A to expand telehealth platform" },
+  { tag: "BUSINESS", headline: "Paycom breaks ground on second headquarters tower in downtown Oklahoma City" },
+  // ── REAL ESTATE ──
+  { tag: "REAL ESTATE", headline: "OKC median home price reaches $285K — up 7% year-over-year, still among most affordable major metros" },
+  { tag: "REAL ESTATE", headline: "New 400-unit mixed-use development announced for Film Row district, delivery expected 2028" },
+  // ── FOOD & DRINK ──
+  { tag: "FOOD & DRINK", headline: "James Beard semifinalist Nonesuch named one of America's best restaurants for third consecutive year" },
+  { tag: "FOOD & DRINK", headline: "OKC's first Korean BBQ food hall opens in Asian District on Classen Boulevard" },
+  // ── COMMUNITY ──
+  { tag: "COMMUNITY", headline: "Regional Food Bank of Oklahoma distributes 2 million meals in Q1 2026 — volunteers needed" },
+  { tag: "COMMUNITY", headline: "Habitat for Humanity OKC completes 50th home this year in Spencer neighborhood" },
+  // ── EDUCATION ──
+  { tag: "EDUCATION", headline: "OU Health Sciences Center receives $30M NIH grant for genomic medicine research" },
+  { tag: "EDUCATION", headline: "OKCPS graduation rate hits 82% — highest in district history" },
+  // ── TRANSIT ──
+  { tag: "TRANSIT", headline: "EMBARK launches new rapid bus line connecting Edmond to downtown OKC — 25-minute express service" },
+  { tag: "TRANSIT", headline: "Will Rogers World Airport reports record 5.2M passengers in 2025, new terminal expansion approved" },
+  // ── GROWTH ──
+  { tag: "GROWTH REPORT", headline: "Oklahoma City ranks No. 3 fastest-growing major US city — Census Bureau preliminary 2025 estimates confirm metro surge" },
+  { tag: "GROWTH REPORT", headline: "OKC metro population surpasses 1.5 million — city proper at 720K residents" },
+  // ── HEALTH ──
+  { tag: "HEALTH", headline: "INTEGRIS opens new 120-bed behavioral health facility on I-44 corridor — largest in the state" },
+  // ── TECH ──
+  { tag: "TECH", headline: "Oklahoma Innovation District announces $50M venture fund for local startups" },
+  { tag: "TECH", headline: "Cyber Command training center at Tinker AFB graduates 500th cohort of cybersecurity specialists" },
+  // ── SPORTS BRIEF ──
+  { tag: "SPORTS BRIEF", headline: "Thunder vs. LA Clippers — Playoffs Round 1 Game 1, April 19 at Paycom Center, 7:00 PM CT — tickets from $85" },
 ];
 
 // ── Mayor's Desk ──────────────────────────
