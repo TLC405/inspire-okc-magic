@@ -1072,7 +1072,7 @@ const ContentCardSingles = ({ event: evt, isEditing, editData, onEdit, onCancel,
   );
 };
 
-const ContentCardFitness = ({ spot, isEditing, editData, onEdit, onCancel, onFieldChange, onCopy }: ContentCardProps & { spot: FitnessSpot }) => {
+const ContentCardFitness = ({ spot, isEditing, editData, onEdit, onCancel, onSave, onFieldChange, onCopy }: ContentCardProps & { spot: FitnessSpot }) => {
   const [expanded, setExpanded] = useState(false);
   return (
     <div className={`skeuo-card-inset p-4 rounded ${isEditing ? "ring-2 ring-accent/30" : ""}`}>
