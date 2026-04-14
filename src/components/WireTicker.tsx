@@ -55,7 +55,7 @@ export function WireTicker() {
     () => new Set(loadPrefs()?.categories || ALL_CATEGORIES)
   );
   const [speed, setSpeed] = useState<Speed>(
-    () => loadPrefs()?.speed || "medium"
+    () => loadPrefs()?.speed || "slow"
   );
 
   // Load DB ticker items

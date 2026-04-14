@@ -864,9 +864,9 @@
   contain: content;
 }
 
-.wire-ticker-track[data-speed="slow"] { animation: wire-scroll 150s linear infinite; }
-.wire-ticker-track[data-speed="medium"] { animation: wire-scroll 90s linear infinite; }
-.wire-ticker-track[data-speed="fast"] { animation: wire-scroll 45s linear infinite; }
+.wire-ticker-track[data-speed="slow"] { animation: wire-scroll 300s linear infinite; }
+.wire-ticker-track[data-speed="medium"] { animation: wire-scroll 200s linear infinite; }
+.wire-ticker-track[data-speed="fast"] { animation: wire-scroll 120s linear infinite; }
 
 @keyframes wire-scroll {
   from { transform: translate3d(0, 0, 0); }
