@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Globe, MapPin, Activity, Users, Shield, AlertTriangle, Eye, Fingerprint, RefreshCw, ChevronDown, ChevronUp, Search } from "lucide-react";
+import { Globe, MapPin, Activity, Users, Shield, AlertTriangle, Eye, Fingerprint, RefreshCw, ChevronDown, ChevronUp, Search, Download, Link2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface VisitorLog {
@@ -323,6 +323,27 @@ export function VisitorDashboard() {
         </select>
         <button onClick={loadVisitors} className="skeuo-btn text-xs" disabled={loading}>
           <RefreshCw size={10} className={loading ? "animate-spin" : ""} /> Refresh
+        </button>
+        <button
+          onClick={() => {
+            if (!analytics) return;
+            const headers = ["IP", "City", "Region", "Country", "Type", "Hits", "Threat", "Last Seen"];
+            const rows = filteredProfiles.map(p => [
+              p.ip, p.city || "", p.region || "", p.country || "",
+              p.classification.label, p.count, p.threat.score, new Date(p.lastSeen).toISOString(),
+            ]);
+            const csv = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+            const blob = new Blob([csv], { type: "text/csv" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `visitors-${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+          }}
+          className="skeuo-btn text-xs"
+        >
+          <Download size={10} /> Export CSV
         </button>
       </div>
 

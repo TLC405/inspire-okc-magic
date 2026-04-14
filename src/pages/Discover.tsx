@@ -50,10 +50,10 @@ const Discover = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-black/30" />
           <div className="absolute bottom-0 left-0 right-0 container pb-6">
             <h1 className="section-head text-foreground text-3xl md:text-5xl drop-shadow-lg">
-              What's Happening in OKC
+              Flea Markets, Community Events &amp; Local Happenings
             </h1>
             <p className="dateline text-foreground/70 mt-1">
-              Events, fitness, volunteering & city highlights — all in one feed
+              Garage sales, farmers markets, art walks, food trucks &amp; everything OKC
             </p>
           </div>
         </div>
