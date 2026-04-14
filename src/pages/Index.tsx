@@ -406,15 +406,6 @@ const Index = () => {
           </div>
         </div>
         )}
-                  className="flex-1 px-3 py-2 bg-muted/30 border border-border/50 rounded text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-accent"
-                />
-                <button type="submit" className="skeuo-btn rounded px-4 py-2 text-sm font-semibold">
-                  Subscribe
-                </button>
-              </form>
-            )}
-          </div>
-        </div>
 
         {/* ═══ Tonight in OKC ═══ */}
         {isModuleVisible("tonight_block") && (
