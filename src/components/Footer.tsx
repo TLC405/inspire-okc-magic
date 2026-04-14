@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import React, { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowRight, Shield } from "lucide-react";
@@ -13,7 +13,7 @@ const sections = [
   { label: "Discover", href: "/discover" },
 ];
 
-export function Footer() {
+export const Footer = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>((props, ref) => {
   const [email, setEmail] = useState("");
   const [done, setDone] = useState(false);
   const { toast } = useToast();
@@ -37,7 +37,7 @@ export function Footer() {
   };
 
   return (
-    <footer className="mt-auto" style={{ boxShadow: "inset 0 2px 6px hsl(0 0% 0% / 0.04)" }}>
+    <footer ref={ref} {...props} className="mt-auto" style={{ boxShadow: "inset 0 2px 6px hsl(0 0% 0% / 0.04)" }}>
       <div className="h-[3px] bg-foreground" />
       <div className="h-[1px] bg-foreground/20 mt-[2px]" />
 
@@ -118,4 +118,5 @@ export function Footer() {
       </div>
     </footer>
   );
-}
+});
+Footer.displayName = "Footer";

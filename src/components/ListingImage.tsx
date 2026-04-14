@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { getStaticImage } from "@/data/listingImages";
 import { Heart, Dumbbell, HandHelping, MapPin, Building2 } from "lucide-react";
 
@@ -50,7 +50,7 @@ interface ListingImageProps {
   className?: string;
 }
 
-export const ListingImage = ({ listingType, listingId, name, category, className = "" }: ListingImageProps) => {
+export const ListingImage = React.forwardRef<HTMLDivElement, ListingImageProps>(({ listingType, listingId, name, category, className = "" }, ref) => {
   const staticUrl = getStaticImage(listingType, listingId, category);
   const [imgError, setImgError] = useState(false);
 
@@ -59,7 +59,7 @@ export const ListingImage = ({ listingType, listingId, name, category, className
 
   if (imgError) {
     return (
-      <div className={`bg-gradient-to-br ${gradient} flex items-center justify-center ${className}`}>
+      <div ref={ref} className={`bg-gradient-to-br ${gradient} flex items-center justify-center ${className}`}>
         <FallbackIcon size={24} className="text-foreground/20" />
       </div>
     );
@@ -74,4 +74,5 @@ export const ListingImage = ({ listingType, listingId, name, category, className
       onError={() => setImgError(true)}
     />
   );
-};
+});
+ListingImage.displayName = "ListingImage";
