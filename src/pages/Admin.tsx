@@ -980,6 +980,7 @@ interface ContentCardProps {
   editData: Record<string, any>;
   onEdit: () => void;
   onCancel: () => void;
+  onSave: () => void;
   onFieldChange: (field: string, value: string) => void;
   onCopy: () => void;
 }
