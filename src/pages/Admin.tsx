@@ -339,6 +339,25 @@ const Admin = () => {
     setEditData({});
   };
 
+  const saveOverride = async (listingType: string, listingId: string) => {
+    if (!user || !editingId) return;
+    try {
+      await supabase.from("listing_overrides" as any).upsert({
+        listing_type: listingType,
+        listing_id: listingId,
+        field_overrides: editData,
+        updated_by: user.id,
+      }, { onConflict: "listing_type,listing_id" });
+      setCopiedMsg("Changes saved to database");
+      setTimeout(() => setCopiedMsg(""), 2000);
+      setEditingId(null);
+      setEditData({});
+    } catch (e: any) {
+      setCopiedMsg(`Error: ${e.message}`);
+      setTimeout(() => setCopiedMsg(""), 3000);
+    }
+  };
+
   const copyAsJson = (data: any, label: string) => {
     navigator.clipboard.writeText(JSON.stringify(data, null, 2));
     setCopiedMsg(`Copied ${label} to clipboard`);
@@ -817,6 +836,23 @@ const Admin = () => {
                 <div className="flex items-center gap-2">
                   <button onClick={() => setShowSettings(!showSettings)} className={`skeuo-btn text-xs ${showSettings ? "bg-accent/20" : ""}`}>
                     <Settings size={12} /> {showSettings ? "Chat" : "Settings"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (chatMessages.length === 0) return;
+                      const md = chatMessages.map(m => `**${m.role === "user" ? "You" : "AI"}**: ${m.content}`).join("\n\n---\n\n");
+                      const blob = new Blob([md], { type: "text/markdown" });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement("a");
+                      a.href = url;
+                      a.download = `inspire-chat-${new Date().toISOString().slice(0, 10)}.md`;
+                      a.click();
+                      URL.revokeObjectURL(url);
+                    }}
+                    className="skeuo-btn text-xs"
+                    disabled={chatMessages.length === 0}
+                  >
+                    <Copy size={12} /> Export
                   </button>
                   <button onClick={clearChat} className="skeuo-btn text-xs">
                     <Trash2 size={12} /> Clear
