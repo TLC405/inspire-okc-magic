@@ -1010,7 +1010,7 @@ const EditableField = ({ label, field, value, editData, isEditing, onChange, mul
   </div>
 );
 
-const ContentCardSingles = ({ event: evt, isEditing, editData, onEdit, onCancel, onFieldChange, onCopy }: ContentCardProps & { event: SinglesEvent }) => {
+const ContentCardSingles = ({ event: evt, isEditing, editData, onEdit, onCancel, onSave, onFieldChange, onCopy }: ContentCardProps & { event: SinglesEvent }) => {
   const [expanded, setExpanded] = useState(false);
   return (
     <div className={`skeuo-card-inset p-4 rounded ${isEditing ? "ring-2 ring-accent/30" : ""}`}>
