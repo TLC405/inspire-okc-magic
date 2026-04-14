@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Globe, MapPin, Activity, Users, Shield, AlertTriangle, Eye, Fingerprint, RefreshCw, ChevronDown, ChevronUp, Search } from "lucide-react";
+import { Globe, MapPin, Activity, Users, Shield, AlertTriangle, Eye, Fingerprint, RefreshCw, ChevronDown, ChevronUp, Search, Download, Link2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface VisitorLog {
@@ -141,6 +141,25 @@ export function VisitorDashboard() {
     const topPages = Object.entries(pageCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
     const peakHour = hourCounts.indexOf(Math.max(...hourCounts));
 
+    // Referrer analytics
+    const referrerCounts: Record<string, number> = {};
+    visitors.forEach(v => {
+      const ref = v.referrer ? new URL(v.referrer).hostname.replace(/^www\./, '') : "Direct";
+      referrerCounts[ref] = (referrerCounts[ref] || 0) + 1;
+    });
+    const topReferrers = Object.entries(referrerCounts).sort((a, b) => b[1] - a[1]).slice(0, 8);
+
+    // Device/browser distribution
+    const browserCounts: Record<string, number> = {};
+    const deviceCounts: Record<string, number> = {};
+    visitors.forEach(v => {
+      const parsed = parseUA(v.user_agent);
+      browserCounts[parsed.browser] = (browserCounts[parsed.browser] || 0) + 1;
+      deviceCounts[parsed.device] = (deviceCounts[parsed.device] || 0) + 1;
+    });
+    const topBrowsers = Object.entries(browserCounts).sort((a, b) => b[1] - a[1]);
+    const topDevices = Object.entries(deviceCounts).sort((a, b) => b[1] - a[1]);
+
     // Build IP profiles
     const ipProfiles = uniqueIps.map(ip => {
       const visits = ipVisits[ip];
@@ -150,11 +169,13 @@ export function VisitorDashboard() {
       const threat = threatScore(ip, visits.length, ua, last.referrer);
       const parsed = parseUA(ua);
       const cls = classifyUA(ua);
+      const sessionMs = new Date(last.created_at).getTime() - new Date(first.created_at).getTime();
       return {
         ip,
         count: visits.length,
         lastSeen: last.created_at,
         firstSeen: first.created_at,
+        sessionDuration: sessionMs > 0 ? Math.round(sessionMs / 60000) : 0,
         city: last.city,
         region: last.region,
         country: last.country,
@@ -169,7 +190,7 @@ export function VisitorDashboard() {
       };
     });
 
-    return { ipCounts, uniqueIps, repeatIps, todayVisits, topCountries, topCities, topPages, peakHour, hourCounts, bots, scanners, humans, noUA, ipProfiles };
+    return { ipCounts, uniqueIps, repeatIps, todayVisits, topCountries, topCities, topPages, peakHour, hourCounts, bots, scanners, humans, noUA, ipProfiles, topReferrers, topBrowsers, topDevices };
   }, [visitors]);
 
   // Filter + sort IP profiles
@@ -273,7 +294,48 @@ export function VisitorDashboard() {
             ))}
           </div>
         </div>
-      </div>
+        </div>
+
+        {/* Referrer Sources */}
+        <div className="skeuo-card p-4 rounded">
+          <h4 className="label-caps text-foreground text-[10px] mb-3 flex items-center gap-1"><Link2 size={11} /> Top Referrers</h4>
+          <div className="space-y-2">
+            {analytics.topReferrers.map(([ref, count]) => (
+              <div key={ref} className="flex items-center gap-2">
+                <span className="text-xs text-foreground flex-1 truncate">{ref}</span>
+                <span className="font-mono text-xs text-foreground font-bold">{count}</span>
+                <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
+                  <div className="h-full bg-accent rounded-full" style={{ width: `${(count / visitors.length) * 100}%` }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Browser + Device Distribution */}
+        <div className="skeuo-card p-4 rounded">
+          <h4 className="label-caps text-foreground text-[10px] mb-3">Browser &amp; Device</h4>
+          <div className="space-y-1 mb-3">
+            {analytics.topBrowsers.map(([browser, count]) => (
+              <div key={browser} className="flex items-center gap-2">
+                <span className="text-xs text-foreground flex-1">{browser}</span>
+                <span className="font-mono text-xs text-foreground font-bold">{count}</span>
+                <div className="w-12 h-1.5 bg-muted rounded-full overflow-hidden">
+                  <div className="h-full bg-accent/60 rounded-full" style={{ width: `${(count / visitors.length) * 100}%` }} />
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="border-t border-border/20 pt-2 space-y-1">
+            {analytics.topDevices.map(([device, count]) => (
+              <div key={device} className="flex items-center gap-2">
+                <span className="text-xs text-foreground flex-1">{device}</span>
+                <span className="font-mono text-xs text-foreground font-bold">{count}</span>
+                <span className="font-mono text-[10px] text-muted-foreground w-8 text-right">{((count / visitors.length) * 100).toFixed(0)}%</span>
+              </div>
+            ))}
+          </div>
+        </div>
 
       {/* ═══ Hourly Activity Heatmap ═══ */}
       <div className="skeuo-card p-4 rounded">
@@ -323,6 +385,27 @@ export function VisitorDashboard() {
         </select>
         <button onClick={loadVisitors} className="skeuo-btn text-xs" disabled={loading}>
           <RefreshCw size={10} className={loading ? "animate-spin" : ""} /> Refresh
+        </button>
+        <button
+          onClick={() => {
+            if (!analytics) return;
+            const headers = ["IP", "City", "Region", "Country", "Type", "Hits", "Threat", "Last Seen"];
+            const rows = filteredProfiles.map(p => [
+              p.ip, p.city || "", p.region || "", p.country || "",
+              p.classification.label, p.count, p.threat.score, new Date(p.lastSeen).toISOString(),
+            ]);
+            const csv = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+            const blob = new Blob([csv], { type: "text/csv" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `visitors-${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+          }}
+          className="skeuo-btn text-xs"
+        >
+          <Download size={10} /> Export CSV
         </button>
       </div>
 
@@ -391,6 +474,10 @@ export function VisitorDashboard() {
                             <span className="text-muted-foreground">Coordinates</span>
                             <p className="text-foreground font-semibold">{profile.lat && profile.lng ? `${profile.lat.toFixed(3)}, ${profile.lng.toFixed(3)}` : "—"}</p>
                           </div>
+                        </div>
+                        <div className="text-[10px]">
+                          <span className="text-muted-foreground">Session duration:</span>{" "}
+                          <span className="text-foreground font-semibold">{profile.sessionDuration > 0 ? `${profile.sessionDuration} min` : "Single hit"}</span>
                         </div>
                         <div className="text-[10px]">
                           <span className="text-muted-foreground">First seen:</span>{" "}

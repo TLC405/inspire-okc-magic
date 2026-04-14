@@ -4,6 +4,7 @@ const TitleCartouche = () => (
     <path d="M -20 -1.8 L 20 -1.8 L 20 1.8 L -20 1.8 Z" fill="none" stroke="hsl(32 18% 58%)" strokeWidth="0.06" opacity="0.4"/>
     <text x="0" y="0.3" textAnchor="middle" fontFamily="'Cinzel', serif" fontSize="2.2" fontWeight="600" fill="hsl(32 28% 25%)" letterSpacing="0.25">THE GREAT PLAINS</text>
     <text x="0" y="2.2" textAnchor="middle" fontFamily="'Roboto Condensed', sans-serif" fontSize="0.7" fill="hsl(32 22% 40%)" fontStyle="italic" letterSpacing="0.12">TLC Presents • Legendary Territories</text>
+    <text x="0" y="-1.6" textAnchor="middle" fontFamily="'Quicksand', sans-serif" fontSize="0.45" fill="hsl(340 35% 50%)" letterSpacing="0.15" opacity="0.7">♥ TLC ♥</text>
     <g stroke="hsl(32 20% 55%)" strokeWidth="0.1" fill="none" opacity="0.5">
       <path d="M -16 -1.3 Q -14 -2 -12 -1.3"/>
       <path d="M 12 -1.3 Q 14 -2 16 -1.3"/>

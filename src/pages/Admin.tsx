@@ -339,6 +339,25 @@ const Admin = () => {
     setEditData({});
   };
 
+  const saveOverride = async (listingType: string, listingId: string) => {
+    if (!user || !editingId) return;
+    try {
+      await supabase.from("listing_overrides" as any).upsert({
+        listing_type: listingType,
+        listing_id: listingId,
+        field_overrides: editData,
+        updated_by: user.id,
+      }, { onConflict: "listing_type,listing_id" });
+      setCopiedMsg("Changes saved to database");
+      setTimeout(() => setCopiedMsg(""), 2000);
+      setEditingId(null);
+      setEditData({});
+    } catch (e: any) {
+      setCopiedMsg(`Error: ${e.message}`);
+      setTimeout(() => setCopiedMsg(""), 3000);
+    }
+  };
+
   const copyAsJson = (data: any, label: string) => {
     navigator.clipboard.writeText(JSON.stringify(data, null, 2));
     setCopiedMsg(`Copied ${label} to clipboard`);
@@ -608,7 +627,7 @@ const Admin = () => {
                       {filteredContentSingles.map((evt) => (
                         <ContentCardSingles key={evt.id} event={evt} isEditing={editingId === evt.id} editData={editData}
                           onEdit={() => startEditing(evt.id, { name: evt.name, venue: evt.venue, neighborhood: evt.neighborhood, description: evt.description, price: evt.price, frequency: evt.frequency, tags: evt.tags.join(", ") })}
-                          onCancel={cancelEditing} onFieldChange={(field, value) => setEditData((d) => ({ ...d, [field]: value }))} onCopy={() => copyAsJson(evt, evt.name)} />
+                          onCancel={cancelEditing} onSave={() => saveOverride("singles", evt.id)} onFieldChange={(field, value) => setEditData((d) => ({ ...d, [field]: value }))} onCopy={() => copyAsJson(evt, evt.name)} />
                       ))}
                     </div>
                   )}
@@ -618,7 +637,7 @@ const Admin = () => {
                       {filteredContentFitness.map((spot) => (
                         <ContentCardFitness key={spot.id} spot={spot} isEditing={editingId === spot.id} editData={editData}
                           onEdit={() => startEditing(spot.id, { name: spot.name, neighborhood: spot.neighborhood, description: spot.description, source: spot.source, tags: spot.tags.join(", ") })}
-                          onCancel={cancelEditing} onFieldChange={(field, value) => setEditData((d) => ({ ...d, [field]: value }))} onCopy={() => copyAsJson(spot, spot.name)} />
+                          onCancel={cancelEditing} onSave={() => saveOverride("fitness", spot.id)} onFieldChange={(field, value) => setEditData((d) => ({ ...d, [field]: value }))} onCopy={() => copyAsJson(spot, spot.name)} />
                       ))}
                     </div>
                   )}
@@ -628,7 +647,7 @@ const Admin = () => {
                       {filteredContentVolunteer.map((org) => (
                         <ContentCardVolunteer key={org.id} org={org} isEditing={editingId === org.id} editData={editData}
                           onEdit={() => startEditing(org.id, { name: org.name, neighborhood: org.neighborhood, description: org.description, source: org.source, tags: org.tags.join(", ") })}
-                          onCancel={cancelEditing} onFieldChange={(field, value) => setEditData((d) => ({ ...d, [field]: value }))} onCopy={() => copyAsJson(org, org.name)} />
+                          onCancel={cancelEditing} onSave={() => saveOverride("volunteer", org.id)} onFieldChange={(field, value) => setEditData((d) => ({ ...d, [field]: value }))} onCopy={() => copyAsJson(org, org.name)} />
                       ))}
                     </div>
                   )}
@@ -818,6 +837,23 @@ const Admin = () => {
                   <button onClick={() => setShowSettings(!showSettings)} className={`skeuo-btn text-xs ${showSettings ? "bg-accent/20" : ""}`}>
                     <Settings size={12} /> {showSettings ? "Chat" : "Settings"}
                   </button>
+                  <button
+                    onClick={() => {
+                      if (chatMessages.length === 0) return;
+                      const md = chatMessages.map(m => `**${m.role === "user" ? "You" : "AI"}**: ${m.content}`).join("\n\n---\n\n");
+                      const blob = new Blob([md], { type: "text/markdown" });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement("a");
+                      a.href = url;
+                      a.download = `inspire-chat-${new Date().toISOString().slice(0, 10)}.md`;
+                      a.click();
+                      URL.revokeObjectURL(url);
+                    }}
+                    className="skeuo-btn text-xs"
+                    disabled={chatMessages.length === 0}
+                  >
+                    <Copy size={12} /> Export
+                  </button>
                   <button onClick={clearChat} className="skeuo-btn text-xs">
                     <Trash2 size={12} /> Clear
                   </button>
@@ -944,6 +980,7 @@ interface ContentCardProps {
   editData: Record<string, any>;
   onEdit: () => void;
   onCancel: () => void;
+  onSave: () => void;
   onFieldChange: (field: string, value: string) => void;
   onCopy: () => void;
 }
@@ -973,7 +1010,7 @@ const EditableField = ({ label, field, value, editData, isEditing, onChange, mul
   </div>
 );
 
-const ContentCardSingles = ({ event: evt, isEditing, editData, onEdit, onCancel, onFieldChange, onCopy }: ContentCardProps & { event: SinglesEvent }) => {
+const ContentCardSingles = ({ event: evt, isEditing, editData, onEdit, onCancel, onSave, onFieldChange, onCopy }: ContentCardProps & { event: SinglesEvent }) => {
   const [expanded, setExpanded] = useState(false);
   return (
     <div className={`skeuo-card-inset p-4 rounded ${isEditing ? "ring-2 ring-accent/30" : ""}`}>
@@ -994,7 +1031,10 @@ const ContentCardSingles = ({ event: evt, isEditing, editData, onEdit, onCancel,
             <Copy size={12} className="text-muted-foreground" />
           </button>
           {isEditing ? (
-            <button onClick={onCancel} className="p-1.5 hover:bg-muted/30 rounded"><X size={12} className="text-muted-foreground" /></button>
+            <>
+              <button onClick={onSave} className="p-1.5 hover:bg-accent/20 rounded" title="Save"><Save size={12} className="text-accent" /></button>
+              <button onClick={onCancel} className="p-1.5 hover:bg-muted/30 rounded"><X size={12} className="text-muted-foreground" /></button>
+            </>
           ) : (
             <button onClick={onEdit} className="p-1.5 hover:bg-muted/30 rounded"><Edit3 size={12} className="text-accent" /></button>
           )}
@@ -1032,7 +1072,7 @@ const ContentCardSingles = ({ event: evt, isEditing, editData, onEdit, onCancel,
   );
 };
 
-const ContentCardFitness = ({ spot, isEditing, editData, onEdit, onCancel, onFieldChange, onCopy }: ContentCardProps & { spot: FitnessSpot }) => {
+const ContentCardFitness = ({ spot, isEditing, editData, onEdit, onCancel, onSave, onFieldChange, onCopy }: ContentCardProps & { spot: FitnessSpot }) => {
   const [expanded, setExpanded] = useState(false);
   return (
     <div className={`skeuo-card-inset p-4 rounded ${isEditing ? "ring-2 ring-accent/30" : ""}`}>
@@ -1075,7 +1115,7 @@ const ContentCardFitness = ({ spot, isEditing, editData, onEdit, onCancel, onFie
   );
 };
 
-const ContentCardVolunteer = ({ org, isEditing, editData, onEdit, onCancel, onFieldChange, onCopy }: ContentCardProps & { org: VolunteerOrg }) => {
+const ContentCardVolunteer = ({ org, isEditing, editData, onEdit, onCancel, onSave, onFieldChange, onCopy }: ContentCardProps & { org: VolunteerOrg }) => {
   const [expanded, setExpanded] = useState(false);
   return (
     <div className={`skeuo-card-inset p-4 rounded ${isEditing ? "ring-2 ring-accent/30" : ""}`}>
