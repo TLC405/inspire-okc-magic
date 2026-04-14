@@ -627,7 +627,7 @@ const Admin = () => {
                       {filteredContentSingles.map((evt) => (
                         <ContentCardSingles key={evt.id} event={evt} isEditing={editingId === evt.id} editData={editData}
                           onEdit={() => startEditing(evt.id, { name: evt.name, venue: evt.venue, neighborhood: evt.neighborhood, description: evt.description, price: evt.price, frequency: evt.frequency, tags: evt.tags.join(", ") })}
-                          onCancel={cancelEditing} onFieldChange={(field, value) => setEditData((d) => ({ ...d, [field]: value }))} onCopy={() => copyAsJson(evt, evt.name)} />
+                          onCancel={cancelEditing} onSave={() => saveOverride("singles", evt.id)} onFieldChange={(field, value) => setEditData((d) => ({ ...d, [field]: value }))} onCopy={() => copyAsJson(evt, evt.name)} />
                       ))}
                     </div>
                   )}
@@ -637,7 +637,7 @@ const Admin = () => {
                       {filteredContentFitness.map((spot) => (
                         <ContentCardFitness key={spot.id} spot={spot} isEditing={editingId === spot.id} editData={editData}
                           onEdit={() => startEditing(spot.id, { name: spot.name, neighborhood: spot.neighborhood, description: spot.description, source: spot.source, tags: spot.tags.join(", ") })}
-                          onCancel={cancelEditing} onFieldChange={(field, value) => setEditData((d) => ({ ...d, [field]: value }))} onCopy={() => copyAsJson(spot, spot.name)} />
+                          onCancel={cancelEditing} onSave={() => saveOverride("fitness", spot.id)} onFieldChange={(field, value) => setEditData((d) => ({ ...d, [field]: value }))} onCopy={() => copyAsJson(spot, spot.name)} />
                       ))}
                     </div>
                   )}
@@ -647,7 +647,7 @@ const Admin = () => {
                       {filteredContentVolunteer.map((org) => (
                         <ContentCardVolunteer key={org.id} org={org} isEditing={editingId === org.id} editData={editData}
                           onEdit={() => startEditing(org.id, { name: org.name, neighborhood: org.neighborhood, description: org.description, source: org.source, tags: org.tags.join(", ") })}
-                          onCancel={cancelEditing} onFieldChange={(field, value) => setEditData((d) => ({ ...d, [field]: value }))} onCopy={() => copyAsJson(org, org.name)} />
+                          onCancel={cancelEditing} onSave={() => saveOverride("volunteer", org.id)} onFieldChange={(field, value) => setEditData((d) => ({ ...d, [field]: value }))} onCopy={() => copyAsJson(org, org.name)} />
                       ))}
                     </div>
                   )}
