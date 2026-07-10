@@ -239,6 +239,9 @@ async function aiExtractEvents(markdown: string, sourceUrl: string) {
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  const authError = await requireAdmin(req);
+  if (authError) return authError;
+
 
   try {
     const body = await req.json().catch(() => ({}));
