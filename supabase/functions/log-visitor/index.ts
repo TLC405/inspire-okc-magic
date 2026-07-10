@@ -23,7 +23,26 @@ Deno.serve(async (req) => {
                "unknown";
 
     const body = await req.json().catch(() => ({}));
-    const { page_path, referrer } = body;
+    let { page_path, referrer } = body ?? {};
+
+    // Validate page_path: must be a relative URL path (starts with '/'), no control chars, max 512 chars
+    const PATH_RE = /^\/[A-Za-z0-9\-._~!$&'()*+,;=:@%\/?#]*$/;
+    if (typeof page_path !== "string" || page_path.length > 512 || !PATH_RE.test(page_path)) {
+      page_path = null;
+    }
+
+    // Sanitize referrer: must parse as URL, truncate to 512 chars
+    if (typeof referrer === "string" && referrer.length > 0) {
+      try {
+        const u = new URL(referrer);
+        referrer = u.toString().slice(0, 512);
+      } catch {
+        referrer = null;
+      }
+    } else {
+      referrer = null;
+    }
+
 
     // Geo lookup via free API
     let geo: { city?: string; region?: string; country?: string; lat?: number; lon?: number } = {};
