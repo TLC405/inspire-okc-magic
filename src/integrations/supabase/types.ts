@@ -529,6 +529,36 @@ export type Database = {
         }
         Relationships: []
       }
+      listing_overrides: {
+        Row: {
+          created_at: string
+          field_overrides: Json
+          id: string
+          listing_id: string
+          listing_type: string
+          updated_at: string
+          updated_by: string
+        }
+        Insert: {
+          created_at?: string
+          field_overrides?: Json
+          id?: string
+          listing_id: string
+          listing_type: string
+          updated_at?: string
+          updated_by: string
+        }
+        Update: {
+          created_at?: string
+          field_overrides?: Json
+          id?: string
+          listing_id?: string
+          listing_type?: string
+          updated_at?: string
+          updated_by?: string
+        }
+        Relationships: []
+      }
       media_overrides: {
         Row: {
           created_at: string
@@ -909,6 +939,33 @@ export type Database = {
         }
         Relationships: []
       }
+      wire_feed_cache: {
+        Row: {
+          category: string
+          created_at: string
+          expires_at: string
+          generated_at: string
+          headline: string
+          id: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          expires_at?: string
+          generated_at?: string
+          headline: string
+          id?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          expires_at?: string
+          generated_at?: string
+          headline?: string
+          id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -918,6 +975,7 @@ export type Database = {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
       }
+      email_queue_dispatch: { Args: never; Returns: undefined }
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
