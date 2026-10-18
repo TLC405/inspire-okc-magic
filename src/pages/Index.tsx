@@ -12,6 +12,7 @@ import { ArrowRight, Building2, Scale, Leaf, Palette, TrendingUp, Heart, Dumbbel
 import { AtAGlance, MayorsDesk, SportsSidebar } from "@/components/CivicPanels";
 import { ThunderPlayoffBracket } from "@/components/ThunderPlayoffBracket";
 import { CometsSchedule } from "@/components/CometsSchedule";
+import { VitalSigns } from "@/components/VitalSigns";
 import { HeroCarousel } from "@/components/HeroCarousel";
 import { LiveBriefings } from "@/components/LiveBriefings";
 import { supabase } from "@/integrations/supabase/client";
@@ -282,6 +283,7 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0 animate-fade-in">
       <Navbar />
+      <VitalSigns />
 
       <main className="flex-1">
         {/* ═══ Hero Photo Carousel ═══ */}

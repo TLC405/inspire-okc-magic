@@ -1,77 +1,114 @@
+import { useEffect, useState } from "react";
 import { Zap } from "lucide-react";
 
-interface Matchup {
-  seed1: number;
-  team1: string;
-  seed2: number;
-  team2: string;
-  series: string; // e.g. "—" for not started, "2-1" for in progress
-  winner?: 1 | 2;
+interface GameInfo {
+  name: string;
+  date: string;
+  state: "pre" | "in" | "post";
+  detail: string;
+  home: { abbr: string; score?: string };
+  away: { abbr: string; score?: string };
+  broadcast?: string;
 }
 
-const wcFirstRound: Matchup[] = [
-  { seed1: 1, team1: "Thunder", seed2: 8, team2: "Timberwolves", series: "—" },
-  { seed1: 4, team1: "Rockets", seed2: 5, team2: "Lakers", series: "—" },
-  { seed1: 3, team1: "Nuggets", seed2: 6, team2: "Clippers", series: "—" },
-  { seed1: 2, team1: "Grizzlies", seed2: 7, team2: "Warriors", series: "—" },
-];
+const ESPN = "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/okc";
 
-const playoffStart = "April 19";
+function parseEvent(ev: any): GameInfo | null {
+  const comp = ev?.competitions?.[0];
+  if (!comp) return null;
+  const home = comp.competitors?.find((c: any) => c.homeAway === "home");
+  const away = comp.competitors?.find((c: any) => c.homeAway === "away");
+  const score = (c: any) => (typeof c?.score === "object" ? c?.score?.displayValue : c?.score);
+  return {
+    name: ev.shortName ?? ev.name,
+    date: ev.date,
+    state: comp.status?.type?.state ?? "pre",
+    detail: comp.status?.type?.shortDetail ?? "",
+    home: { abbr: home?.team?.abbreviation ?? "", score: score(home) },
+    away: { abbr: away?.team?.abbreviation ?? "", score: score(away) },
+    broadcast: comp.broadcasts?.[0]?.media?.shortName,
+  };
+}
 
+/** Live Thunder Game Center — pulls current record and next/live game from ESPN. */
 export function ThunderPlayoffBracket() {
+  const [record, setRecord] = useState<string>("");
+  const [standing, setStanding] = useState<string>("");
+  const [game, setGame] = useState<GameInfo | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    const load = async () => {
+      try {
+        const ctrl = new AbortController();
+        const t = setTimeout(() => ctrl.abort(), 10000);
+        const res = await fetch(ESPN, { signal: ctrl.signal });
+        clearTimeout(t);
+        const json = await res.json();
+        const team = json?.team;
+        if (!alive) return;
+        setRecord(team?.record?.items?.[0]?.summary ?? "");
+        setStanding(team?.standingSummary ?? "");
+        const next = parseEvent(team?.nextEvent?.[0]);
+        setGame(next);
+        setFailed(false);
+      } catch {
+        if (alive) setFailed(true);
+      }
+    };
+    load();
+    const id = setInterval(load, game?.state === "in" ? 30000 : 300000);
+    return () => { alive = false; clearInterval(id); };
+  }, [game?.state]);
+
+  const when = game
+    ? new Date(game.date).toLocaleString("en-US", { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/Chicago" })
+    : "";
+
   return (
     <div className="skeuo-card p-4 rounded-lg">
-      <div className="flex items-center gap-2 mb-3">
-        <Zap size={14} className="text-[hsl(8,87%,54%)]" />
-        <span className="label-caps text-[hsl(200,100%,50%)] text-[10px] font-bold tracking-widest">
-          2026 NBA Playoffs — Western Conference
-        </span>
+      <div className="flex items-center justify-between gap-2 mb-3">
+        <div className="flex items-center gap-2">
+          <Zap size={14} className="text-primary" />
+          <span className="label-caps text-primary text-[10px] font-bold tracking-widest">Thunder Game Center</span>
+        </div>
+        {game?.state === "in" && (
+          <span className="font-mono text-[8px] font-bold uppercase tracking-widest text-destructive border border-destructive/50 px-1.5 py-0.5">Live</span>
+        )}
       </div>
-      <p className="font-mono text-[8px] text-muted-foreground mb-3 tracking-wider uppercase">
-        First Round · Best of 7 · Begins {playoffStart}
-      </p>
 
-      <div className="space-y-1.5">
-        {wcFirstRound.map((m, i) => (
-          <div key={i} className="border border-foreground/10 rounded overflow-hidden">
-            <div className="grid grid-cols-[1fr_auto] text-[11px]">
-              {/* Team 1 */}
-              <div className={`flex items-center gap-1.5 px-2 py-1.5 ${m.winner === 1 ? "bg-accent/10 font-bold" : ""}`}>
-                <span className="font-mono text-[9px] text-muted-foreground/50 w-3 text-right">{m.seed1}</span>
-                <span className={`text-foreground ${m.team1 === "Thunder" ? "font-bold text-[hsl(200,100%,50%)]" : ""}`}>
-                  {m.team1}
-                </span>
-              </div>
-              <div className="flex items-center px-2 font-mono text-[9px] text-muted-foreground/60 border-l border-foreground/10 bg-muted/20 row-span-2 justify-center w-10">
-                {m.series}
-              </div>
-              {/* Team 2 */}
-              <div className={`flex items-center gap-1.5 px-2 py-1.5 border-t border-foreground/10 ${m.winner === 2 ? "bg-accent/10 font-bold" : ""}`}>
-                <span className="font-mono text-[9px] text-muted-foreground/50 w-3 text-right">{m.seed2}</span>
-                <span className="text-foreground">{m.team2}</span>
-              </div>
+      {failed && !game ? (
+        <p className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">Scoreboard temporarily unavailable</p>
+      ) : !game ? (
+        <p className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">Loading scoreboard...</p>
+      ) : (
+        <>
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center text-center gap-2 py-2 border-y border-foreground/10">
+            <div>
+              <p className="font-black text-lg text-foreground" style={{ fontFamily: "'Playfair Display', serif" }}>{game.away.abbr}</p>
+              {game.state !== "pre" && <p className="font-mono text-xl font-bold text-foreground">{game.away.score}</p>}
+            </div>
+            <span className="font-mono text-[9px] text-muted-foreground uppercase">at</span>
+            <div>
+              <p className="font-black text-lg text-foreground" style={{ fontFamily: "'Playfair Display', serif" }}>{game.home.abbr}</p>
+              {game.state !== "pre" && <p className="font-mono text-xl font-bold text-foreground">{game.home.score}</p>}
             </div>
           </div>
-        ))}
-      </div>
+          <p className="font-mono text-[9px] text-muted-foreground uppercase tracking-wider text-center mt-2">
+            {game.state === "pre" ? `${when} CT` : game.detail}
+            {game.broadcast ? ` · ${game.broadcast}` : ""}
+          </p>
+        </>
+      )}
 
-      <div className="mt-3 pt-2 border-t border-foreground/10">
-        <p className="font-mono text-[8px] text-muted-foreground/50 tracking-wider text-center uppercase">
-          Thunder Up · No. 1 Seed · Home Court Advantage
-        </p>
-      </div>
+      {(record || standing) && (
+        <div className="mt-3 pt-2 border-t border-foreground/10 text-center">
+          <p className="font-mono text-[8px] text-muted-foreground tracking-wider uppercase">
+            {record && `Record ${record}`}{record && standing ? " · " : ""}{standing}
+          </p>
+        </div>
+      )}
     </div>
-  );
-}
-
-/** Compact header teaser for the Navbar */
-export function ThunderPlayoffTeaser() {
-  return (
-    <span className="flex items-center gap-1 font-mono text-[8px] md:text-[9px] tracking-wider uppercase font-bold text-[hsl(200,100%,65%)]">
-      <Zap size={8} className="text-[hsl(8,87%,54%)]" />
-      <span className="hidden sm:inline">Playoffs R1:</span>
-      <span>Thunder vs MIN</span>
-      <span className="text-[hsl(8,87%,54%)] hidden md:inline">· {playoffStart}</span>
-    </span>
   );
 }
