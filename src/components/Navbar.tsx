@@ -80,7 +80,10 @@ export function Navbar() {
     const onScroll = () => {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
-        const nowScrolled = window.scrollY > 80;
+        // Hysteresis: collapse past 160px, expand only near the top, so the
+        // header shrinking can't bounce scroll position back across the threshold.
+        const y = window.scrollY;
+        const nowScrolled = lastScrolled ? y > 10 : y > 160;
         if (nowScrolled !== lastScrolled) {
           lastScrolled = nowScrolled;
           setScrolled(nowScrolled);
