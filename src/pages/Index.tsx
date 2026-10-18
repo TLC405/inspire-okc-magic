@@ -11,7 +11,6 @@ import { cityShowcase } from "@/data/cityShowcase";
 import { ArrowRight, Building2, Scale, Leaf, Palette, TrendingUp, Heart, Dumbbell, HandHelping, Mail, Clock, Sun, Moon, Sunrise, Network, Activity, Shield, Sparkles } from "lucide-react";
 import { AtAGlance, MayorsDesk, SportsSidebar } from "@/components/CivicPanels";
 import { ThunderPlayoffBracket } from "@/components/ThunderPlayoffBracket";
-import { CometsSchedule } from "@/components/CometsSchedule";
 import { VitalSigns } from "@/components/VitalSigns";
 import { HeroCarousel } from "@/components/HeroCarousel";
 import { LiveBriefings } from "@/components/LiveBriefings";
@@ -664,7 +663,6 @@ const Index = () => {
             {/* Civic Panels Sidebar */}
             <div className="lg:col-span-4 space-y-6">
               <ThunderPlayoffBracket />
-              <CometsSchedule />
               <AtAGlance />
               <MayorsDesk />
               <SportsSidebar />
