@@ -112,3 +112,13 @@ export function ThunderPlayoffBracket() {
     </div>
   );
 }
+
+/** Compact menu teaser linking to the live Thunder schedule. */
+export function ThunderPlayoffTeaser() {
+  return (
+    <a href="https://www.nba.com/thunder/schedule" target="_blank" rel="noopener noreferrer"
+      className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-widest text-primary">
+      <Zap size={12} /> Thunder Live Schedule
+    </a>
+  );
+}
