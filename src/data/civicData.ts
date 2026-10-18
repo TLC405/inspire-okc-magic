@@ -70,21 +70,6 @@ export interface DateNightListing {
 
 // ── Wire Ticker Headlines ──────────────────────────
 export const tickerItems: TickerItem[] = [
-  // ── THUNDER ──
-  { tag: "THUNDER WIRE", headline: "SGA drops 36 pts as OKC defeats Denver 118–103, clinches No. 1 seed in the Western Conference — playoffs begin April 19" },
-  { tag: "THUNDER WIRE", headline: "Chet Holmgren records triple-double (18-12-10) in Thunder's dominant win over Sacramento Kings" },
-  { tag: "THUNDER WIRE", headline: "Jalen Williams named to All-Star reserves — third Thunder player selected this season" },
-  { tag: "THUNDER WIRE", headline: "Thunder set franchise record with 67 regular-season wins, surpassing 2012–13 mark" },
-  // ── COMETS ──
-  { tag: "COMET WATCH", headline: "OKC Comets announce 2026 NWSL home schedule — season opener vs. Portland Thorns, May 3 at Taft Stadium, tickets from $18" },
-  { tag: "COMET WATCH", headline: "Comets sign Colombian international midfielder Catalina Usme to two-year deal" },
-  { tag: "COMET WATCH", headline: "Taft Stadium expansion to 12,000 seats approved — construction begins July 2026" },
-  // ── ENERGY FC ──
-  { tag: "ENERGY FC", headline: "OKC Energy FC opens USL Championship season with 3–1 home win over San Antonio" },
-  { tag: "ENERGY FC", headline: "Energy FC academy product signs first professional contract at age 17" },
-  // ── DODGERS ──
-  { tag: "OKC BASEBALL", headline: "Oklahoma City Dodgers 2026 season underway — home games at Chickasaw Bricktown Ballpark through September" },
-  { tag: "OKC BASEBALL", headline: "Dodgers prospect hits for the cycle in 9–2 win over Sugar Land Space Cowboys" },
   // ── CITY HALL ──
   { tag: "CITY HALL", headline: "Mayor Holt signs Broadband Equity Act, directing $12M to connect 28 underserved OKC neighborhoods by 2027" },
   { tag: "CITY HALL", headline: "City Council approves $45M affordable housing bond for five priority corridors" },
